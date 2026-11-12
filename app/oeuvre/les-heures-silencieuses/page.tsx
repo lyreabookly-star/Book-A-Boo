@@ -5,7 +5,7 @@ import { InteriorPage } from "../../components/site-shell";
 export default function Oeuvre() {
   return (
     <InteriorPage
-      active="/bibliotheque"
+      active="/explorer"
       eyebrow="FICHE DE LECTURE · ŒUVRE DE DÉMONSTRATION"
       title={<>Les heures<br /><em>silencieuses.</em></>}
       description="Une histoire sur les mots que l'on tait, les souvenirs qui persistent et les rencontres qui changent doucement une vie."
@@ -36,7 +36,7 @@ export default function Oeuvre() {
           </div>
           <div className="work-actions">
             <Link href="/oeuvre/les-heures-silencieuses/lecture" className="primary-button">Commencer la lecture <ArrowRight size={16} /></Link>
-            <button className="work-icon-button" aria-label="Ajouter à ma bibliothèque"><Bookmark size={17} /></button>
+            <Link href="/inscription" className="work-save-link"><Bookmark size={16}/> Enregistrer</Link>
             <button className="work-icon-button" aria-label="Partager"><Share2 size={17} /></button>
           </div>
           <div className="work-tags"><span>Famille</span><span>Seconde chance</span><span>Secrets</span><span>Émotions</span></div>
