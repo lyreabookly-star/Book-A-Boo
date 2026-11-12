@@ -13,7 +13,7 @@ export default function Home() {
     <main>
       <div className="announcement"><span className="announcement-dot" /> Un nouvel espace pour les histoires qui méritent d’être lues <span className="announcement-arrow">↗</span></div>
       <header className="site-header">
-        <a className="brand" href="#" aria-label="Book-A-Boo accueil"><span className="brand-symbol">b.</span><span>book-a-boo<span className="brand-period">.</span></span></a>
+        <a className="brand" href="#" aria-label="Book-A-Boo accueil"><img className="brand-logo" src="/book-a-boo-logo.svg" alt="Book-A-Boo" /></a>
         <nav className="main-nav"><a className="active" href="#decouvrir">Découvrir</a><a href="#genres">Genres</a><a href="#communaute">Communauté</a></nav>
         <div className="header-actions"><button className="icon-button" aria-label="Rechercher"><Search size={18}/></button><a className="login-link" href="#connexion">Connexion</a><a className="signup-button" href="#inscription">Rejoindre <ArrowRight size={15}/></a></div>
       </header>
@@ -39,7 +39,7 @@ export default function Home() {
 
       <section className="writer-banner" id="ecrire"><div className="writer-icon"><Feather size={24}/></div><div><div className="eyebrow">VOTRE HISTOIRE A SA PLACE ICI</div><h2>Les mondes que vous imaginez<br/><em>méritent d’exister.</em></h2><p>Publiez à votre rythme, construisez votre univers et trouvez vos premiers lecteurs.</p></div><a href="#inscription" className="writer-cta">Commencer à écrire <ArrowRight size={17}/></a><span className="banner-watermark">b.</span></section>
 
-      <footer id="communaute"><a className="brand footer-brand" href="#"><span className="brand-symbol">b.</span><span>book-a-boo<span className="brand-period">.</span></span></a><span>Stories have no limits.</span><div className="footer-links"><a href="#decouvrir">Découvrir</a><a href="#genres">Genres</a><a href="#ecrire">Écrire</a><a href="#connexion">Connexion</a></div><span className="copyright">© 2026 BOOK-A-BOO</span></footer>
+      <footer id="communaute"><a className="brand footer-brand" href="#"><img className="brand-logo" src="/book-a-boo-logo.svg" alt="Book-A-Boo" /></a><span>Stories have no limits.</span><div className="footer-links"><a href="#decouvrir">Découvrir</a><a href="#genres">Genres</a><a href="#ecrire">Écrire</a><a href="#connexion">Connexion</a></div><span className="copyright">© 2026 BOOK-A-BOO</span></footer>
     </main>
   );
 }
