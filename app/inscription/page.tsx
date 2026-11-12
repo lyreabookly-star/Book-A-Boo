@@ -1,3 +1,15 @@
-import Link from "next/link";
 import { InteriorPage } from "../components/site-shell";
-export default function Inscription(){return <InteriorPage active="/profil" eyebrow="REJOINDRE BOOK-A-BOO" title={<>Votre place<br/><em>est ici.</em></>} description="Lecteur, lectrice, auteur ou autrice : chaque voix a sa place."><div className="auth-placeholder"><h2>Les inscriptions arrivent bientôt</h2><p>Nous préparons la création de comptes et la protection de vos données. Cette page ne collecte encore aucune information.</p><Link href="/connexion">Vous avez déjà un compte ? Connexion →</Link></div></InteriorPage>}
+import { AuthForm } from "../components/auth-form";
+
+export default function Inscription() {
+  return (
+    <InteriorPage
+      active="/profil"
+      eyebrow="REJOINDRE BOOK-A-BOO"
+      title={<>Votre place<br /><em>est ici.</em></>}
+      description="Lecteur, lectrice, auteur ou autrice : chaque voix a sa place."
+    >
+      <AuthForm mode="signup" />
+    </InteriorPage>
+  );
+}
