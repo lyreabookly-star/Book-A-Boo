@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { BookOpen, Compass, Feather, House, UserRound, LogIn } from "lucide-react";
+import { Compass, Feather, House, UserRound, LogIn } from "lucide-react";
 
 const items = [
   { href: "/", label: "Accueil", icon: House },
-  { href: "/bibliotheque", label: "Bibliothèque", icon: BookOpen },
   { href: "/explorer", label: "Explorer", icon: Compass },
   { href: "/ecrire", label: "Écrire", icon: Feather },
   { href: "/profil", label: "Profil", icon: UserRound },
@@ -25,5 +24,5 @@ export function SiteHeader({ active = "/" }: { active?: string }) {
 }
 
 export function InteriorPage({ active, eyebrow, title, description, children }: { active: string; eyebrow: string; title: React.ReactNode; description: string; children?: React.ReactNode }) {
-  return <main className="app-page"><SiteHeader active={active}/><section className="interior-hero"><div className="eyebrow"><span className="eyebrow-line"/>{eyebrow}</div><h1>{title}</h1><p>{description}</p></section><section className="interior-content">{children}</section><footer className="app-footer"><Link href="/">Book-A-Boo</Link><span>Chaque histoire ouvre un monde.</span><span>© 2026 BOOK-A-BOO</span></footer></main>;
+  return <main className="app-page"><SiteHeader active={active}/><section className="interior-hero"><div className="eyebrow"><span className="eyebrow-line"/>{eyebrow}</div><h1>{title}</h1><p>{description}</p></section><section className="interior-content">{children}</section><footer className="app-footer"><Link href="/">Book-A-Boo</Link><span>Chaque histoire ouvre un monde.</span></footer></main>;
 }
