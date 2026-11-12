@@ -1,3 +1,15 @@
-import Link from "next/link";
 import { InteriorPage } from "../components/site-shell";
-export default function Connexion(){return <InteriorPage active="/profil" eyebrow="HEUREUX DE VOUS REVOIR" title={<>Retrouvons<br/><em>votre univers.</em></>} description="La connexion permettra de retrouver vos lectures, vos brouillons et votre profil."><div className="auth-placeholder"><h2>Connexion bientôt disponible</h2><p>Nous préparons une authentification sécurisée. Aucun mot de passe ne doit être saisi sur cette version provisoire.</p><Link href="/inscription">Pas encore de compte ? Rejoindre Book-A-Boo →</Link></div></InteriorPage>}
+import { AuthForm } from "../components/auth-form";
+
+export default function Connexion() {
+  return (
+    <InteriorPage
+      active="/profil"
+      eyebrow="HEUREUX DE VOUS REVOIR"
+      title={<>Retrouvons<br /><em>votre univers.</em></>}
+      description="Connectez-vous pour retrouver vos lectures, vos histoires et votre espace personnel."
+    >
+      <AuthForm mode="login" />
+    </InteriorPage>
+  );
+}
