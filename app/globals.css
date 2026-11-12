@@ -5,3 +5,56 @@
 @media(max-width:620px){.announcement{font-size:8px;padding:0 8px}.site-header{height:65px}.brand{font-size:17px}.main-nav{display:none}.header-actions{gap:12px}.icon-button{display:none}.login-link{font-size:10px}.signup-button{padding:11px 12px;font-size:10px}.hero{grid-template-columns:1fr;padding:52px 7% 48px;gap:35px}.hero h1{font-size:61px}.hero-description{font-size:13px}.hero-note{margin-top:28px}.hero-art{height:315px;max-width:100%}.book{width:140px;height:205px}.book-front .cover-title{font-size:21px}.genre-strip{padding:18px 7%;display:block}.strip-label{margin-bottom:15px}.genre-list{justify-content:flex-start;gap:14px 20px}.genre-list a{font-size:10px}.all-genres{margin-top:17px}.library-section{padding:61px 7%}.section-heading{display:block}.section-heading h2{font-size:37px}.text-link{margin-top:19px}.book-grid{grid-template-columns:1fr;gap:33px}.cover{height:300px}.cover-title{font-size:31px}.story-card p{font-size:12px}.library-foot{display:block;line-height:1.7}.library-foot a{margin-top:12px}.writer-banner{margin:0 5% 45px;padding:27px 7%;display:grid;grid-template-columns:48px 1fr;gap:14px}.writer-icon{width:46px;height:46px}.writer-banner h2{font-size:25px}.writer-banner p{line-height:1.7}.writer-cta{grid-column:2;margin:7px 0 0;width:max-content}.banner-watermark{right:-10px}footer{padding:25px 7%;display:grid;grid-template-columns:1fr 1fr;gap:14px}footer>span:nth-child(2){text-align:right}.footer-links{grid-column:1/-1;grid-row:2;margin:5px 0;flex-wrap:wrap}.copyright{grid-column:1/-1}}
 
 .brand-logo{display:block;width:164px;height:auto;max-height:44px;object-fit:contain;object-position:left center}.footer-brand .brand-logo{width:150px}@media(max-width:620px){.brand-logo{width:132px;max-height:38px}.footer-brand .brand-logo{width:130px}}
+
+/* Navigation et pages principales — étape 1 */
+.site-header-app .brand-logo{width:164px;max-height:48px}
+.site-header-app .login-link{display:flex;align-items:center;gap:7px}
+.mobile-nav{display:none}
+.interior-hero{max-width:1120px;margin:0 auto;padding:76px 7% 48px}
+.interior-hero h1{font-size:clamp(48px,6vw,76px);line-height:1.06;margin:22px 0 16px}
+.interior-hero>p{max-width:610px;color:var(--muted);font-size:15px;line-height:1.8}
+.interior-content{max-width:1120px;margin:0 auto;padding:0 7% 90px;min-height:340px}
+.empty-state,.auth-placeholder,.notice-panel{background:#ece8df;padding:38px;max-width:760px}
+.empty-mark{font:italic 54px var(--serif);color:#b4a99a}
+.empty-state h2,.auth-placeholder h2{font:32px var(--serif);font-weight:500;margin:12px 0}
+.empty-state p,.auth-placeholder p,.notice-panel p{color:var(--muted);font-size:13px;line-height:1.8;max-width:580px}
+.empty-state .primary-button{margin-top:12px}
+.genre-page-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.genre-tile{display:flex;align-items:center;gap:15px;padding:22px;border:1px solid var(--line);min-height:86px;background:#fbfaf7}
+.genre-tile span{font:italic 13px var(--serif);color:var(--accent)}
+.genre-tile strong{font:20px var(--serif);font-weight:500}
+.genre-tile b{margin-left:auto;color:var(--accent)}
+.small-note{font-size:11px;color:var(--muted);margin-top:20px}
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.feature-panel{border:1px solid var(--line);padding:25px;background:#fbfaf7}
+.feature-panel svg{color:var(--accent);width:23px;height:23px}
+.feature-panel h2{font:22px var(--serif);font-weight:500;margin:19px 0 8px}
+.feature-panel p{font-size:12px;line-height:1.7;color:var(--muted);margin:0}
+.notice-panel{margin-top:18px;background:#f0ede6}
+.notice-panel strong{font:20px var(--serif);font-weight:500}
+.notice-panel a,.auth-placeholder a{font-size:12px;font-weight:700;color:var(--accent)}
+.auth-placeholder{margin-top:10px}
+.app-footer{border-top:1px solid var(--line);padding:25px 7%;display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:10px}
+.app-footer a{font-weight:700;color:var(--ink)}
+@media(max-width:620px){
+ .site-header-app{height:66px;padding:0 6%}
+ .site-header-app .brand-logo{width:130px;max-height:40px}
+ .site-header-app .main-nav{display:none}
+ .site-header-app .header-actions{gap:10px}
+ .site-header-app .login-link{font-size:10px}
+ .site-header-app .login-link svg{display:none}
+ .site-header-app .signup-button{padding:10px 11px}
+ .mobile-nav{position:fixed;z-index:50;left:0;right:0;bottom:0;display:flex;justify-content:space-around;align-items:center;background:#fbfaf7;border-top:1px solid var(--line);padding:8px 3px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -5px 20px #20201e0b}
+ .mobile-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:54px;color:#817e75;font-size:9px}
+ .mobile-nav a.active{color:var(--accent);font-weight:700}
+ .interior-hero{padding:49px 7% 28px}
+ .interior-hero h1{font-size:49px}
+ .interior-hero>p{font-size:13px}
+ .interior-content{padding:0 7% 100px}
+ .genre-page-grid{grid-template-columns:1fr 1fr;gap:9px}
+ .genre-tile{padding:16px 12px;gap:9px;min-height:75px}
+ .genre-tile strong{font-size:16px}
+ .feature-grid{grid-template-columns:1fr}
+ .empty-state,.auth-placeholder,.notice-panel{padding:25px}
+ .app-footer{padding:22px 7% 90px;flex-wrap:wrap}
+}
