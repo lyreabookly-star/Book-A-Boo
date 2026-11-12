@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
@@ -42,6 +43,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           email: email.trim(),
           password,
           options: {
+            emailRedirectTo: window.location.origin + "/connexion",
             data: {
               username: cleanUsername,
               display_name: displayName.trim() || cleanUsername,
