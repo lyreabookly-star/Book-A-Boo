@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, Camera, Heart, LockKeyhole, Settings2, UserRound, Users } from "lucide-react";
+import { BookOpen, Camera, Heart, LockKeyhole, Settings2, UserRound, Users, Bookmark } from "lucide-react";
 import { InteriorPage } from "../components/site-shell";
 
 export default function Profil() {
@@ -8,7 +8,7 @@ export default function Profil() {
       active="/profil"
       eyebrow="VOTRE ESPACE PERSONNEL"
       title={<>Votre profil,<br /><em>votre univers.</em></>}
-      description="Un espace à votre image, pour présenter votre identité littéraire, retrouver vos lectures et partager vos histoires."
+      description="Un espace à votre image, pour présenter votre identité littéraire, vos histoires et les lectures que vous choisissez de partager."
     >
       <div className="profile-preview">
         <div className="profile-preview-top">
@@ -24,17 +24,17 @@ export default function Profil() {
             <div className="profile-counts"><span><strong>0</strong> histoires</span><span><strong>0</strong> abonnés</span><span><strong>0</strong> abonnements</span></div>
           </div>
         </div>
-        <div className="profile-tabs"><span className="selected"><BookOpen size={15}/> Publications</span><span><Heart size={15}/> Bibliothèque</span><span><Users size={15}/> Abonnements</span></div>
-        <div className="profile-empty"><BookOpen size={24} /><strong>Votre univers littéraire prendra vie ici.</strong><p>Vos histoires publiées et vos lectures apparaîtront dans cet espace.</p></div>
+        <div className="profile-tabs"><span className="selected"><BookOpen size={15}/> Publications</span><Link href="/bibliotheque"><Bookmark size={15}/> Bibliothèque</Link><span><Users size={15}/> Abonnements</span></div>
+        <div className="profile-empty"><BookOpen size={24} /><strong>Votre univers littéraire prendra vie ici.</strong><p>Vos histoires publiées apparaîtront ici. Votre bibliothèque sera consultable par les visiteurs si vous choisissez de la rendre publique.</p><Link href="/bibliotheque">Voir ma bibliothèque →</Link></div>
       </div>
 
       <div className="profile-details-grid">
         <article className="profile-detail"><span className="profile-detail-icon"><UserRound size={18}/></span><div><h3>Votre identité</h3><p>Prénom et nom pour votre compte, pseudonyme unique pour être reconnu dans la communauté.</p></div></article>
         <article className="profile-detail"><span className="profile-detail-icon"><Camera size={18}/></span><div><h3>Votre image</h3><p>Choisissez une photo dans la galerie de votre téléphone ou utilisez un avatar de la collection gratuite.</p></div></article>
-        <article className="profile-detail"><span className="profile-detail-icon"><Settings2 size={18}/></span><div><h3>À votre rythme</h3><p>Modifiez votre photo, votre biographie et vos informations quand vous le souhaitez.</p></div></article>
+        <article className="profile-detail"><span className="profile-detail-icon"><Settings2 size={18}/></span><div><h3>Votre espace</h3><p>Choisissez les lectures que vous souhaitez partager publiquement et gardez le reste privé.</p></div></article>
       </div>
 
-      <div className="notice-panel profile-notice"><strong>Votre espace est en préparation.</strong><p>La création de compte, l’édition du profil et l’envoi de photo seront activés avec Supabase. Cette page de présentation ne collecte aucune donnée pour le moment.</p><Link href="/inscription">Découvrir l’inscription →</Link></div>
+      <div className="notice-panel profile-notice"><strong>Votre espace est en préparation.</strong><p>La création de compte, l’édition du profil, la bibliothèque personnelle et ses réglages de visibilité seront activés avec Supabase. Cette page ne collecte aucune donnée pour le moment.</p><Link href="/inscription">Découvrir l’inscription →</Link></div>
     </InteriorPage>
   );
 }
