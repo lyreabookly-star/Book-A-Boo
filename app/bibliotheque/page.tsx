@@ -1,0 +1,3 @@
+import Link from "next/link";
+import { InteriorPage } from "../components/site-shell";
+export default function Bibliotheque(){return <InteriorPage active="/bibliotheque" eyebrow="LE CATALOGUE BOOK-A-BOO" title={<>La bibliothèque<br/><em>des possibles.</em></>} description="Retrouvez les œuvres publiées, explorez les univers et gardez une trace de vos prochaines lectures."><div className="empty-state"><div className="empty-mark">01</div><h2>Les rayons prennent forme.</h2><p>Le catalogue sera alimenté par les histoires publiées sur Book-A-Boo. Les œuvres d’exemple de la page d’accueil ne sont pas des publications réelles.</p><Link className="primary-button" href="/explorer">Explorer les genres →</Link></div></InteriorPage>}
