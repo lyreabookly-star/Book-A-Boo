@@ -1,0 +1,4 @@
+import Link from "next/link";
+import { InteriorPage } from "../components/site-shell";
+const genres=["Romance","Fantasy","Drame","Thriller","Psychologie","Fanfiction","Poésie","Science-fiction","Horreur","Historique","Littérature générale"];
+export default function Explorer(){return <InteriorPage active="/explorer" eyebrow="TROUVER VOTRE PROCHAINE LECTURE" title={<>Explorer<br/><em>de nouveaux mondes.</em></>} description="Parcourez les genres et laissez-vous guider vers votre prochaine histoire."><div className="genre-page-grid">{genres.map((g,i)=><Link href="/bibliotheque" className="genre-tile" key={g}><span>0{i+1}</span><strong>{g}</strong><b>↗</b></Link>)}</div><p className="small-note">Les filtres et recommandations seront activés lorsque le catalogue sera connecté à la base de données.</p></InteriorPage>}
