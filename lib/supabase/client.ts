@@ -11,11 +11,11 @@ let browserClient: ReturnType<typeof createSupabaseClient> | null = null;
  */
 export function getSupabaseBrowserClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
   if (!url || !publishableKey) {
     throw new Error(
-      "La connexion Supabase de Book-A-Boo n'est pas configurée. Vérifiez les variables NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY."
+      "La connexion Supabase de Book-A-Boo n'est pas configurée. Vérifiez NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY."
     );
   }
 
