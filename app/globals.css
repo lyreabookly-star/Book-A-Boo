@@ -411,7 +411,7 @@ html[data-theme="dark"] .settings-choice-buttons button.chosen,html[data-theme="
 html[data-theme="dark"] .settings-danger{background:#a64e42}
 html[data-theme="dark"] .settings-feedback{background:#34372f;color:#e4e8df}
 html[data-theme="dark"] .app-footer,html[data-theme="dark"] footer{color:#aaa69c}
-html[data-theme="dark"] .brand-logo{filter:brightness(1.12)}
+html[data-theme="dark"] .brand-logo{filter:brightness(0) invert(1)!important;opacity:1!important;mix-blend-mode:normal}
 html[data-theme="dark"] .settings-avatar-preview{background:#3b3d36}
 .settings-avatar-upload{display:flex;align-items:center;gap:17px;padding:16px;border:1px solid var(--line);background:rgba(127,127,127,.035)}
 .settings-avatar-preview{width:82px;height:82px;flex:0 0 82px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:#eee9e1;color:var(--accent);font:italic 36px var(--serif)}
