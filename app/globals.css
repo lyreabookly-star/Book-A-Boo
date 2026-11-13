@@ -423,3 +423,13 @@ html[data-theme="dark"] .settings-avatar-preview{background:#3b3d36}
 .settings-avatar-copy .settings-save{margin-top:3px}
 .profile-account-avatar{width:88px;height:88px;object-fit:cover;border-radius:50%;display:block;margin:0 0 17px;border:2px solid var(--line)}
 @media(max-width:620px){.settings-avatar-upload{align-items:flex-start}.settings-avatar-preview{width:68px;height:68px;flex-basis:68px}.settings-avatar-copy{width:100%}}
+
+/* Compléments de contraste pour les zones éditoriales et de lecture */
+html[data-theme="dark"] .hero-art,html[data-theme="dark"] .reading-page,html[data-theme="dark"] .reading-demo-note,html[data-theme="dark"] .reading-progress,html[data-theme="dark"] .work-icon-button,html[data-theme="dark"] .work-tags span,html[data-theme="dark"] .catalogue-search,html[data-theme="dark"] .writer-project-row,html[data-theme="dark"] .settings-avatar-upload{background:#292b27;color:#eeeae2}
+html[data-theme="dark"] .reading-toolbar,html[data-theme="dark"] .reading-bottom,html[data-theme="dark"] .writer-editor-top,html[data-theme="dark"] .writer-work-title,html[data-theme="dark"] .writer-save-row,html[data-theme="dark"] .personal-library-intro{color:#d7d2c8;border-color:#454840}
+html[data-theme="dark"] .reading-body,html[data-theme="dark"] .reading-body p,html[data-theme="dark"] .reading-body>p,html[data-theme="dark"] .writer-manuscript,html[data-theme="dark"] .writer-chapter-title,html[data-theme="dark"] .writer-work-title input{color:#e8e3d9}
+html[data-theme="dark"] .reading-demo-note,html[data-theme="dark"] .personal-library-note,html[data-theme="dark"] .explore-note,html[data-theme="dark"] .writer-security-note{color:#d0ccc2}
+html[data-theme="dark"] .reading-toolbar button,html[data-theme="dark"] .reading-bottom button,html[data-theme="dark"] .reading-bottom a,html[data-theme="dark"] .work-save-link{color:#e8e3d9}
+html[data-theme="dark"] .auth-form input::placeholder,html[data-theme="dark"] .writer-create-form input::placeholder,html[data-theme="dark"] .writer-create-form textarea::placeholder{color:#9d9a91}
+html[data-theme="dark"] .profile-account-status{color:#a8c39d}
+html[data-theme="dark"] .story-meta span:last-child,html[data-theme="dark"] .profile-account-handle{color:#e0a28e}
