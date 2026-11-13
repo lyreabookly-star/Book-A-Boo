@@ -29,7 +29,10 @@ export function ProfileAccount() {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         if (userError) throw userError;
         if (!user) {
-          if (active) setLoading(false);
+          if (active) {
+            setEmail("");
+            setProfile(null);
+          }
           return;
         }
         const { data, error: profileError } = await supabase
@@ -54,9 +57,28 @@ export function ProfileAccount() {
       if (!session) {
         setEmail("");
         setProfile(null);
-      } else {
-        setEmail(session.user.email ?? "");
+        return;
       }
+      setLoading(true);
+      void supabase
+        .from("profiles")
+        .select("username, display_name, bio, avatar_url, is_public, show_library_on_profile")
+        .eq("id", session.user.id)
+        .maybeSingle()
+        .then(({ data, error: profileError }) => {
+          if (!active) return;
+          if (profileError) {
+            setError(profileError.message);
+            setProfile(null);
+          } else {
+            setError("");
+            setProfile(data);
+            setEmail(session.user.email ?? "");
+          }
+        })
+        .finally(() => {
+          if (active) setLoading(false);
+        });
     });
     return () => {
       active = false;
@@ -91,7 +113,8 @@ export function ProfileAccount() {
       <div className="profile-account-top"><span className="profile-account-mark">b.</span><span className="profile-account-status">SESSION ACTIVE</span></div>
       <span className="auth-form-kicker">VOTRE COMPTE BOOK-A-BOO</span>
       <h2>{profile?.display_name || profile?.username || "Votre profil"}</h2>
-      {profile?.avatar_url && <img className="profile-account-avatar" src={profile.avatar_url} alt="Photo de profil" />}\n      {profile?.username && <p className="profile-account-handle">@{profile.username}</p>}
+      {profile?.avatar_url && <img className="profile-account-avatar" src={profile.avatar_url} alt="Photo de profil" />}
+      {profile?.username && <p className="profile-account-handle">@{profile.username}</p>}
       <p className="profile-account-email">{email}</p>
       {profile?.bio && <p>{profile.bio}</p>}
       {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
