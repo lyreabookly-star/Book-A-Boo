@@ -17,6 +17,7 @@ type HeaderProfile = { id: string; avatarUrl: string | null; displayName: string
 
 export function SiteHeader({ active = "/", hideGuestActions = false }: { active?: string; hideGuestActions?: boolean }) {
   const [profile, setProfile] = useState<HeaderProfile | null>(null);
+  const [canManageEditorial, setCanManageEditorial] = useState(false);
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
@@ -25,21 +26,25 @@ export function SiteHeader({ active = "/", hideGuestActions = false }: { active?
 
     async function syncProfile(userId: string | null) {
       if (!userId) {
-        if (alive) setProfile(null);
+        if (alive) {
+          setProfile(null);
+          setCanManageEditorial(false);
+        }
         return;
       }
-      const { data } = await supabase
-        .from("profiles")
-        .select("avatar_url, display_name")
-        .eq("id", userId)
-        .maybeSingle();
-      const profileData = data as { avatar_url?: string | null; display_name?: string | null } | null;
+      const [{ data: profileData }, { data: membership }] = await Promise.all([
+        supabase.from("profiles").select("avatar_url, display_name").eq("id", userId).maybeSingle(),
+        supabase.from("editorial_members").select("can_manage").eq("user_id", userId).eq("can_manage", true).maybeSingle(),
+      ]);
+      const profileRecord = profileData as { avatar_url?: string | null; display_name?: string | null } | null;
+      const membershipRecord = membership as { can_manage?: boolean } | null;
       if (alive) {
         setProfile({
           id: userId,
-          avatarUrl: profileData?.avatar_url ?? null,
-          displayName: profileData?.display_name ?? null,
+          avatarUrl: profileRecord?.avatar_url ?? null,
+          displayName: profileRecord?.display_name ?? null,
         });
+        setCanManageEditorial(membershipRecord?.can_manage === true);
       }
     }
 
@@ -62,11 +67,15 @@ export function SiteHeader({ active = "/", hideGuestActions = false }: { active?
     };
   }, []);
 
+  const visibleItems = canManageEditorial
+    ? [...items, { href: "/redaction", label: "Rédaction", icon: Feather }]
+    : items;
+
   return <>
     <header className="site-header site-header-app">
       <Link className="brand" href="/" aria-label="Book-A-Boo accueil"><img className="brand-logo" src="/book-a-boo-logo.svg" alt="Book-A-Boo" /></Link>
       <nav className="main-nav" aria-label="Navigation principale">
-        {items.map(item => <Link key={item.href} className={active === item.href ? "active" : ""} href={item.href}>{item.label}</Link>)}
+        {visibleItems.map(item => <Link key={item.href} className={active === item.href ? "active" : ""} href={item.href}>{item.label}</Link>)}
       </nav>
       <div className="header-actions">
         {authReady && profile ? (
@@ -82,7 +91,7 @@ export function SiteHeader({ active = "/", hideGuestActions = false }: { active?
       </div>
     </header>
     <nav className="mobile-nav" aria-label="Navigation mobile">
-      {items.map(item => { const Icon = item.icon; return <Link key={item.href} href={item.href} className={active === item.href ? "active" : ""}><Icon size={19}/><span>{item.label}</span></Link>; })}
+      {visibleItems.map(item => { const Icon = item.icon; return <Link key={item.href} href={item.href} className={active === item.href ? "active" : ""}><Icon size={19}/><span>{item.label}</span></Link>; })}
     </nav>
   </>;
 }
