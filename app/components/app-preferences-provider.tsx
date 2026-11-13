@@ -70,7 +70,6 @@ const dictionary: Record<string, Record<Locale, string>> = {
   "Explorer les histoires": { fr:"Explorer les histoires", en:"Explore stories", es:"Explorar historias", pt:"Explorar histórias" },
   "Je veux écrire": { fr:"Je veux écrire", en:"I want to write", es:"Quiero escribir", pt:"Quero escrever" },
   "Des histoires qui vous ressemblent. Des univers qui vous emportent. Un lieu pour lire, écrire et faire voyager les mots.": { fr:"Des histoires qui vous ressemblent. Des univers qui vous emportent. Un lieu pour lire, écrire et faire voyager les mots.", en:"Stories that speak to you. Worlds that sweep you away. A place to read, write, and let words travel.", es:"Historias que hablan de ti. Mundos que te llevan lejos. Un lugar para leer, escribir y dejar volar las palabras.", pt:"Histórias que combinam com você. Mundos que encantam. Um lugar para ler, escrever e deixar as palavras viajarem." },
-  "À LA UNE": { fr:"À LA UNE", en:"FEATURED", es:"DESTACADOS", pt:"EM DESTAQUE" },
   "Découvrir les œuvres": { fr:"Découvrir les œuvres", en:"Discover stories", es:"Descubrir obras", pt:"Descobrir obras" },
   "Chaque histoire ouvre un monde.": { fr:"Chaque histoire ouvre un monde.", en:"Every story opens a world.", es:"Cada historia abre un mundo.", pt:"Cada história abre um mundo." },
   "Commencer à écrire": { fr:"Commencer à écrire", en:"Start writing", es:"Empezar a escribir", pt:"Começar a escrever" },
