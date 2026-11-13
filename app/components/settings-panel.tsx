@@ -81,6 +81,11 @@ export function SettingsPanel() {
     }
   }
   const [settings, setSettings] = useState<Settings>(defaults);
+  const filePickerLabel = locale === "en" ? "Choose a file" : locale === "es" ? "Elegir archivo" : locale === "pt" ? "Escolher arquivo" : "Choisir un fichier";
+  const noFileSelected = locale === "en" ? "No file selected" : locale === "es" ? "Ningún archivo seleccionado" : locale === "pt" ? "Nenhum arquivo selecionado" : "Aucun fichier choisi";
+  const passwordPlaceholder = locale === "en" ? "At least 8 characters" : locale === "es" ? "Mínimo 8 caracteres" : locale === "pt" ? "Pelo menos 8 caracteres" : "8 caractères minimum";
+  const currentEmailLabel = locale === "en" ? "Current address: " : locale === "es" ? "Dirección actual: " : locale === "pt" ? "Endereço atual: " : "Adresse actuelle : ";
+  const emailConfirmationNote = locale === "en" ? ". A confirmation will be required for any change." : locale === "es" ? ". Se solicitará una confirmación para cualquier cambio." : locale === "pt" ? ". Será necessária uma confirmação para qualquer alteração." : ". Une confirmation sera demandée pour tout changement.";
 
   useEffect(() => {
     let active = true;
@@ -211,7 +216,7 @@ export function SettingsPanel() {
       <form className="settings-form" onSubmit={event => { event.preventDefault(); void saveProfile(); }}>
         <div className="settings-avatar-upload settings-full">
           <div className="settings-avatar-preview">{(avatarPreviewUrl || avatarUrl) ? <img src={avatarPreviewUrl || avatarUrl || ""} alt="Aperçu de la photo de profil" style={{ objectPosition: `${avatarPositionX}% ${avatarPositionY}%`, transform: `scale(${avatarZoom})` }} /> : <span>{displayName.trim().charAt(0).toUpperCase() || username.charAt(0).toUpperCase() || "b."}</span>}</div>
-          <div className="settings-avatar-copy"><strong>Photo de profil</strong><small>Choisissez une image JPG, PNG ou WebP · 5 Mo maximum. Vous pourrez ensuite ajuster le cadrage.</small><div className="settings-file-picker"><label className="settings-file-button" htmlFor="bab-avatar-file">{locale === "en" ? "Choose a file" : locale === "es" ? "Elegir archivo" : locale === "pt" ? "Escolher arquivo" : "Choisir un fichier"}</label><span>{avatarFile ? avatarFile.name : locale === "en" ? "No file selected" : locale === "es" ? "Ningún archivo seleccionado" : locale === "pt" ? "Nenhum arquivo selecionado" : "Aucun fichier choisi"}</span><input id="bab-avatar-file" type="file" accept="image/jpeg,image/png,image/webp" onChange={e => selectAvatar(e.target.files?.[0] ?? null)} /></div></div>
+          <div className="settings-avatar-copy"><strong>Photo de profil</strong><small>Choisissez une image JPG, PNG ou WebP · 5 Mo maximum. Vous pourrez ensuite ajuster le cadrage.</small><div className="settings-file-picker"><label className="settings-file-button" htmlFor="bab-avatar-file">{filePickerLabel}</label><span>{avatarFile ? avatarFile.name : noFileSelected}</span><input id="bab-avatar-file" type="file" accept="image/jpeg,image/png,image/webp" onChange={e => selectAvatar(e.target.files?.[0] ?? null)} /></div></div>
           {avatarPreviewUrl && <div className="avatar-crop-controls settings-full">
             <div className="avatar-crop-stage"><img src={avatarPreviewUrl} alt="Aperçu du cadrage" style={{ objectPosition: `${avatarPositionX}% ${avatarPositionY}%`, transform: `scale(${avatarZoom})` }} /></div>
             <div className="avatar-crop-sliders">
@@ -233,9 +238,9 @@ export function SettingsPanel() {
       </form>
     </section>
     <section className="settings-section">
-      <div className="settings-section-heading"><span>02 / CONNEXION</span><h2>Adresse e-mail</h2><p>Adresse actuelle : <strong>{email}</strong>. Une confirmation sera demandée pour tout changement.</p></div>
+      <div className="settings-section-heading"><span>02 / CONNEXION</span><h2>Adresse e-mail</h2><p>{currentEmailLabel}<strong>{email}</strong>{emailConfirmationNote}</p></div>
       <form className="settings-inline-form" onSubmit={updateEmail}><label>Nouvelle adresse e-mail<input type="email" value={newEmail} onChange={e=>setNewEmail(e.target.value)} required/></label><button className="settings-save" disabled={saving || newEmail.trim()===email}>Modifier l'adresse</button></form>
-      <form className="settings-inline-form" onSubmit={updatePassword}><label>Nouveau mot de passe<input type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} minLength={8} placeholder="8 caractères minimum" required/></label><button className="settings-save" disabled={saving || newPassword.length<8}>Changer le mot de passe</button></form>
+      <form className="settings-inline-form" onSubmit={updatePassword}><label>Nouveau mot de passe<input type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} minLength={8} placeholder={passwordPlaceholder} required/></label><button className="settings-save" disabled={saving || newPassword.length<8}>Changer le mot de passe</button></form>
     </section>
     <section className="settings-section">
       <div className="settings-section-heading"><span>03 / EXPÉRIENCE</span><h2>Apparence et langue</h2><p>Choisissez vos préférences de lecture et de navigation.</p></div>
