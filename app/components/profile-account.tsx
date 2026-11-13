@@ -89,7 +89,7 @@ export function ProfileAccount() {
       <div className="profile-account-top"><span className="profile-account-mark">b.</span><span className="profile-account-status">SESSION ACTIVE</span></div>
       <span className="auth-form-kicker">VOTRE COMPTE BOOK-A-BOO</span>
       <h2>{profile?.display_name || profile?.username || "Votre profil"}</h2>
-      {profile?.username && <p className="profile-account-handle">@{profile.username}</p>}
+      {profile?.avatar_url && <img className="profile-account-avatar" src={profile.avatar_url} alt="Photo de profil" />}\n      {profile?.username && <p className="profile-account-handle">@{profile.username}</p>}
       <p className="profile-account-email">{email}</p>
       {profile?.bio && <p>{profile.bio}</p>}
       {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
