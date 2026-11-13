@@ -203,6 +203,9 @@ const dictionary: Record<string, Record<Locale, string>> = {
 
   // Paramètres — traductions complètes
   "Vos réglages, vos choix": { fr:"Vos réglages, vos choix", en:"Your settings, your choices", es:"Tus ajustes, tus elecciones", pt:"Suas configurações, suas escolhas" },
+  "Vos réglages,": { fr:"Vos réglages,", en:"Your settings,", es:"Tus ajustes,", pt:"Suas configurações," },
+  "vos choix.": { fr:"vos choix.", en:"your choices.", es:"tus elecciones.", pt:"suas escolhas." },
+  "← Retour au profil": { fr:"← Retour au profil", en:"← Back to profile", es:"← Volver al perfil", pt:"← Voltar ao perfil" },
   "01 / IDENTITÉ": { fr:"01 / IDENTITÉ", en:"01 / IDENTITY", es:"01 / IDENTIDAD", pt:"01 / IDENTIDADE" },
   "Photo de profil": { fr:"Photo de profil", en:"Profile photo", es:"Foto de perfil", pt:"Foto de perfil" },
   "Choisissez une image JPG, PNG ou WebP · 5 Mo maximum. Vous pourrez ensuite ajuster le cadrage.": { fr:"Choisissez une image JPG, PNG ou WebP · 5 Mo maximum. Vous pourrez ensuite ajuster le cadrage.", en:"Choose a JPG, PNG, or WebP image · 5 MB maximum. You can adjust the crop afterward.", es:"Elige una imagen JPG, PNG o WebP · máximo 5 MB. Después podrás ajustar el recorte.", pt:"Escolha uma imagem JPG, PNG ou WebP · máximo de 5 MB. Depois, você poderá ajustar o enquadramento." },
