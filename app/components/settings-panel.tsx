@@ -4,12 +4,14 @@ import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
+import { useAppPreferences } from "./app-preferences-provider";
 
 type Settings = { theme: "light" | "dark"; preferred_language: "fr" | "en" | "es" | "pt"; email_notifications: boolean; product_updates: boolean };
 const defaults: Settings = { theme: "light", preferred_language: "fr", email_notifications: true, product_updates: false };
 
 export function SettingsPanel() {
   const router = useRouter();
+  const { setLocale, setTheme } = useAppPreferences();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -25,6 +27,9 @@ export function SettingsPanel() {
   const [newPassword, setNewPassword] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [showLibrary, setShowLibrary] = useState(true);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarSaving, setAvatarSaving] = useState(false);
   const [settings, setSettings] = useState<Settings>(defaults);
 
   useEffect(() => {
@@ -34,7 +39,7 @@ export function SettingsPanel() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.replace("/connexion?next=%2Fparametres"); return; }
       const [profile, privateProfile, prefs] = await Promise.all([
-        supabase.from("profiles").select("username,display_name,bio,is_public,show_library_on_profile,preferred_language").eq("id", user.id).maybeSingle(),
+        supabase.from("profiles").select("username,display_name,bio,avatar_url,is_public,show_library_on_profile,preferred_language").eq("id", user.id).maybeSingle(),
         supabase.from("profile_private").select("first_name,last_name").eq("user_id", user.id).maybeSingle(),
         supabase.from("user_settings").select("theme,preferred_language,email_notifications,product_updates").eq("user_id", user.id).maybeSingle()
       ]);
@@ -44,11 +49,15 @@ export function SettingsPanel() {
       setUsername(profile.data?.username ?? "");
       setDisplayName(profile.data?.display_name ?? "");
       setBio(profile.data?.bio ?? "");
+      setAvatarUrl(profile.data?.avatar_url ?? null);
       setIsPublic(profile.data?.is_public ?? true);
       setShowLibrary(profile.data?.show_library_on_profile ?? true);
       setFirstName(privateProfile.data?.first_name ?? "");
       setLastName(privateProfile.data?.last_name ?? "");
-      setSettings({ ...defaults, ...(prefs.data ?? {}), preferred_language: prefs.data?.preferred_language ?? profile.data?.preferred_language ?? "fr" });
+      const loadedSettings = { ...defaults, ...(prefs.data ?? {}), preferred_language: prefs.data?.preferred_language ?? profile.data?.preferred_language ?? "fr" } as Settings;
+      setSettings(loadedSettings);
+      setLocale(loadedSettings.preferred_language);
+      setTheme(loadedSettings.theme);
       setLoading(false);
     }
     void load();
@@ -61,6 +70,28 @@ export function SettingsPanel() {
 
   function update<K extends keyof Settings>(key: K, value: Settings[K]) {
     setSettings(current => ({ ...current, [key]: value }));
+    if (key === "theme") setTheme(value as Settings["theme"]);
+    if (key === "preferred_language") setLocale(value as Settings["preferred_language"]);
+  }
+
+  async function uploadAvatar() {
+    if (!avatarFile || !userId) return;
+    setAvatarSaving(true); setError(""); setMessage("");
+    try {
+      if (!["image/jpeg","image/png","image/webp"].includes(avatarFile.type)) throw new Error("Choisissez une image JPG, PNG ou WebP.");
+      if (avatarFile.size > 5 * 1024 * 1024) throw new Error("La photo ne doit pas dépasser 5 Mo.");
+      const supabase = getSupabaseBrowserClient() as any;
+      const extension = avatarFile.type === "image/png" ? "png" : avatarFile.type === "image/webp" ? "webp" : "jpg";
+      const path = `${userId}/avatar.${extension}`;
+      const { error: uploadError } = await supabase.storage.from("avatars").upload(path, avatarFile, { upsert: true, contentType: avatarFile.type, cacheControl: "3600" });
+      if (uploadError) throw uploadError;
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      const publicUrl = `${data.publicUrl}?v=${Date.now()}`;
+      const { error: profileError } = await supabase.from("profiles").update({ avatar_url: publicUrl, updated_at: new Date().toISOString() }).eq("id", userId);
+      if (profileError) throw profileError;
+      setAvatarUrl(publicUrl); setAvatarFile(null); setMessage("Votre photo de profil a été mise à jour.");
+    } catch (e) { setError(e instanceof Error ? e.message : "Envoi de la photo impossible."); }
+    finally { setAvatarSaving(false); }
   }
 
   async function saveProfile() {
@@ -128,6 +159,10 @@ export function SettingsPanel() {
     <section className="settings-section">
       <div className="settings-section-heading"><span>01 / IDENTITÉ</span><h2>Votre compte</h2><p>Les informations qui définissent votre présence sur Book-A-Boo.</p></div>
       <form className="settings-form" onSubmit={event => { event.preventDefault(); void saveProfile(); }}>
+        <div className="settings-avatar-upload settings-full">
+          <div className="settings-avatar-preview">{avatarUrl ? <img src={avatarUrl} alt="Photo de profil" /> : <span>{displayName.trim().charAt(0).toUpperCase() || username.charAt(0).toUpperCase() || "b."}</span>}</div>
+          <div className="settings-avatar-copy"><strong>Photo de profil</strong><small>JPG, PNG ou WebP · 5 Mo maximum</small><input type="file" accept="image/jpeg,image/png,image/webp" onChange={e => setAvatarFile(e.target.files?.[0] ?? null)} /><button type="button" className="settings-save" onClick={uploadAvatar} disabled={!avatarFile || avatarSaving}>{avatarSaving ? "Envoi…" : "Mettre à jour ma photo"}</button></div>
+        </div>
         <label>Prénom<input value={firstName} onChange={e=>setFirstName(e.target.value)} maxLength={80}/></label>
         <label>Nom<input value={lastName} onChange={e=>setLastName(e.target.value)} maxLength={80}/></label>
         <label>Pseudo<input value={username} onChange={e=>setUsername(e.target.value)} minLength={3} maxLength={24}/><small>3 à 24 caractères : lettres, chiffres et _.</small></label>
