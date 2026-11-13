@@ -94,7 +94,7 @@ export function ProfileAccount() {
       {profile?.bio && <p>{profile.bio}</p>}
       {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
       <div className="profile-account-actions">
-        <Link className="auth-submit" href="/bibliotheque">Ma bibliothèque →</Link>
+        <Link className="auth-submit" href="/bibliotheque">Ma bibliothèque →</Link><Link className="auth-secondary" href="/parametres">Paramètres du compte ⚙</Link>
         <button className="auth-secondary" type="button" onClick={signOut}>Me déconnecter</button>
       </div>
       <p className="auth-privacy">Votre prénom, votre nom et votre adresse e-mail restent privés.</p>
