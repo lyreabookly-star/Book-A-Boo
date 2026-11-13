@@ -1,0 +1,168 @@
+"use client";
+
+import { useEffect, useState, type FormEvent } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { getSupabaseBrowserClient } from "../../lib/supabase/client";
+
+type Settings = { theme: "light" | "dark"; preferred_language: "fr" | "en" | "es" | "pt"; email_notifications: boolean; product_updates: boolean };
+const defaults: Settings = { theme: "light", preferred_language: "fr", email_notifications: true, product_updates: false };
+
+export function SettingsPanel() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [userId, setUserId] = useState("");
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [bio, setBio] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [isPublic, setIsPublic] = useState(true);
+  const [showLibrary, setShowLibrary] = useState(true);
+  const [settings, setSettings] = useState<Settings>(defaults);
+
+  useEffect(() => {
+    let active = true;
+    async function load() {
+      const supabase = getSupabaseBrowserClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.replace("/connexion?next=%2Fparametres"); return; }
+      const [profile, privateProfile, prefs] = await Promise.all([
+        supabase.from("profiles").select("username,display_name,bio,is_public,show_library_on_profile,preferred_language").eq("id", user.id).maybeSingle(),
+        supabase.from("profile_private").select("first_name,last_name").eq("user_id", user.id).maybeSingle(),
+        supabase.from("user_settings").select("theme,preferred_language,email_notifications,product_updates").eq("user_id", user.id).maybeSingle()
+      ]);
+      if (!active) return;
+      if (profile.error || privateProfile.error || prefs.error) setError("Certains réglages n'ont pas pu être chargés.");
+      setUserId(user.id); setEmail(user.email ?? ""); setNewEmail(user.email ?? "");
+      setUsername(profile.data?.username ?? "");
+      setDisplayName(profile.data?.display_name ?? "");
+      setBio(profile.data?.bio ?? "");
+      setIsPublic(profile.data?.is_public ?? true);
+      setShowLibrary(profile.data?.show_library_on_profile ?? true);
+      setFirstName(privateProfile.data?.first_name ?? "");
+      setLastName(privateProfile.data?.last_name ?? "");
+      setSettings({ ...defaults, ...(prefs.data ?? {}), preferred_language: prefs.data?.preferred_language ?? profile.data?.preferred_language ?? "fr" });
+      setLoading(false);
+    }
+    void load();
+    return () => { active = false; };
+  }, [router]);
+
+  useEffect(() => {
+    if (typeof document !== "undefined") document.documentElement.dataset.theme = settings.theme;
+  }, [settings.theme]);
+
+  function update<K extends keyof Settings>(key: K, value: Settings[K]) {
+    setSettings(current => ({ ...current, [key]: value }));
+  }
+
+  async function saveProfile(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setSaving(true); setError(""); setMessage("");
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const cleanUsername = username.trim().toLowerCase();
+      if (!/^[a-z0-9_]{3,24}$/.test(cleanUsername)) throw new Error("Le pseudo doit contenir 3 à 24 caractères : lettres sans accent, chiffres ou _.");
+      const [p, pp] = await Promise.all([
+        supabase.from("profiles").update({ username: cleanUsername, display_name: displayName.trim() || null, bio: bio.trim(), is_public: isPublic, show_library_on_profile: showLibrary, preferred_language: settings.preferred_language, updated_at: new Date().toISOString() }).eq("id", userId),
+        supabase.from("profile_private").upsert({ user_id: userId, first_name: firstName.trim(), last_name: lastName.trim(), updated_at: new Date().toISOString() }, { onConflict: "user_id" })
+      ]);
+      if (p.error) throw p.error; if (pp.error) throw pp.error;
+      setMessage("Votre profil et vos préférences sont enregistrés.");
+    } catch (e) { setError(e instanceof Error ? e.message : "Enregistrement impossible."); }
+    finally { setSaving(false); }
+  }
+
+  async function savePreferences() {
+    setSaving(true); setError(""); setMessage("");
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { error: prefError } = await supabase.from("user_settings").upsert({ user_id: userId, ...settings, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
+      if (prefError) throw prefError;
+      const { error: profileError } = await supabase.from("profiles").update({ preferred_language: settings.preferred_language, updated_at: new Date().toISOString() }).eq("id", userId);
+      if (profileError) throw profileError;
+      setMessage("Vos préférences sont enregistrées.");
+    } catch (e) { setError(e instanceof Error ? e.message : "Enregistrement impossible."); }
+    finally { setSaving(false); }
+  }
+
+  async function updateEmail(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setSaving(true); setError(""); setMessage("");
+    try {
+      const { error: e } = await getSupabaseBrowserClient().auth.updateUser({ email: newEmail.trim() });
+      if (e) throw e;
+      setMessage("Une confirmation a été envoyée à votre nouvelle adresse e-mail. Votre adresse ne changera qu'après validation.");
+    } catch (e) { setError(e instanceof Error ? e.message : "Modification de l'e-mail impossible."); }
+    finally { setSaving(false); }
+  }
+
+  async function updatePassword(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setSaving(true); setError(""); setMessage("");
+    try {
+      if (newPassword.length < 8) throw new Error("Le mot de passe doit contenir au moins 8 caractères.");
+      const { error: e } = await getSupabaseBrowserClient().auth.updateUser({ password: newPassword });
+      if (e) throw e;
+      setNewPassword(""); setMessage("Votre mot de passe a été modifié.");
+    } catch (e) { setError(e instanceof Error ? e.message : "Modification du mot de passe impossible."); }
+    finally { setSaving(false); }
+  }
+
+  async function signOutEverywhere() {
+    setSaving(true); setError(""); setMessage("");
+    const { error: e } = await getSupabaseBrowserClient().auth.signOut({ scope: "global" });
+    if (e) { setError(e.message); setSaving(false); return; }
+    router.replace("/connexion"); router.refresh();
+  }
+
+  if (loading) return <div className="settings-panel"><p>Chargement de vos réglages…</p></div>;
+
+  return <div className="settings-panel">
+    <div className="settings-back"><Link href="/profil">← Retour au profil</Link><span>VOS PRÉFÉRENCES PERSONNELLES</span></div>
+    {(error || message) && <p className={error ? "settings-feedback settings-error" : "settings-feedback settings-success"} role="status">{error || message}</p>}
+    <section className="settings-section">
+      <div className="settings-section-heading"><span>01 / IDENTITÉ</span><h2>Votre compte</h2><p>Les informations qui définissent votre présence sur Book-A-Boo.</p></div>
+      <form className="settings-form" onSubmit={saveProfile}>
+        <label>Prénom<input value={firstName} onChange={e=>setFirstName(e.target.value)} maxLength={80}/></label>
+        <label>Nom<input value={lastName} onChange={e=>setLastName(e.target.value)} maxLength={80}/></label>
+        <label>Pseudo<input value={username} onChange={e=>setUsername(e.target.value)} minLength={3} maxLength={24}/><small>3 à 24 caractères : lettres, chiffres et _.</small></label>
+        <label>Nom affiché<input value={displayName} onChange={e=>setDisplayName(e.target.value)} maxLength={80}/></label>
+        <label className="settings-full">Biographie<textarea value={bio} onChange={e=>setBio(e.target.value)} maxLength={300} rows={3}/><small>{bio.length}/300 caractères</small></label>
+        <div className="settings-full"><button className="settings-save" disabled={saving}>{saving ? "Enregistrement…" : "Enregistrer mon profil"}</button></div>
+      </form>
+    </section>
+    <section className="settings-section">
+      <div className="settings-section-heading"><span>02 / CONNEXION</span><h2>Adresse e-mail</h2><p>Adresse actuelle : <strong>{email}</strong>. Une confirmation sera demandée pour tout changement.</p></div>
+      <form className="settings-inline-form" onSubmit={updateEmail}><label>Nouvelle adresse e-mail<input type="email" value={newEmail} onChange={e=>setNewEmail(e.target.value)} required/></label><button className="settings-save" disabled={saving || newEmail.trim()===email}>Modifier l'adresse</button></form>
+      <form className="settings-inline-form" onSubmit={updatePassword}><label>Nouveau mot de passe<input type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} minLength={8} placeholder="8 caractères minimum" required/></label><button className="settings-save" disabled={saving || newPassword.length<8}>Changer le mot de passe</button></form>
+    </section>
+    <section className="settings-section">
+      <div className="settings-section-heading"><span>03 / EXPÉRIENCE</span><h2>Apparence et langue</h2><p>Choisissez vos préférences de lecture et de navigation.</p></div>
+      <div className="settings-choice-row"><div><strong>Thème de l'interface</strong><small>Clair ou sombre</small></div><div className="settings-choice-buttons"><button type="button" className={settings.theme==="light"?"chosen":""} onClick={()=>update("theme","light")}>Clair</button><button type="button" className={settings.theme==="dark"?"chosen":""} onClick={()=>update("theme","dark")}>Sombre</button></div></div>
+      <div className="settings-choice-row"><div><strong>Langue préférée</strong><small>Votre choix est enregistré dans votre compte</small></div><select value={settings.preferred_language} onChange={e=>update("preferred_language",e.target.value as Settings["preferred_language"])}><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option><option value="pt">Português</option></select></div>
+      <button className="settings-save" onClick={savePreferences} disabled={saving}>{saving ? "Enregistrement…" : "Enregistrer mes préférences"}</button>
+    </section>
+    <section className="settings-section">
+      <div className="settings-section-heading"><span>04 / CONFIDENTIALITÉ</span><h2>Ce que les autres voient</h2><p>Gardez le contrôle sur les informations visibles par les autres lecteurs.</p></div>
+      <label className="settings-toggle"><span><strong>Profil public</strong><small>Autoriser les autres lecteurs à consulter votre profil.</small></span><input type="checkbox" checked={isPublic} onChange={e=>setIsPublic(e.target.checked)}/></label>
+      <label className="settings-toggle"><span><strong>Afficher ma bibliothèque sur mon profil</strong><small>Permettre aux visiteurs de voir les livres de votre bibliothèque.</small></span><input type="checkbox" checked={showLibrary} onChange={e=>setShowLibrary(e.target.checked)}/></label>
+      <button className="settings-save" onClick={saveProfile} disabled={saving}>Enregistrer la confidentialité</button>
+    </section>
+    <section className="settings-section">
+      <div className="settings-section-heading"><span>05 / MESSAGES</span><h2>Notifications</h2><p>Définissez vos préférences pour les futurs messages par e-mail.</p></div>
+      <label className="settings-toggle"><span><strong>Notifications par e-mail</strong><small>Recevoir les notifications importantes liées à votre compte.</small></span><input type="checkbox" checked={settings.email_notifications} onChange={e=>update("email_notifications",e.target.checked)}/></label>
+      <label className="settings-toggle"><span><strong>Nouveautés Book-A-Boo</strong><small>Recevoir les actualités et annonces de la plateforme.</small></span><input type="checkbox" checked={settings.product_updates} onChange={e=>update("product_updates",e.target.checked)}/></label>
+      <button className="settings-save" onClick={savePreferences} disabled={saving}>Enregistrer les notifications</button>
+    </section>
+    <section className="settings-section settings-security">
+      <div className="settings-section-heading"><span>06 / SÉCURITÉ</span><h2>Vos sessions</h2><p>Vous pouvez fermer votre compte sur tous les appareils connectés. Vous devrez vous reconnecter ensuite.</p></div>
+      <button className="settings-danger" onClick={signOutEverywhere} disabled={saving}>Me déconnecter de tous les appareils</button>
+      <p className="settings-footnote">La suppression définitive du compte nécessite une procédure sécurisée distincte ; elle n'est pas proposée ici pour éviter toute suppression accidentelle.</p>
+    </section>
+  </div>;
+}
