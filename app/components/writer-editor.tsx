@@ -22,7 +22,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
-    const supabase = getSupabaseBrowserClient();
+    const supabase = getSupabaseBrowserClient() as any;
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError) throw authError;
     if (!user) {
@@ -61,7 +61,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     if (!chapter || !story) return false;
     setSaving(true); setSaved(false); setError("");
     try {
-      const supabase = getSupabaseBrowserClient();
+      const supabase = getSupabaseBrowserClient() as any;
       const { error: chapterError } = await supabase.from("chapters")
         .update({ title: title.trim() || "Chapitre", content, updated_at: new Date().toISOString() })
         .eq("id", chapter.id);
@@ -84,7 +84,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     try {
       const savedCurrent = await save();
       if (!savedCurrent) return;
-      const supabase = getSupabaseBrowserClient();
+      const supabase = getSupabaseBrowserClient() as any;
       const nextNumber = Math.max(0, ...chapters.map(c => c.chapter_number)) + 1;
       const { data, error: insertError } = await supabase.from("chapters")
         .insert({ story_id: story.id, author_id: (await supabase.auth.getUser()).data.user?.id, title: `Chapitre ${nextNumber}`, chapter_number: nextNumber, content: "" })
@@ -110,7 +110,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   return (
     <div className="writer-editor">
       <div className="writer-editor-top"><Link href="/ecrire"><ArrowLeft size={15} /> Mes manuscrits</Link><span><BookOpen size={14} /> BROUILLON PRIVÉ</span></div>
-      <label className="writer-work-title">Titre de l'œuvre<input value={story.title} onChange={e => setStory({ ...story, title: e.target.value })} onBlur={async () => { const s = getSupabaseBrowserClient(); const { error: e } = await s.from("stories").update({ title: story.title.trim() }).eq("id", story.id); if (e) setError(e.message); }} maxLength={160} /></label>
+      <label className="writer-work-title">Titre de l'œuvre<input value={story.title} onChange={e => setStory({ ...story, title: e.target.value })} onBlur={async () => { const s = getSupabaseBrowserClient() as any; const { error: e } = await s.from("stories").update({ title: story.title.trim() }).eq("id", story.id); if (e) setError(e.message); }} maxLength={160} /></label>
       <div className="writer-editor-grid">
         <aside className="writer-chapter-list"><div className="writer-chapter-heading"><span className="catalogue-overline">SOMMAIRE</span><button onClick={addChapter} aria-label="Ajouter un chapitre"><Plus size={16} /></button></div>
           {chapters.map(item => <button key={item.id} className={chapter?.id === item.id ? "writer-chapter active" : "writer-chapter"} onClick={() => selectChapter(item)}> <span>{String(item.chapter_number).padStart(2,"0")}</span>{item.title}</button>)}
