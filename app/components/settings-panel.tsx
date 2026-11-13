@@ -30,7 +30,7 @@ export function SettingsPanel() {
   useEffect(() => {
     let active = true;
     async function load() {
-      const supabase = getSupabaseBrowserClient();
+      const supabase = getSupabaseBrowserClient() as any;
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.replace("/connexion?next=%2Fparametres"); return; }
       const [profile, privateProfile, prefs] = await Promise.all([
@@ -66,7 +66,7 @@ export function SettingsPanel() {
   async function saveProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setSaving(true); setError(""); setMessage("");
     try {
-      const supabase = getSupabaseBrowserClient();
+      const supabase = getSupabaseBrowserClient() as any;
       const cleanUsername = username.trim().toLowerCase();
       if (!/^[a-z0-9_]{3,24}$/.test(cleanUsername)) throw new Error("Le pseudo doit contenir 3 à 24 caractères : lettres sans accent, chiffres ou _.");
       const [p, pp] = await Promise.all([
@@ -82,7 +82,7 @@ export function SettingsPanel() {
   async function savePreferences() {
     setSaving(true); setError(""); setMessage("");
     try {
-      const supabase = getSupabaseBrowserClient();
+      const supabase = getSupabaseBrowserClient() as any;
       const { error: prefError } = await supabase.from("user_settings").upsert({ user_id: userId, ...settings, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
       if (prefError) throw prefError;
       const { error: profileError } = await supabase.from("profiles").update({ preferred_language: settings.preferred_language, updated_at: new Date().toISOString() }).eq("id", userId);
