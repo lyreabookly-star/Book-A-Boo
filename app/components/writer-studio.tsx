@@ -30,7 +30,7 @@ export function WriterStudio() {
     let alive = true;
     async function load() {
       try {
-        const supabase = getSupabaseBrowserClient();
+        const supabase = getSupabaseBrowserClient() as any;
         const { data: { user }, error: authError } = await supabase.auth.getUser();
         if (authError) throw authError;
         if (!user) {
@@ -63,7 +63,7 @@ export function WriterStudio() {
     setCreating(true);
     setError("");
     try {
-      const supabase = getSupabaseBrowserClient();
+      const supabase = getSupabaseBrowserClient() as any;
       const { data, error: insertError } = await supabase
         .from("stories")
         .insert({ author_id: userId, title: title.trim(), synopsis: synopsis.trim(), status: "draft", visibility: "private" })
