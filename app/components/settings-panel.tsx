@@ -63,8 +63,8 @@ export function SettingsPanel() {
     setSettings(current => ({ ...current, [key]: value }));
   }
 
-  async function saveProfile(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setSaving(true); setError(""); setMessage("");
+  async function saveProfile() {
+    setSaving(true); setError(""); setMessage("");
     try {
       const supabase = getSupabaseBrowserClient() as any;
       const cleanUsername = username.trim().toLowerCase();
@@ -127,13 +127,13 @@ export function SettingsPanel() {
     {(error || message) && <p className={error ? "settings-feedback settings-error" : "settings-feedback settings-success"} role="status">{error || message}</p>}
     <section className="settings-section">
       <div className="settings-section-heading"><span>01 / IDENTITÉ</span><h2>Votre compte</h2><p>Les informations qui définissent votre présence sur Book-A-Boo.</p></div>
-      <form className="settings-form" onSubmit={saveProfile}>
+      <form className="settings-form" onSubmit={event => { event.preventDefault(); void saveProfile(); }}>
         <label>Prénom<input value={firstName} onChange={e=>setFirstName(e.target.value)} maxLength={80}/></label>
         <label>Nom<input value={lastName} onChange={e=>setLastName(e.target.value)} maxLength={80}/></label>
         <label>Pseudo<input value={username} onChange={e=>setUsername(e.target.value)} minLength={3} maxLength={24}/><small>3 à 24 caractères : lettres, chiffres et _.</small></label>
         <label>Nom affiché<input value={displayName} onChange={e=>setDisplayName(e.target.value)} maxLength={80}/></label>
         <label className="settings-full">Biographie<textarea value={bio} onChange={e=>setBio(e.target.value)} maxLength={300} rows={3}/><small>{bio.length}/300 caractères</small></label>
-        <div className="settings-full"><button className="settings-save" disabled={saving}>{saving ? "Enregistrement…" : "Enregistrer mon profil"}</button></div>
+        <div className="settings-full"><button type="submit" className="settings-save" disabled={saving}>{saving ? "Enregistrement…" : "Enregistrer mon profil"}</button></div>
       </form>
     </section>
     <section className="settings-section">
@@ -151,7 +151,7 @@ export function SettingsPanel() {
       <div className="settings-section-heading"><span>04 / CONFIDENTIALITÉ</span><h2>Ce que les autres voient</h2><p>Gardez le contrôle sur les informations visibles par les autres lecteurs.</p></div>
       <label className="settings-toggle"><span><strong>Profil public</strong><small>Autoriser les autres lecteurs à consulter votre profil.</small></span><input type="checkbox" checked={isPublic} onChange={e=>setIsPublic(e.target.checked)}/></label>
       <label className="settings-toggle"><span><strong>Afficher ma bibliothèque sur mon profil</strong><small>Permettre aux visiteurs de voir les livres de votre bibliothèque.</small></span><input type="checkbox" checked={showLibrary} onChange={e=>setShowLibrary(e.target.checked)}/></label>
-      <button className="settings-save" onClick={saveProfile} disabled={saving}>Enregistrer la confidentialité</button>
+      <button type="button" className="settings-save" onClick={saveProfile} disabled={saving}>Enregistrer la confidentialité</button>
     </section>
     <section className="settings-section">
       <div className="settings-section-heading"><span>05 / MESSAGES</span><h2>Notifications</h2><p>Définissez vos préférences pour les futurs messages par e-mail.</p></div>
