@@ -7,7 +7,7 @@ import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { StorySaveButton } from "./story-save-button";
 import { useAppPreferences } from "./app-preferences-provider";
 
-type Story = { id: string; title: string; synopsis: string; genre: string; language: string; author_id: string; created_at: string };
+type Story = { id: string; title: string; synopsis: string; genre: string; language: string; author_id: string; created_at: string; cover_url: string | null };
 type Author = { id: string; username: string; display_name: string | null };
 
 export function ExploreStories({ initialGenre = "" }: { initialGenre?: string }) {
@@ -26,7 +26,7 @@ export function ExploreStories({ initialGenre = "" }: { initialGenre?: string })
       try {
         const supabase = getSupabaseBrowserClient() as any;
         const { data, error } = await supabase.from("stories")
-          .select("id,title,synopsis,genre,language,author_id,created_at")
+          .select("id,title,synopsis,genre,language,author_id,created_at,cover_url")
           .eq("status", "published").eq("visibility", "public")
           .order("published_at", { ascending: false });
         if (error) throw error;
@@ -75,8 +75,8 @@ export function ExploreStories({ initialGenre = "" }: { initialGenre?: string })
     </div>
     {loading ? <p className="explore-live-empty">{labels.loading}</p> : filtered.length ? <div className="explore-live-grid">
       {filtered.map((story, index) => <article className="explore-live-card" key={story.id}>
-        <Link href={`/histoire/${story.id}`} className={`explore-live-cover explore-live-cover-${index % 4}`}>
-          <span className="explore-live-cover-index">BAB / {String(index + 1).padStart(3,"0")}</span><BookOpen size={31}/><strong>{story.title}</strong><small>{story.genre || "Book-A-Boo"}</small>
+        <Link href={`/histoire/${story.id}`} className={`explore-live-cover explore-live-cover-${index % 4}${story.cover_url ? " has-custom-cover" : ""}`}>
+          {story.cover_url ? <img src={story.cover_url} alt={locale === "en" ? `Cover of ${story.title}` : locale === "es" ? `Portada de ${story.title}` : locale === "pt" ? `Capa de ${story.title}` : `Couverture de ${story.title}`} /> : <><span className="explore-live-cover-index">BAB / {String(index + 1).padStart(3,"0")}</span><BookOpen size={31}/><strong>{story.title}</strong><small>{story.genre || "Book-A-Boo"}</small></>}
         </Link>
         <div className="explore-live-meta"><span>{story.genre || (locale === "en" ? "Literature" : "Littérature")}</span><span>{story.language.toUpperCase()}</span></div>
         <h3><Link href={`/histoire/${story.id}`}>{story.title}</Link></h3>
