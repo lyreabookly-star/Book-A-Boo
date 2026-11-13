@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { useAppPreferences } from "./app-preferences-provider";
 
-type Settings = { theme: "light" | "dark"; preferred_language: "fr" | "en" | "es" | "pt"; email_notifications: boolean; product_updates: boolean };
-const defaults: Settings = { theme: "light", preferred_language: "fr", email_notifications: true, product_updates: false };
+type Settings = { theme: "light" | "dark"; preferred_language: "fr" | "en" | "es" | "pt"; email_notifications: boolean; product_updates: boolean; notify_new_followers: boolean; notify_followed_author_stories: boolean };
+const defaults: Settings = { theme: "light", preferred_language: "fr", email_notifications: true, product_updates: false, notify_new_followers: true, notify_followed_author_stories: true };
 
 export function SettingsPanel() {
   const router = useRouter();
@@ -96,7 +96,7 @@ export function SettingsPanel() {
       const [profile, privateProfile, prefs] = await Promise.all([
         supabase.from("profiles").select("username,display_name,bio,avatar_url,is_public,show_library_on_profile,preferred_language").eq("id", user.id).maybeSingle(),
         supabase.from("profile_private").select("first_name,last_name").eq("user_id", user.id).maybeSingle(),
-        supabase.from("user_settings").select("theme,preferred_language,email_notifications,product_updates").eq("user_id", user.id).maybeSingle()
+        supabase.from("user_settings").select("theme,preferred_language,email_notifications,product_updates,notify_new_followers,notify_followed_author_stories").eq("user_id", user.id).maybeSingle()
       ]);
       if (!active) return;
       if (profile.error || privateProfile.error || prefs.error) setError("Certains réglages n'ont pas pu être chargés.");
@@ -255,9 +255,11 @@ export function SettingsPanel() {
       <button type="button" className="settings-save" onClick={saveProfile} disabled={saving}>Enregistrer la confidentialité</button>
     </section>
     <section className="settings-section">
-      <div className="settings-section-heading"><span>05 / MESSAGES</span><h2>Notifications</h2><p>Définissez vos préférences pour les futurs messages par e-mail.</p></div>
+      <div className="settings-section-heading"><span>05 / MESSAGES</span><h2>Notifications</h2><p>Choisissez les alertes que vous souhaitez recevoir sur Book-A-Boo et par e-mail.</p></div>
       <label className="settings-toggle"><span><strong>Notifications par e-mail</strong><small>Recevoir les notifications importantes liées à votre compte.</small></span><input type="checkbox" checked={settings.email_notifications} onChange={e=>update("email_notifications",e.target.checked)}/></label>
       <label className="settings-toggle"><span><strong>Nouveautés Book-A-Boo</strong><small>Recevoir les actualités et annonces de la plateforme.</small></span><input type="checkbox" checked={settings.product_updates} onChange={e=>update("product_updates",e.target.checked)}/></label>
+      <label className="settings-toggle"><span><strong>Nouveaux abonnés</strong><small>Être averti lorsqu’un membre commence à vous suivre.</small></span><input type="checkbox" checked={settings.notify_new_followers} onChange={e=>update("notify_new_followers",e.target.checked)}/></label>
+      <label className="settings-toggle"><span><strong>Nouvelles publications</strong><small>Être averti lorsqu’un auteur que vous suivez publie une histoire publique.</small></span><input type="checkbox" checked={settings.notify_followed_author_stories} onChange={e=>update("notify_followed_author_stories",e.target.checked)}/></label>
       <button className="settings-save" onClick={savePreferences} disabled={saving}>Enregistrer les notifications</button>
     </section>
     <section className="settings-section settings-security">
