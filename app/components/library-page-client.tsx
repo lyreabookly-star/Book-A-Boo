@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Bookmark, BookOpen, CheckCircle2, Clock3, LoaderCircle, Trash2 } from "lucide-react";
+import { Bookmark, BookOpen, CheckCircle2, Clock3, LoaderCircle, Trash2, ArrowUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { useAppPreferences } from "./app-preferences-provider";
 
-type LibraryRow = { id: string; status: "reading" | "to_read" | "completed"; updated_at: string; story: { id: string; title: string; synopsis: string; genre: string; language: string; author_id: string } | null };
+type LibraryRow = { id: string; status: "reading" | "to_read" | "completed"; updated_at: string; story: { id: string; title: string; synopsis: string; genre: string; language: string; author_id: string; cover_url: string | null } | null };
 type Author = { id: string; username: string; display_name: string | null };
 
 export function LibraryPageClient() {
@@ -19,6 +19,7 @@ export function LibraryPageClient() {
   const [authors, setAuthors] = useState<Record<string, Author>>({});
   const [active, setActive] = useState<"reading" | "to_read" | "completed">("to_read");
   const [error, setError] = useState("");
+  const [sort, setSort] = useState<"recent" | "title">("recent");
 
   const copy = {
     login: locale === "en" ? "Log in to open your library." : locale === "es" ? "Inicia sesión para abrir tu biblioteca." : locale === "pt" ? "Entre para abrir sua biblioteca." : "Connectez-vous pour ouvrir votre bibliothèque.",
@@ -31,7 +32,10 @@ export function LibraryPageClient() {
     reading: locale === "en" ? "Currently reading" : locale === "es" ? "Leyendo" : locale === "pt" ? "Lendo" : "En cours",
     to_read: locale === "en" ? "To read" : locale === "es" ? "Por leer" : locale === "pt" ? "Para ler" : "À lire",
     completed: locale === "en" ? "Finished" : locale === "es" ? "Terminados" : locale === "pt" ? "Concluídos" : "Terminés",
-    change: locale === "en" ? "Move to…" : locale === "es" ? "Mover a…" : locale === "pt" ? "Mover para…" : "Déplacer vers…"
+    change: locale === "en" ? "Move to…" : locale === "es" ? "Mover a…" : locale === "pt" ? "Mover para…" : "Déplacer vers…",
+    sortRecent: locale === "en" ? "Recently updated" : locale === "es" ? "Actualizadas recientemente" : locale === "pt" ? "Atualizadas recentemente" : "Modifiées récemment",
+    sortTitle: locale === "en" ? "Title A–Z" : locale === "es" ? "Título A–Z" : locale === "pt" ? "Título A–Z" : "Titre A–Z",
+    total: locale === "en" ? "saved stories" : locale === "es" ? "historias guardadas" : locale === "pt" ? "histórias salvas" : "histoires enregistrées"
   };
 
   useEffect(() => {
@@ -43,7 +47,7 @@ export function LibraryPageClient() {
         if (authError) throw authError;
         if (!user) { if (activeEffect) setLoading(false); return; }
         const { data, error: queryError } = await supabase.from("user_library")
-          .select("id,status,updated_at,story:stories(id,title,synopsis,genre,language,author_id)")
+          .select("id,status,updated_at,story:stories(id,title,synopsis,genre,language,author_id,cover_url)")
           .eq("user_id", user.id).order("updated_at", { ascending: false });
         if (queryError) throw queryError;
         const list = (data ?? []) as LibraryRow[];
@@ -63,7 +67,7 @@ export function LibraryPageClient() {
     return () => { activeEffect = false; };
   }, []);
 
-  const visibleRows = useMemo(() => rows.filter(row => row.status === active && row.story), [rows, active]);
+  const visibleRows = useMemo(() => rows.filter(row => row.status === active && row.story).sort((a, b) => sort === "title" ? a.story!.title.localeCompare(b.story!.title, locale) : new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()), [rows, active, sort, locale]);
 
   async function changeStatus(row: LibraryRow, status: LibraryRow["status"]) {
     setError("");
@@ -94,13 +98,14 @@ export function LibraryPageClient() {
       <div><span className="catalogue-overline">{locale === "en" ? "YOUR READING SPACE" : locale === "es" ? "TU ESPACIO DE LECTURA" : locale === "pt" ? "SEU ESPAÇO DE LEITURA" : "VOTRE ESPACE DE LECTURE"}</span><h2>{locale === "en" ? <>A library that <em>follows you.</em></> : locale === "es" ? <>Una biblioteca a <em>tu ritmo.</em></> : locale === "pt" ? <>Uma biblioteca no <em>seu ritmo.</em></> : <>Une bibliothèque à <em>votre image.</em></>}</h2><p>{locale === "en" ? "Keep the stories you love close and organize your reading." : locale === "es" ? "Guarda cerca las historias que te gustan y organiza tus lecturas." : locale === "pt" ? "Mantenha por perto as histórias que ama e organize suas leituras." : "Gardez près de vous les histoires que vous aimez et organisez vos lectures."}</p></div>
       <div className="library-privacy"><Clock3 size={16}/><span>{locale === "en" ? "Your reading, your pace" : locale === "es" ? "Tu lectura, tu ritmo" : locale === "pt" ? "Sua leitura, seu ritmo" : "Vos lectures, votre rythme"}</span></div>
     </div>
+    <div className="library-summary-line"><span>{rows.length} {copy.total}</span><label><ArrowUpDown size={15}/><select value={sort} onChange={e => setSort(e.target.value as "recent" | "title")} aria-label={locale === "en" ? "Sort library" : locale === "es" ? "Ordenar biblioteca" : locale === "pt" ? "Ordenar biblioteca" : "Trier la bibliothèque"}><option value="recent">{copy.sortRecent}</option><option value="title">{copy.sortTitle}</option></select></label></div>
     <div className="personal-library-tabs library-live-tabs">
       {tabs.map(tab => { const Icon = tab.icon; return <button type="button" key={tab.id} className={active === tab.id ? "personal-library-tab active" : "personal-library-tab"} onClick={() => setActive(tab.id)}><Icon size={17}/><span><strong>{tab.label}</strong><small>{rows.filter(row => row.status === tab.id).length} {locale === "en" ? "stories" : locale === "es" ? "historias" : locale === "pt" ? "histórias" : "histoires"}</small></span></button>; })}
     </div>
     {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
     {visibleRows.length ? <div className="library-live-grid">
       {visibleRows.map(row => { const story = row.story!; return <article className="library-live-card" key={row.id}>
-        <Link href={`/histoire/${story.id}`} className="library-live-cover"><BookOpen size={28}/><strong>{story.title}</strong><small>{story.genre || "Book-A-Boo"}</small></Link>
+        <Link href={`/histoire/${story.id}`} className={`library-live-cover${story.cover_url ? " has-custom-cover" : ""}`}>{story.cover_url ? <img src={story.cover_url} alt={locale === "en" ? `Cover of ${story.title}` : locale === "es" ? `Portada de ${story.title}` : locale === "pt" ? `Capa de ${story.title}` : `Couverture de ${story.title}`} /> : <><BookOpen size={28}/><strong>{story.title}</strong><small>{story.genre || "Book-A-Boo"}</small></>}</Link>
         <div className="library-live-card-body"><span className="library-live-genre">{story.genre || "Littérature"} · {story.language.toUpperCase()}</span><h3><Link href={`/histoire/${story.id}`}>{story.title}</Link></h3><p>{story.synopsis || (locale === "en" ? "A story to discover." : locale === "es" ? "Una historia por descubrir." : locale === "pt" ? "Uma história para descobrir." : "Une histoire à découvrir.")}</p><small className="explore-live-author">{locale === "en" ? "By" : locale === "es" ? "Por" : locale === "pt" ? "Por" : "Par"} {authors[story.author_id]?.display_name || authors[story.author_id]?.username || "Book-A-Boo"}</small>
           <label className="library-live-select">{copy.change}<select value={row.status} onChange={e => void changeStatus(row, e.target.value as LibraryRow["status"])}>{tabs.map(tab => <option key={tab.id} value={tab.id}>{tab.label}</option>)}</select></label>
           <button type="button" className="library-remove-button" onClick={() => void remove(row)}><Trash2 size={14}/>{copy.remove}</button>
