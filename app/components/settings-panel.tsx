@@ -29,7 +29,57 @@ export function SettingsPanel() {
   const [showLibrary, setShowLibrary] = useState(true);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
+  const [avatarZoom, setAvatarZoom] = useState(1);
+  const [avatarPositionX, setAvatarPositionX] = useState(50);
+  const [avatarPositionY, setAvatarPositionY] = useState(50);
   const [avatarSaving, setAvatarSaving] = useState(false);
+
+  useEffect(() => {
+    if (!avatarPreviewUrl) return;
+    return () => URL.revokeObjectURL(avatarPreviewUrl);
+  }, [avatarPreviewUrl]);
+
+  function selectAvatar(file: File | null) {
+    if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
+    setAvatarFile(file);
+    setAvatarPreviewUrl(file ? URL.createObjectURL(file) : null);
+    setAvatarZoom(1);
+    setAvatarPositionX(50);
+    setAvatarPositionY(50);
+    setError("");
+    setMessage("");
+  }
+
+  async function makeCroppedAvatar(file: File): Promise<File> {
+    const sourceUrl = URL.createObjectURL(file);
+    try {
+      const image = new Image();
+      image.src = sourceUrl;
+      await new Promise<void>((resolve, reject) => {
+        image.onload = () => resolve();
+        image.onerror = () => reject(new Error("Cette image n'a pas pu être ouverte."));
+      });
+      const size = 512;
+      const scale = Math.max(size / image.naturalWidth, size / image.naturalHeight) * avatarZoom;
+      const width = image.naturalWidth * scale;
+      const height = image.naturalHeight * scale;
+      const x = (size - width) * (avatarPositionX / 100);
+      const y = (size - height) * (avatarPositionY / 100);
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Le recadrage de l'image est indisponible.");
+      context.drawImage(image, x, y, width, height);
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob(result => result ? resolve(result) : reject(new Error("Impossible de préparer cette photo.")), "image/jpeg", 0.9);
+      });
+      return new File([blob], "avatar.jpg", { type: "image/jpeg" });
+    } finally {
+      URL.revokeObjectURL(sourceUrl);
+    }
+  }
   const [settings, setSettings] = useState<Settings>(defaults);
 
   useEffect(() => {
@@ -80,16 +130,16 @@ export function SettingsPanel() {
     try {
       if (!["image/jpeg","image/png","image/webp"].includes(avatarFile.type)) throw new Error("Choisissez une image JPG, PNG ou WebP.");
       if (avatarFile.size > 5 * 1024 * 1024) throw new Error("La photo ne doit pas dépasser 5 Mo.");
+      const croppedFile = await makeCroppedAvatar(avatarFile);
       const supabase = getSupabaseBrowserClient() as any;
-      const extension = avatarFile.type === "image/png" ? "png" : avatarFile.type === "image/webp" ? "webp" : "jpg";
-      const path = `${userId}/avatar.${extension}`;
-      const { error: uploadError } = await supabase.storage.from("avatars").upload(path, avatarFile, { upsert: true, contentType: avatarFile.type, cacheControl: "3600" });
+      const path = `${userId}/avatar.jpg`;
+      const { error: uploadError } = await supabase.storage.from("avatars").upload(path, croppedFile, { upsert: true, contentType: "image/jpeg", cacheControl: "3600" });
       if (uploadError) throw uploadError;
       const { data } = supabase.storage.from("avatars").getPublicUrl(path);
       const publicUrl = `${data.publicUrl}?v=${Date.now()}`;
       const { error: profileError } = await supabase.from("profiles").update({ avatar_url: publicUrl, updated_at: new Date().toISOString() }).eq("id", userId);
       if (profileError) throw profileError;
-      setAvatarUrl(publicUrl); setAvatarFile(null); setMessage("Votre photo de profil a été mise à jour.");
+      setAvatarUrl(publicUrl); selectAvatar(null); setMessage("Votre photo de profil a été recadrée et mise à jour.");
     } catch (e) { setError(e instanceof Error ? e.message : "Envoi de la photo impossible."); }
     finally { setAvatarSaving(false); }
   }
@@ -160,8 +210,19 @@ export function SettingsPanel() {
       <div className="settings-section-heading"><span>01 / IDENTITÉ</span><h2>Votre compte</h2><p>Les informations qui définissent votre présence sur Book-A-Boo.</p></div>
       <form className="settings-form" onSubmit={event => { event.preventDefault(); void saveProfile(); }}>
         <div className="settings-avatar-upload settings-full">
-          <div className="settings-avatar-preview">{avatarUrl ? <img src={avatarUrl} alt="Photo de profil" /> : <span>{displayName.trim().charAt(0).toUpperCase() || username.charAt(0).toUpperCase() || "b."}</span>}</div>
-          <div className="settings-avatar-copy"><strong>Photo de profil</strong><small>JPG, PNG ou WebP · 5 Mo maximum</small><input type="file" accept="image/jpeg,image/png,image/webp" onChange={e => setAvatarFile(e.target.files?.[0] ?? null)} /><button type="button" className="settings-save" onClick={uploadAvatar} disabled={!avatarFile || avatarSaving}>{avatarSaving ? "Envoi…" : "Mettre à jour ma photo"}</button></div>
+          <div className="settings-avatar-preview">{(avatarPreviewUrl || avatarUrl) ? <img src={avatarPreviewUrl || avatarUrl || ""} alt="Aperçu de la photo de profil" style={{ objectPosition: `${avatarPositionX}% ${avatarPositionY}%`, transform: `scale(${avatarZoom})` }} /> : <span>{displayName.trim().charAt(0).toUpperCase() || username.charAt(0).toUpperCase() || "b."}</span>}</div>
+          <div className="settings-avatar-copy"><strong>Photo de profil</strong><small>Choisissez une image JPG, PNG ou WebP · 5 Mo maximum. Vous pourrez ensuite ajuster le cadrage.</small><input type="file" accept="image/jpeg,image/png,image/webp" onChange={e => selectAvatar(e.target.files?.[0] ?? null)} /></div>
+          {avatarPreviewUrl && <div className="avatar-crop-controls settings-full">
+            <div className="avatar-crop-stage"><img src={avatarPreviewUrl} alt="Aperçu du cadrage" style={{ objectPosition: `${avatarPositionX}% ${avatarPositionY}%`, transform: `scale(${avatarZoom})` }} /></div>
+            <div className="avatar-crop-sliders">
+              <label>Zoom <strong>{avatarZoom.toFixed(1)}×</strong><input type="range" min="1" max="3" step="0.05" value={avatarZoom} onChange={e => setAvatarZoom(Number(e.target.value))} /></label>
+              <label>Cadrage horizontal <strong>{avatarPositionX}%</strong><input type="range" min="0" max="100" value={avatarPositionX} onChange={e => setAvatarPositionX(Number(e.target.value))} /></label>
+              <label>Cadrage vertical <strong>{avatarPositionY}%</strong><input type="range" min="0" max="100" value={avatarPositionY} onChange={e => setAvatarPositionY(Number(e.target.value))} /></label>
+              <button type="button" className="settings-choice-buttons" onClick={() => { setAvatarZoom(1); setAvatarPositionX(50); setAvatarPositionY(50); }}>Réinitialiser le cadrage</button>
+              <button type="button" className="settings-save" onClick={uploadAvatar} disabled={!avatarFile || avatarSaving}>{avatarSaving ? "Envoi…" : "Valider et enregistrer la photo"}</button>
+              <button type="button" className="settings-danger" onClick={() => selectAvatar(null)} disabled={avatarSaving}>Annuler</button>
+            </div>
+          </div>}
         </div>
         <label>Prénom<input value={firstName} onChange={e=>setFirstName(e.target.value)} maxLength={80}/></label>
         <label>Nom<input value={lastName} onChange={e=>setLastName(e.target.value)} maxLength={80}/></label>
