@@ -5,7 +5,7 @@ import { ExploreStories } from "./components/explore-stories";
 
 export default function Home() {
  return <main>
-  <SiteHeader active="/"/>
+  <SiteHeader active="/" hideGuestActions/>
   <section className="hero" id="decouvrir"><div className="hero-copy"><div className="eyebrow"><span className="eyebrow-line"/> LA LITTÉRATURE, SANS FRONTIÈRES</div><h1>Il y a tout un<br/>monde <em>à lire.</em></h1><p className="hero-description">Des histoires qui vous ressemblent. Des univers qui vous emportent. Un lieu pour lire, écrire et faire voyager les mots.</p><div className="hero-buttons"><Link href="/explorer" className="primary-button">Explorer les histoires <ArrowRight size={17}/></Link><Link href="/ecrire" className="secondary-button"><Feather size={16}/> Je veux écrire</Link></div><div className="hero-note"><span className="reader-stack"><i>✦</i><i>文</i><i>é</i></span><span>Une communauté ouverte aux voix du monde entier.</span></div></div>
   <figure className="hero-art hero-photo" aria-label="Photographie rapprochée de pages imprimées et de lunettes de lecture"><img src="https://images.unsplash.com/photo-1679891984007-917d7f8d0f94?auto=format&fit=crop&fm=jpg&q=85&w=1600" alt="Gros plan sur des pages imprimées avec des lunettes posées dessus, lumière chaude et papier crème."/><div className="hero-photo-brand"><img src="/book-a-boo-logo.svg" alt="Logo Book-A-Boo"/></div><figcaption className="hero-photo-caption"><span>Lire, Écrire, Découvrir</span></figcaption></figure></section>
   <ExploreStories />
