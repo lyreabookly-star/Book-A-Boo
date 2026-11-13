@@ -318,19 +318,29 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = preferences.locale;
     localStorage.setItem("bab-locale", preferences.locale);
     localStorage.setItem("bab-theme", preferences.theme);
+    let applying = false;
     const apply = () => {
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      let node: Node | null;
-      while ((node = walker.nextNode())) {
-        const parent = node.parentElement;
-        if (!parent || parent.closest("script,style,textarea,input,select,option,[data-no-translate]")) continue;
-        const translated = translateNode(node.textContent ?? "", preferences.locale);
-        if (translated !== node.textContent) node.textContent = translated;
+      if (applying || !document.body) return;
+      applying = true;
+      try {
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        let node: Node | null;
+        while ((node = walker.nextNode())) {
+          const parent = node.parentElement;
+          if (!parent || parent.closest("script,style,textarea,input,select,option,[data-no-translate]")) continue;
+          const currentText = node.textContent ?? "";
+          const translated = translateNode(currentText, preferences.locale);
+          if (translated !== currentText) node.textContent = translated;
+        }
+      } finally {
+        applying = false;
       }
     };
     apply();
+    // Observe newly inserted elements only. Watching characterData also observes
+    // our own translations and needlessly re-enters React-managed text updates.
     const observer = new MutationObserver(() => apply());
-    observer.observe(document.body, { childList:true, subtree:true, characterData:true });
+    observer.observe(document.body, { childList:true, subtree:true });
     return () => observer.disconnect();
   }, [preferences]);
 
