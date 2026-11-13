@@ -67,7 +67,9 @@ export function AuthForm({ mode }: AuthFormProps) {
           password,
         });
         if (loginError) throw loginError;
-        router.push("/profil");
+        const requestedNext = new URLSearchParams(window.location.search).get("next");
+        const destination = requestedNext?.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/profil";
+        router.push(destination);
         router.refresh();
       }
     } catch (caught) {
