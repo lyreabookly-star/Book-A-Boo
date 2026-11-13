@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AppPreferencesProvider } from "./components/app-preferences-provider";
+import { ServiceWorkerRegister } from "./components/service-worker-register";
 
 export const metadata: Metadata = {
   title: "Book-A-Boo — Stories have no limits",
@@ -24,7 +25,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr">
-      <body><AppPreferencesProvider>{children}</AppPreferencesProvider></body>
+      <body><ServiceWorkerRegister /><AppPreferencesProvider>{children}</AppPreferencesProvider></body>
     </html>
   );
 }
