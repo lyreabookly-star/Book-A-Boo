@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BookOpen, FilePlus2, Feather, LoaderCircle, LockKeyhole } from "lucide-react";
@@ -56,7 +57,7 @@ export function WriterStudio() {
     return () => { alive = false; };
   }, []);
 
-  async function createStory(event: React.FormEvent<HTMLFormElement>) {
+  async function createStory(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!userId || !title.trim()) return;
     setCreating(true);
