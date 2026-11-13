@@ -270,7 +270,13 @@ const dictionary: Record<string, Record<Locale, string>> = {
   "Écrivez librement. Pensez à sauvegarder votre travail.": { fr:"Écrivez librement. Pensez à sauvegarder votre travail.", en:"Write freely. Remember to save your work.", es:"Escribe libremente. Recuerda guardar tu trabajo.", pt:"Escreva livremente. Lembre-se de salvar seu trabalho." },
   "SOMMAIRE": { fr:"SOMMAIRE", en:"CONTENTS", es:"ÍNDICE", pt:"SUMÁRIO" },
   "Mes manuscrits": { fr:"Mes manuscrits", en:"My manuscripts", es:"Mis manuscritos", pt:"Meus manuscritos" },
-  "Titre de l'œuvre": { fr:"Titre de l'œuvre", en:"Story title", es:"Título de la historia", pt:"Título da história" }
+  "Titre de l'œuvre": { fr:"Titre de l'œuvre", en:"Story title", es:"Título de la historia", pt:"Título da história" },
+
+  "STUDIO D'ÉCRITURE BOOK-A-BOO": { fr:"STUDIO D'ÉCRITURE BOOK-A-BOO", en:"BOOK-A-BOO WRITING STUDIO", es:"ESTUDIO DE ESCRITURA BOOK-A-BOO", pt:"ESTÚDIO DE ESCRITA BOOK-A-BOO" },
+  "Les histoires": { fr:"Les histoires", en:"Stories", es:"Las historias", pt:"As histórias" },
+  "commencent par vous.": { fr:"commencent par vous.", en:"begin with you.", es:"comienzan contigo.", pt:"começam com você." },
+  "Un espace pensé pour vos idées, vos manuscrits et les univers que vous construisez. Vos brouillons restent privés.": { fr:"Un espace pensé pour vos idées, vos manuscrits et les univers que vous construisez. Vos brouillons restent privés.", en:"A space for your ideas, manuscripts, and the worlds you create. Your drafts remain private.", es:"Un espacio para tus ideas, manuscritos y los mundos que construyes. Tus borradores son privados.", pt:"Um espaço para suas ideias, manuscritos e os universos que você cria. Seus rascunhos permanecem privados." },
+  "VOTRE ESPACE DE LECTURE": { fr:"VOTRE ESPACE DE LECTURE", en:"YOUR READING SPACE", es:"TU ESPACIO DE LECTURA", pt:"SEU ESPAÇO DE LEITURA" },
 
 };
 
