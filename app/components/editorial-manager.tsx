@@ -4,11 +4,13 @@ import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { ArrowLeft, BookOpen, Check, Plus, Trash2 } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
+import { useAppPreferences } from "./app-preferences-provider";
 
 type Story = { id: string; title: string; synopsis: string | null; genre: string | null; cover_url: string | null };
 type Pick = { id: string; story_id: string; position: number; eyebrow: string; editorial_note: string | null; story?: Story };
 
 export function EditorialManager() {
+  const { locale } = useAppPreferences();
   const [loading, setLoading] = useState(true);
   const [allowed, setAllowed] = useState(false);
   const [stories, setStories] = useState<Story[]>([]);
@@ -78,7 +80,7 @@ export function EditorialManager() {
     <form className="editorial-manager-form" onSubmit={addPick}>
       <label>Histoire publiée
         <select value={storyId} onChange={event => setStoryId(event.target.value)} required>
-          <option value="">Choisir une histoire…</option>
+          <option value="">{locale === "en" ? "Choose a story…" : locale === "es" ? "Elegir una historia…" : locale === "pt" ? "Escolher uma história…" : "Choisir une histoire…"}</option>
           {stories.filter(story => !picks.some(pick => pick.story_id === story.id)).map(story => <option key={story.id} value={story.id}>{story.title}</option>)}
         </select>
       </label>
@@ -88,7 +90,7 @@ export function EditorialManager() {
         </select>
       </label>
       <label className="editorial-manager-note">Mot de la rédaction (facultatif)
-        <textarea value={note} onChange={event => setNote(event.target.value)} rows={3} maxLength={320} placeholder="Pourquoi cette histoire mérite-t-elle d’être découverte ?"/>
+        <textarea value={note} onChange={event => setNote(event.target.value)} rows={3} maxLength={320} placeholder={locale === "en" ? "Why does this story deserve to be discovered?" : locale === "es" ? "¿Por qué merece la pena descubrir esta historia?" : locale === "pt" ? "Por que esta história merece ser descoberta?" : "Pourquoi cette histoire mérite-t-elle d’être découverte ?"}/>
       </label>
       <button type="submit" disabled={saving || !storyId || picks.length >= 12}><Plus size={16}/>{saving ? "Ajout…" : "Ajouter à la sélection"}</button>
     </form>
@@ -97,7 +99,7 @@ export function EditorialManager() {
       {picks.map(pick => <article key={pick.id} className="editorial-manager-item">
         {pick.story?.cover_url ? <img src={pick.story.cover_url} alt=""/> : <div className="editorial-manager-cover"><BookOpen size={20}/></div>}
         <div><span>POSITION {pick.position}</span><strong>{pick.story?.title ?? "Histoire indisponible"}</strong>{pick.editorial_note && <p>{pick.editorial_note}</p>}</div>
-        <button type="button" className="editorial-manager-remove" onClick={() => void removePick(pick.id)} aria-label="Retirer de la sélection"><Trash2 size={17}/></button>
+        <button type="button" className="editorial-manager-remove" onClick={() => void removePick(pick.id)} aria-label={locale === "en" ? "Remove from selection" : locale === "es" ? "Quitar de la selección" : locale === "pt" ? "Remover da seleção" : "Retirer de la sélection"}><Trash2 size={17}/></button>
       </article>)}
     </div>}
     {!stories.length && <p className="editorial-manager-hint">Aucune histoire publique publiée n’est disponible pour le moment. Les brouillons et histoires privées ne sont pas proposés.</p>}
