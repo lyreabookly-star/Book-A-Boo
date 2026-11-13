@@ -528,3 +528,23 @@ html[data-theme="dark"] .story-detail-chapter-list button.active{background:#a34
 html[data-theme="dark"] .writer-publication-row{background:#292b27;border-color:#454840}
 html[data-theme="dark"] .writer-publication-row strong{color:#eeeae2}
 @media(max-width:620px){.writer-publication-row{align-items:flex-start;flex-direction:column}.writer-publish-button{width:100%}}
+
+
+.public-profile-heading{display:flex;align-items:center;gap:22px;padding:25px 0 36px;border-bottom:1px solid var(--line)}
+.public-profile-heading>img,.public-profile-avatar{width:94px;height:94px;flex:0 0 94px;object-fit:cover;border-radius:50%;display:grid;place-items:center;background:#e9e4db;color:var(--accent)}
+.public-profile-heading h2{font-size:38px;margin:7px 0 2px}
+.public-profile-heading p{font-size:10px;color:var(--muted);margin:0}
+.public-profile-bio{max-width:560px;margin-top:13px;font-size:12px;line-height:1.8;color:var(--muted)}
+.public-profile-library{padding-top:38px}
+.public-profile-books{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.public-profile-book{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid var(--line);background:rgba(255,255,255,.2)}
+.public-profile-book>svg:first-child{color:var(--accent)}
+.public-profile-book>svg:last-child{margin-left:auto;color:var(--muted)}
+.public-profile-book span{display:flex;flex-direction:column;gap:5px;min-width:0}
+.public-profile-book strong{font:17px var(--serif);font-weight:500}
+.public-profile-book small{font-size:8px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+html[data-theme="dark"] .public-profile-heading,html[data-theme="dark"] .public-profile-book{border-color:#454840}
+html[data-theme="dark"] .public-profile-book{background:#272925;color:#eeeae2}
+html[data-theme="dark"] .public-profile-heading h2{color:#eeeae2}
+html[data-theme="dark"] .public-profile-avatar{background:#3b3d36;color:#e3b09c}
+@media(max-width:620px){.public-profile-heading{align-items:flex-start;gap:15px}.public-profile-heading>img,.public-profile-avatar{width:72px;height:72px;flex-basis:72px}.public-profile-heading h2{font-size:29px}.public-profile-books{grid-template-columns:1fr}}
