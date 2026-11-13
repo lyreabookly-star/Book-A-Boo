@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BookOpen, FilePlus2, Feather, LoaderCircle, LockKeyhole } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
+import { useAppPreferences } from "./app-preferences-provider";
 
 type Story = {
   id: string;
@@ -17,6 +18,7 @@ type Story = {
 
 export function WriterStudio() {
   const router = useRouter();
+  const { locale } = useAppPreferences();
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState("");
   const [stories, setStories] = useState<Story[]>([]);
@@ -111,8 +113,8 @@ export function WriterStudio() {
       {showForm && (
         <form className="writer-create-form" onSubmit={createStory}>
           <span className="catalogue-overline">NOUVEAU MANUSCRIT</span>
-          <label>Titre de votre œuvre<input value={title} onChange={e => setTitle(e.target.value)} maxLength={160} placeholder="Le titre de votre histoire" required /></label>
-          <label>Résumé <span>(facultatif)</span><textarea value={synopsis} onChange={e => setSynopsis(e.target.value)} maxLength={1200} rows={3} placeholder="Quelques mots sur votre univers…" /></label>
+          <label>Titre de votre œuvre<input value={title} onChange={e => setTitle(e.target.value)} maxLength={160} placeholder={locale === "en" ? "Your story title" : locale === "es" ? "El título de tu historia" : locale === "pt" ? "O título da sua história" : "Le titre de votre histoire"} required /></label>
+          <label>Résumé <span>(facultatif)</span><textarea value={synopsis} onChange={e => setSynopsis(e.target.value)} maxLength={1200} rows={3} placeholder={locale === "en" ? "A few words about your world…" : locale === "es" ? "Unas palabras sobre tu universo…" : locale === "pt" ? "Algumas palavras sobre seu universo…" : "Quelques mots sur votre univers…"} /></label>
           {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
           <div className="writer-form-actions"><button className="auth-submit" type="submit" disabled={creating}>{creating ? "Création…" : "Créer mon manuscrit"}</button><button className="auth-secondary" type="button" onClick={() => setShowForm(false)}>Annuler</button></div>
         </form>
@@ -138,7 +140,7 @@ export function WriterStudio() {
           <button className="auth-secondary" onClick={() => setShowForm(true)}>Créer ma première œuvre</button>
         </div>
       )}
-      <div className="writer-security-note"><LockKeyhole size={16} /><span><strong>Vos brouillons sont privés.</strong> Seul votre compte peut les consulter et les modifier.</span></div>
+      <div className="writer-security-note"><LockKeyhole size={16} /><span><strong>{locale === "en" ? "Your drafts are private." : locale === "es" ? "Tus borradores son privados." : locale === "pt" ? "Seus rascunhos são privados." : "Vos brouillons sont privés."}</strong> Seul votre compte peut les consulter et les modifier.</span></div>
     </>
   );
 }
