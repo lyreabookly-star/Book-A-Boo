@@ -252,6 +252,11 @@ const dictionary: Record<string, Record<Locale, string>> = {
   "Entrez dans l'univers d'un auteur et gardez cette histoire près de vous.": { fr:"Entrez dans l'univers d'un auteur et gardez cette histoire près de vous.", en:"Step into an author's world and keep this story close.", es:"Entra en el universo de un autor y guarda esta historia cerca.", pt:"Entre no universo de um autor e mantenha esta história por perto." },
   "TROUVER VOTRE PROCHAINE LECTURE": { fr:"TROUVER VOTRE PROCHAINE LECTURE", en:"FIND YOUR NEXT READ", es:"ENCUENTRA TU PRÓXIMA LECTURA", pt:"ENCONTRE SUA PRÓXIMA LEITURA" },
   "BOOK-A-BOO · HISTOIRE": { fr:"BOOK-A-BOO · HISTOIRE", en:"BOOK-A-BOO · STORY", es:"BOOK-A-BOO · HISTORIA", pt:"BOOK-A-BOO · HISTÓRIA" },
+  "Un lecteur,": { fr:"Un lecteur,", en:"A reader,", es:"Un lector,", pt:"Um leitor," },
+  "un univers.": { fr:"un univers.", en:"a world.", es:"un universo.", pt:"um universo." },
+  "Découvrez les univers et les lectures que ce membre a choisi de partager.": { fr:"Découvrez les univers et les lectures que ce membre a choisi de partager.", en:"Discover the worlds and reading choices this member has chosen to share.", es:"Descubre los mundos y las lecturas que este miembro ha decidido compartir.", pt:"Descubra os universos e as leituras que este membro escolheu compartilhar." },
+  "BOOK-A-BOO · PROFIL": { fr:"BOOK-A-BOO · PROFIL", en:"BOOK-A-BOO · PROFILE", es:"BOOK-A-BOO · PERFIL", pt:"BOOK-A-BOO · PERFIL" },
+  "Voir mon profil public ↗": { fr:"Voir mon profil public ↗", en:"View my public profile ↗", es:"Ver mi perfil público ↗", pt:"Ver meu perfil público ↗" },
   "Vos brouillons sont privés.": { fr:"Vos brouillons sont privés.", en:"Your drafts are private.", es:"Tus borradores son privados.", pt:"Seus rascunhos são privados." },
 };
 
