@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Bookmark, BookOpen, CheckCircle2, Clock3, LoaderCircle, Trash2, ArrowUpDown, Plus, ListPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -24,6 +24,7 @@ export function LibraryPageClient() {
   const [readingLists, setReadingLists] = useState<ReadingList[]>([]);
   const [newListName, setNewListName] = useState("");
   const [listError, setListError] = useState("");
+  const [selectedList, setSelectedList] = useState("");
 
   const copy = {
     login: locale === "en" ? "Log in to open your library." : locale === "es" ? "Inicia sesión para abrir tu biblioteca." : locale === "pt" ? "Entre para abrir sua biblioteca." : "Connectez-vous pour ouvrir votre bibliothèque.",
@@ -76,10 +77,10 @@ export function LibraryPageClient() {
     return () => { activeEffect = false; };
   }, []);
 
-  const visibleRows = useMemo(() => rows.filter(row => row.status === active && row.story).sort((a, b) => sort === "title" ? a.story!.title.localeCompare(b.story!.title, locale) : new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()), [rows, active, sort, locale]);
+  const visibleRows = useMemo(() => rows.filter(row => row.status === active && row.story && (!selectedList || readingLists.find(list => list.id === selectedList)?.items.includes(row.story.id))).sort((a, b) => sort === "title" ? a.story!.title.localeCompare(b.story!.title, locale) : new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()), [rows, active, sort, locale, selectedList, readingLists]);
 
 
-  async function createReadingList(event: React.FormEvent<HTMLFormElement>) {
+  async function createReadingList(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const name = newListName.trim();
     if (!name || !userId) return;
@@ -105,6 +106,7 @@ export function LibraryPageClient() {
     const { error: deleteError } = await supabase.from("user_reading_lists").delete().eq("id", listId).eq("user_id", userId);
     if (deleteError) { setListError(deleteError.message); return; }
     setReadingLists(items => items.filter(list => list.id !== listId));
+    if (selectedList === listId) setSelectedList("");
   }
 
   async function changeStatus(row: LibraryRow, status: LibraryRow["status"]) {
@@ -140,7 +142,7 @@ export function LibraryPageClient() {
     <div className="personal-library-tabs library-live-tabs">
       {tabs.map(tab => { const Icon = tab.icon; return <button type="button" key={tab.id} className={active === tab.id ? "personal-library-tab active" : "personal-library-tab"} onClick={() => setActive(tab.id)}><Icon size={17}/><span><strong>{tab.label}</strong><small>{rows.filter(row => row.status === tab.id).length} {locale === "en" ? "stories" : locale === "es" ? "historias" : locale === "pt" ? "histórias" : "histoires"}</small></span></button>; })}
     </div>
-<section className="reading-lists-panel"><div className="reading-lists-heading"><div><span className="catalogue-overline">VOS COLLECTIONS</span><h3>Listes de lecture</h3></div><span>{readingLists.length}</span></div><form className="reading-list-create" onSubmit={createReadingList}><input value={newListName} onChange={e => setNewListName(e.target.value)} maxLength={60} placeholder="Ex. : Mes coups de cœur" aria-label="Nom de la nouvelle liste"/><button type="submit" disabled={!newListName.trim()}><Plus size={15}/>Créer</button></form>{readingLists.length > 0 && <div className="reading-list-chips">{readingLists.map(list => <span key={list.id}>{list.name} ({list.items.length})<button type="button" aria-label={`Supprimer ${list.name}`} onClick={() => void deleteReadingList(list.id)}>×</button></span>)}</div>}</section>
+<section className="reading-lists-panel"><div className="reading-lists-heading"><div><span className="catalogue-overline">VOS COLLECTIONS</span><h3>Listes de lecture</h3></div><span>{readingLists.length}</span></div><form className="reading-list-create" onSubmit={createReadingList}><input value={newListName} onChange={e => setNewListName(e.target.value)} maxLength={60} placeholder="Ex. : Mes coups de cœur" aria-label="Nom de la nouvelle liste"/><button type="submit" disabled={!newListName.trim()}><Plus size={15}/>Créer</button></form>{readingLists.length > 0 && <div className="reading-list-chips"><button type="button" className={!selectedList ? "active" : ""} onClick={() => setSelectedList("")}>Toutes</button>{readingLists.map(list => <span key={list.id}><button type="button" className={selectedList === list.id ? "active" : ""} onClick={() => setSelectedList(selectedList === list.id ? "" : list.id)}>{list.name} ({list.items.length})</button><button type="button" className="reading-list-delete" aria-label={`Supprimer ${list.name}`} onClick={() => void deleteReadingList(list.id)}>×</button></span>)}</div>}</section>
     {(error || listError) && <p className="auth-feedback auth-error" role="alert">{error || listError}</p>}
     {visibleRows.length ? <div className="library-live-grid">
       {visibleRows.map(row => { const story = row.story!; return <article className="library-live-card" key={row.id}>
