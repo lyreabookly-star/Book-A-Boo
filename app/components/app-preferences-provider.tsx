@@ -245,6 +245,13 @@ const dictionary: Record<string, Record<Locale, string>> = {
   "Le recadrage de l'image est indisponible.": { fr:"Le recadrage de l'image est indisponible.", en:"Image cropping is unavailable.", es:"El recorte de imagen no está disponible.", pt:"O recorte da imagem não está disponível." },
   // Compléments du studio d'écriture
   "(facultatif)": { fr:"(facultatif)", en:"(optional)", es:"(opcional)", pt:"(opcional)" },
+  "VOTRE ESPACE DE LECTURE": { fr:"VOTRE ESPACE DE LECTURE", en:"YOUR READING SPACE", es:"TU ESPACIO DE LECTURA", pt:"SEU ESPAÇO DE LEITURA" },
+  "Retrouvez les histoires que vous avez enregistrées, celles que vous lisez en ce moment et vos lectures terminées.": { fr:"Retrouvez les histoires que vous avez enregistrées, celles que vous lisez en ce moment et vos lectures terminées.", en:"Find the stories you've saved, the ones you're reading now, and the ones you've finished.", es:"Encuentra las historias que guardaste, las que estás leyendo y las que terminaste.", pt:"Encontre as histórias que você salvou, as que está lendo e as que já terminou." },
+  "Un monde à": { fr:"Un monde à", en:"A world to", es:"Un mundo por", pt:"Um mundo para" },
+  "découvrir.": { fr:"découvrir.", en:"discover.", es:"descubrir.", pt:"descobrir." },
+  "Entrez dans l'univers d'un auteur et gardez cette histoire près de vous.": { fr:"Entrez dans l'univers d'un auteur et gardez cette histoire près de vous.", en:"Step into an author's world and keep this story close.", es:"Entra en el universo de un autor y guarda esta historia cerca.", pt:"Entre no universo de um autor e mantenha esta história por perto." },
+  "TROUVER VOTRE PROCHAINE LECTURE": { fr:"TROUVER VOTRE PROCHAINE LECTURE", en:"FIND YOUR NEXT READ", es:"ENCUENTRA TU PRÓXIMA LECTURA", pt:"ENCONTRE SUA PRÓXIMA LEITURA" },
+  "BOOK-A-BOO · HISTOIRE": { fr:"BOOK-A-BOO · HISTOIRE", en:"BOOK-A-BOO · STORY", es:"BOOK-A-BOO · HISTORIA", pt:"BOOK-A-BOO · HISTÓRIA" },
   "Vos brouillons sont privés.": { fr:"Vos brouillons sont privés.", en:"Your drafts are private.", es:"Tus borradores son privados.", pt:"Seus rascunhos são privados." },
 };
 
