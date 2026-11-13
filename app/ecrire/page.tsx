@@ -1,5 +1,5 @@
-import { BookOpen, Clock3, FilePlus2, Feather, FolderOpen, Lightbulb, PenLine, Sparkles } from "lucide-react";
 import { InteriorPage } from "../components/site-shell";
+import { WriterStudio } from "../components/writer-studio";
 
 export default function Ecrire() {
   return (
@@ -7,75 +7,9 @@ export default function Ecrire() {
       active="/ecrire"
       eyebrow="STUDIO D'ÉCRITURE BOOK-A-BOO"
       title={<>Les histoires<br /><em>commencent par vous.</em></>}
-      description="Un espace pensé pour vos idées, vos manuscrits et les univers que vous construisez. Prenez votre temps : chaque histoire a son rythme."
+      description="Un espace pensé pour vos idées, vos manuscrits et les univers que vous construisez. Vos brouillons restent privés."
     >
-      <div className="writer-dashboard-head">
-        <div>
-          <span className="writer-welcome">BIENVENUE DANS VOTRE STUDIO</span>
-          <h2>Votre bureau <em>d'auteur.</em></h2>
-          <p>Votre espace de création vous attend. Commencez par une idée, un titre ou quelques lignes.</p>
-        </div>
-        <div className="writer-avatar"><Feather size={25} /></div>
-      </div>
-
-      <div className="writer-start-grid">
-        <div className="writer-start-card writer-start-primary">
-          <span className="writer-start-icon"><FilePlus2 size={21} /></span>
-          <span className="writer-start-label">NOUVEAU PROJET</span>
-          <h3>Créer une œuvre</h3>
-          <p>Donnez un titre à votre histoire et posez les premières pierres de votre univers.</p>
-          <span className="writer-card-action">Éditeur en préparation</span>
-        </div>
-        <div className="writer-start-card">
-          <span className="writer-start-icon"><PenLine size={21} /></span>
-          <span className="writer-start-label">ÉCRITURE</span>
-          <h3>Écrire un chapitre</h3>
-          <p>Retrouvez un éditeur confortable pour écrire et organiser vos chapitres.</p>
-          <span className="writer-card-action">Bientôt disponible</span>
-        </div>
-        <div className="writer-start-card">
-          <span className="writer-start-icon"><FolderOpen size={21} /></span>
-          <span className="writer-start-label">ORGANISATION</span>
-          <h3>Mes manuscrits</h3>
-          <p>Gardez vos idées, brouillons et textes en cours au même endroit.</p>
-          <span className="writer-card-action">Bientôt disponible</span>
-        </div>
-      </div>
-
-      <div className="writer-lower-grid">
-        <section className="writer-project-panel">
-          <div className="writer-panel-heading">
-            <div><span className="catalogue-overline">VOTRE ATELIER</span><h2>Projets récents</h2></div>
-            <span className="writer-count">0 PROJET</span>
-          </div>
-          <div className="writer-empty">
-            <span className="writer-empty-icon"><BookOpen size={23} /></span>
-            <strong>La première page est encore blanche.</strong>
-            <p>Vos œuvres et brouillons apparaîtront ici, privés jusqu'à ce que vous décidiez de les partager.</p>
-            <span className="writer-coming-soon">Votre espace sera activé ici</span>
-          </div>
-        </section>
-        <aside className="writer-side-panel">
-          <span className="writer-side-icon"><Lightbulb size={20} /></span>
-          <span className="catalogue-overline">UN CONSEIL POUR COMMENCER</span>
-          <h3>Une idée n'a pas besoin d'être parfaite pour exister.</h3>
-          <p>Notez une scène, une phrase ou le nom d'un personnage. Votre univers se précisera en avançant.</p>
-          <div className="writer-side-footer"><Clock3 size={14} /> Écrivez à votre rythme</div>
-        </aside>
-      </div>
-
-      <div className="writer-security-note">
-        <Sparkles size={16} />
-        <span><strong>Votre travail vous appartient.</strong> Les brouillons resteront privés. Aucune œuvre ne sera publiée sans votre validation.</span>
-      </div>
-      <div className="writer-coming-note">
-        <div>
-          <span className="catalogue-overline">PROCHAINE ÉTAPE</span>
-          <h2>Un studio complet, bientôt.</h2>
-          <p>La sauvegarde des textes, la gestion des chapitres et la publication seront activées après la mise en place des comptes et de la base de données.</p>
-        </div>
-        <span className="writer-coming-soon">Bientôt disponible</span>
-      </div>
+      <WriterStudio />
     </InteriorPage>
   );
 }
