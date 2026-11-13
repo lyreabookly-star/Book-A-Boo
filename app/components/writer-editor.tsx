@@ -57,8 +57,8 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     return () => { alive = false; };
   }, [load]);
 
-  async function save() {
-    if (!chapter || !story) return;
+  async function save(): Promise<boolean> {
+    if (!chapter || !story) return false;
     setSaving(true); setSaved(false); setError("");
     try {
       const supabase = getSupabaseBrowserClient();
@@ -71,8 +71,10 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       if (storyError) throw storyError;
       setSaved(true);
       setChapters(items => items.map(item => item.id === chapter.id ? { ...item, title: title.trim() || "Chapitre", content } : item));
+      return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : "La sauvegarde a échoué.");
+      return false;
     } finally { setSaving(false); }
   }
 
@@ -80,7 +82,8 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     if (!story) return;
     setError("");
     try {
-      await save();
+      const savedCurrent = await save();
+      if (!savedCurrent) return;
       const supabase = getSupabaseBrowserClient();
       const nextNumber = Math.max(0, ...chapters.map(c => c.chapter_number)) + 1;
       const { data, error: insertError } = await supabase.from("chapters")
@@ -93,7 +96,11 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     } catch (e) { setError(e instanceof Error ? e.message : "Impossible d'ajouter ce chapitre."); }
   }
 
-  function selectChapter(item: Chapter) {
+  async function selectChapter(item: Chapter) {
+    if (chapter?.id !== item.id) {
+      const savedCurrent = await save();
+      if (!savedCurrent) return;
+    }
     setChapter(item); setTitle(item.title); setContent(item.content); setSaved(false);
   }
 
