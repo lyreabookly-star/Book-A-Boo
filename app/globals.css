@@ -316,3 +316,73 @@
 .profile-account-handle{font-size:10px;color:var(--accent);margin:0}
 .profile-account-email{font-size:11px;color:var(--muted);margin:9px 0}
 @media(max-width:620px){.auth-card{padding:24px 19px}.auth-card-heading h2,.profile-account-card h2,.profile-logged-out h2{font-size:27px}.auth-name-fields{grid-template-columns:1fr}.profile-account-actions{align-items:stretch;flex-direction:column}.profile-account-actions>*{width:100%}}
+
+
+/* Studio d'écriture connecté et éditeur de manuscrits */
+.writer-state{display:flex;align-items:center;gap:10px;padding:35px 0;color:var(--muted);font-size:12px}
+.spin{animation:writer-spin 1s linear infinite}@keyframes writer-spin{to{transform:rotate(360deg)}}
+.writer-login-panel{max-width:650px;padding:32px;background:#fbfaf7;border:1px solid var(--line)}
+.writer-login-panel h2{font:30px var(--serif);font-weight:500;margin:12px 0}
+.writer-login-panel>p{max-width:520px;font-size:12px;line-height:1.8;color:var(--muted)}
+.writer-toolbar{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:24px 0 18px}
+.writer-toolbar h2{font:29px var(--serif);font-weight:500;margin:8px 0 0}
+.writer-toolbar .primary-button{border:0;cursor:pointer}
+.writer-create-form{display:flex;flex-direction:column;gap:16px;padding:23px;margin:0 0 22px;background:#fbfaf7;border:1px solid var(--line)}
+.writer-create-form label{display:flex;flex-direction:column;gap:8px;font-size:10px;font-weight:700}
+.writer-create-form label span{font-weight:400;color:var(--muted)}
+.writer-create-form input,.writer-create-form textarea{width:100%;border:1px solid #dedbd3;background:#fffefa;padding:13px;font:12px var(--sans);color:var(--ink);resize:vertical}
+.writer-create-form input{height:45px}
+.writer-form-actions{display:flex;gap:10px;flex-wrap:wrap}
+.writer-form-actions .auth-submit{min-width:190px;cursor:pointer}
+.writer-project-list{display:flex;flex-direction:column;border:1px solid var(--line);background:#fbfaf7}
+.writer-project-row{display:flex;align-items:center;gap:14px;padding:17px 19px;border-bottom:1px solid var(--line)}
+.writer-project-row:last-child{border-bottom:0}
+.writer-project-row:hover{background:#f1eee8}
+.writer-project-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:50%;background:#eee9e1;color:var(--accent);flex:0 0 auto}
+.writer-project-copy{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.writer-project-copy strong{font:18px var(--serif);font-weight:500}
+.writer-project-copy small{font-size:9px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.writer-project-status{font-size:7px;letter-spacing:.12em;color:#7f786d;white-space:nowrap}
+.writer-empty-real{border:1px solid var(--line);background:#fbfaf7;margin-top:12px}
+.writer-empty-real .auth-secondary{margin-top:10px}
+.writer-empty .writer-coming-soon{font-size:10px;color:var(--muted);margin-top:8px}
+.writer-editor{border:1px solid var(--line);background:#fbfaf7}
+.writer-editor-top{display:flex;align-items:center;justify-content:space-between;padding:15px 19px;border-bottom:1px solid var(--line);font-size:9px;color:var(--muted)}
+.writer-editor-top a,.writer-editor-top span{display:flex;align-items:center;gap:8px}
+.writer-editor-top a{font-weight:700;color:var(--ink)}
+.writer-editor-top span{letter-spacing:.12em;color:#62765b}
+.writer-work-title{display:flex;flex-direction:column;gap:8px;padding:17px 20px;border-bottom:1px solid var(--line);font-size:8px;letter-spacing:.14em;color:var(--muted)}
+.writer-work-title input{border:0;background:transparent;outline:none;font:27px var(--serif);color:var(--ink);letter-spacing:-.03em}
+.writer-editor-grid{display:grid;grid-template-columns:205px minmax(0,1fr);min-height:540px}
+.writer-chapter-list{padding:17px 12px;border-right:1px solid var(--line);background:#f4f1eb}
+.writer-chapter-heading{display:flex;align-items:center;justify-content:space-between;padding:0 5px 13px}
+.writer-chapter-heading button{border:0;background:#e7e0d5;color:var(--accent);width:29px;height:29px;display:grid;place-items:center;cursor:pointer}
+.writer-chapter{display:flex;align-items:center;gap:9px;width:100%;padding:11px 8px;border:0;background:transparent;text-align:left;font-size:10px;color:#69645b;cursor:pointer}
+.writer-chapter span{font:italic 11px var(--serif);color:#a34f3e}
+.writer-chapter.active{background:#e8e2d8;color:var(--ink);font-weight:700}
+.writer-writing-area{display:flex;flex-direction:column;padding:27px 30px}
+.writer-chapter-title{width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;padding:4px 0 16px;outline:none;font:28px var(--serif);color:var(--ink)}
+.writer-manuscript{width:100%;min-height:350px;flex:1;border:0;outline:none;resize:vertical;background:transparent;padding:23px 0;font:16px/2 var(--serif);color:#514d46}
+.writer-manuscript::placeholder{color:#aaa398}
+.writer-save-row{display:flex;align-items:center;justify-content:space-between;gap:15px;border-top:1px solid var(--line);padding-top:15px}
+.writer-save-row>span{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted)}
+.writer-save-row>span svg{color:#58704e}
+.writer-save-row button{display:flex;align-items:center;gap:8px;cursor:pointer}
+@media(max-width:620px){
+ .writer-toolbar{align-items:flex-start;flex-direction:column}
+ .writer-toolbar .primary-button{width:100%}
+ .writer-create-form{padding:18px}
+ .writer-project-row{padding:14px 12px;gap:9px}
+ .writer-project-status{font-size:6px}
+ .writer-editor-grid{grid-template-columns:1fr}
+ .writer-chapter-list{border-right:0;border-bottom:1px solid var(--line);padding:12px}
+ .writer-chapter-list .writer-chapter{width:auto;display:inline-flex;margin:3px}
+ .writer-writing-area{padding:20px 16px}
+ .writer-chapter-title{font-size:24px}
+ .writer-manuscript{font-size:15px;min-height:300px}
+ .writer-editor-top{padding:13px}
+ .writer-work-title{padding:14px}
+ .writer-work-title input{font-size:23px}
+ .writer-save-row{align-items:flex-start;flex-direction:column}
+ .writer-save-row button{width:100%;justify-content:center}
+}
