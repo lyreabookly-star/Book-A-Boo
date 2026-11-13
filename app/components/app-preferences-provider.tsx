@@ -309,6 +309,26 @@ const dictionary: Record<string, Record<Locale, string>> = {
   "Retirer de la sélection": { fr:"Retirer de la sélection", en:"Remove from selection", es:"Quitar de la selección", pt:"Remover da seleção" },
   "Aucune histoire publique publiée n’est disponible pour le moment. Les brouillons et histoires privées ne sont pas proposés.": { fr:"Aucune histoire publique publiée n’est disponible pour le moment. Les brouillons et histoires privées ne sont pas proposés.", en:"No published public stories are available yet. Drafts and private stories are not shown.", es:"Todavía no hay historias públicas publicadas. No se muestran borradores ni historias privadas.", pt:"Ainda não há histórias públicas publicadas. Rascunhos e histórias privadas não são exibidos." }
 
+
+  "LA VIE DE VOTRE COMMUNAUTÉ": { fr:"LA VIE DE VOTRE COMMUNAUTÉ", en:"YOUR COMMUNITY'S ACTIVITY", es:"LA ACTIVIDAD DE TU COMUNIDAD", pt:"A ATIVIDADE DA SUA COMUNIDADE" },
+  "Les mots continuent": { fr:"Les mots continuent", en:"The words keep", es:"Las palabras siguen", pt:"As palavras continuam" },
+  "de voyager.": { fr:"de voyager.", en:"travelling.", es:"viajando.", pt:"viajando." },
+  "Retrouvez les nouvelles histoires publiées par les auteurs que vous suivez.": { fr:"Retrouvez les nouvelles histoires publiées par les auteurs que vous suivez.", en:"Find the latest stories published by authors you follow.", es:"Descubre las nuevas historias publicadas por los autores que sigues.", pt:"Encontre as novas histórias publicadas pelos autores que você segue." },
+  "Le fil d'actualités n'a pas pu être chargé. Réessayez dans un instant.": { fr:"Le fil d'actualités n'a pas pu être chargé. Réessayez dans un instant.", en:"The activity feed couldn't be loaded. Please try again shortly.", es:"No se pudo cargar el feed de actividad. Inténtalo de nuevo en un momento.", pt:"Não foi possível carregar o feed de atividades. Tente novamente em instantes." },
+  "Chargement de vos actualités…": { fr:"Chargement de vos actualités…", en:"Loading your feed…", es:"Cargando tus novedades…", pt:"Carregando suas novidades…" },
+  "Votre communauté vous attend.": { fr:"Votre communauté vous attend.", en:"Your community is waiting for you.", es:"Tu comunidad te espera.", pt:"Sua comunidade está esperando por você." },
+  "Connectez-vous pour suivre vos auteurs préférés et retrouver leurs nouvelles publications ici.": { fr:"Connectez-vous pour suivre vos auteurs préférés et retrouver leurs nouvelles publications ici.", en:"Log in to follow your favourite authors and see their latest publications here.", es:"Inicia sesión para seguir a tus autores favoritos y ver aquí sus nuevas publicaciones.", pt:"Entre para seguir seus autores favoritos e ver as novas publicações deles aqui." },
+  "Votre fil commence ici.": { fr:"Votre fil commence ici.", en:"Your feed starts here.", es:"Tu feed comienza aquí.", pt:"Seu feed começa aqui." },
+  "Découvrez des histoires dans Explorer, ouvrez le profil ou une histoire d'un auteur, puis choisissez « Suivre l'auteur ». Ses nouvelles publications apparaîtront ici.": { fr:"Découvrez des histoires dans Explorer, ouvrez le profil ou une histoire d'un auteur, puis choisissez « Suivre l'auteur ». Ses nouvelles publications apparaîtront ici.", en:"Discover stories in Explore, open an author's profile or a story, then choose “Follow author”. Their new publications will appear here.", es:"Descubre historias en Explorar, abre el perfil o una historia de un autor y elige «Seguir al autor». Sus nuevas publicaciones aparecerán aquí.", pt:"Descubra histórias em Explorar, abra o perfil ou uma história de um autor e escolha “Seguir autor”. As novas publicações aparecerão aqui." },
+  "Découvrir des auteurs →": { fr:"Découvrir des auteurs →", en:"Discover authors →", es:"Descubrir autores →", pt:"Descobrir autores →" },
+  "a publié une histoire": { fr:"a publié une histoire", en:"published a story", es:"ha publicado una historia", pt:"publicou uma história" },
+  "Auteur Book-A-Boo": { fr:"Auteur Book-A-Boo", en:"Book-A-Boo author", es:"Autor de Book-A-Boo", pt:"Autor do Book-A-Boo" },
+  "LITTÉRATURE": { fr:"LITTÉRATURE", en:"LITERATURE", es:"LITERATURA", pt:"LITERATURA" },
+  "Une nouvelle histoire à découvrir.": { fr:"Une nouvelle histoire à découvrir.", en:"A new story to discover.", es:"Una nueva historia por descubrir.", pt:"Uma nova história para descobrir." },
+  "Lire l'histoire": { fr:"Lire l'histoire", en:"Read the story", es:"Leer la historia", pt:"Ler a história" },
+  "Actualités": { fr:"Actualités", en:"News", es:"Novedades", pt:"Novidades" },
+  "Rédaction": { fr:"Rédaction", en:"Editorial", es:"Redacción", pt:"Redação" }
+
 };
 
 function translateNode(value: string, locale: Locale) {
