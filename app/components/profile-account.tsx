@@ -75,9 +75,7 @@ export function ProfileAccount() {
             setProfile(data);
             setEmail(session.user.email ?? "");
           }
-        })
-        .finally(() => {
-          if (active) setLoading(false);
+          setLoading(false);
         });
     });
     return () => {
