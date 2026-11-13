@@ -10,6 +10,8 @@ type Profile = {
   display_name: string | null;
   bio: string;
   avatar_url: string | null;
+  is_public: boolean;
+  show_library_on_profile: boolean;
 };
 
 export function ProfileAccount() {
@@ -32,7 +34,7 @@ export function ProfileAccount() {
         }
         const { data, error: profileError } = await supabase
           .from("profiles")
-          .select("username, display_name, bio, avatar_url")
+          .select("username, display_name, bio, avatar_url, is_public, show_library_on_profile")
           .eq("id", user.id)
           .maybeSingle();
         if (profileError) throw profileError;
@@ -94,7 +96,7 @@ export function ProfileAccount() {
       {profile?.bio && <p>{profile.bio}</p>}
       {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
       <div className="profile-account-actions">
-        <Link className="auth-submit" href="/bibliotheque">Ma bibliothèque →</Link><Link className="auth-secondary" href="/parametres">Paramètres du compte ⚙</Link>
+        <Link className="auth-submit" href="/bibliotheque">Ma bibliothèque →</Link>{profile?.is_public && profile.username && <Link className="auth-secondary" href={`/u/${encodeURIComponent(profile.username)}`}>Voir mon profil public ↗</Link>}<Link className="auth-secondary" href="/parametres">Paramètres du compte ⚙</Link>
         <button className="auth-secondary" type="button" onClick={signOut}>Me déconnecter</button>
       </div>
       <p className="auth-privacy">Votre prénom, votre nom et votre adresse e-mail restent privés.</p>
