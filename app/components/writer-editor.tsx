@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { ChangeEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, BookOpen, Check, LoaderCircle, Plus, Save } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { useAppPreferences } from "./app-preferences-provider";
 
-type Story = { id: string; title: string; synopsis: string; status: "draft" | "published"; visibility: "private" | "public"; published_at: string | null };
+type Story = { id: string; title: string; synopsis: string; status: "draft" | "published"; visibility: "private" | "public"; published_at: string | null; cover_url: string | null };
 type Chapter = { id: string; title: string; content: string; chapter_number: number; updated_at: string };
 
 export function WriterEditor({ storyId }: { storyId: string }) {
@@ -23,6 +24,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [publishing, setPublishing] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
 
   const load = useCallback(async () => {
     const supabase = getSupabaseBrowserClient() as any;
@@ -33,7 +35,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       return;
     }
     const { data: storyData, error: storyError } = await supabase
-      .from("stories").select("id,title,synopsis,status,visibility,published_at").eq("id", storyId).eq("author_id", user.id).single();
+      .from("stories").select("id,title,synopsis,status,visibility,published_at,cover_url").eq("id", storyId).eq("author_id", user.id).single();
     if (storyError) throw storyError;
     const { data: chapterData, error: chapterError } = await supabase
       .from("chapters").select("id,title,content,chapter_number,updated_at").eq("story_id", storyId).order("chapter_number");
@@ -79,6 +81,63 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       setError(e instanceof Error ? e.message : "La sauvegarde a échoué.");
       return false;
     } finally { setSaving(false); }
+  }
+
+  async function uploadCover(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file || !story) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setError(locale === "en" ? "Choose a JPG, PNG or WebP image." : locale === "es" ? "Elige una imagen JPG, PNG o WebP." : locale === "pt" ? "Escolha uma imagem JPG, PNG ou WebP." : "Choisissez une image JPG, PNG ou WebP.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError(locale === "en" ? "The image must be 5 MB or smaller." : locale === "es" ? "La imagen debe pesar 5 MB o menos." : locale === "pt" ? "A imagem deve ter no máximo 5 MB." : "L'image doit peser 5 Mo maximum.");
+      return;
+    }
+    setUploadingCover(true);
+    setError("");
+    try {
+      const supabase = getSupabaseBrowserClient() as any;
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw authError || new Error("Connexion requise.");
+      const extension = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
+      const path = `${user.id}/${story.id}/cover-${Date.now()}.${extension}`;
+      const { error: uploadError } = await supabase.storage.from("book-covers").upload(path, file, { contentType: file.type, upsert: false });
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabase.storage.from("book-covers").getPublicUrl(path);
+      const { error: updateError } = await supabase.from("stories").update({ cover_url: urlData.publicUrl, updated_at: new Date().toISOString() }).eq("id", story.id);
+      if (updateError) {
+        await supabase.storage.from("book-covers").remove([path]);
+        throw updateError;
+      }
+      setStory(current => current ? { ...current, cover_url: urlData.publicUrl } : current);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : (locale === "en" ? "Cover upload failed." : locale === "es" ? "No se pudo subir la portada." : locale === "pt" ? "Falha ao enviar a capa." : "L'envoi de la couverture a échoué."));
+    } finally {
+      setUploadingCover(false);
+    }
+  }
+
+  async function removeCover() {
+    if (!story) return;
+    setUploadingCover(true);
+    setError("");
+    try {
+      const supabase = getSupabaseBrowserClient() as any;
+      const { error: updateError } = await supabase.from("stories").update({ cover_url: null, updated_at: new Date().toISOString() }).eq("id", story.id);
+      if (updateError) throw updateError;
+      if (story.cover_url) {
+        const marker = "/book-covers/";
+        const path = story.cover_url.includes(marker) ? story.cover_url.split(marker)[1]?.split("?")[0] : "";
+        if (path) await supabase.storage.from("book-covers").remove([decodeURIComponent(path)]);
+      }
+      setStory(current => current ? { ...current, cover_url: null } : current);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : (locale === "en" ? "Could not remove the cover." : locale === "es" ? "No se pudo quitar la portada." : locale === "pt" ? "Não foi possível remover a capa." : "Impossible de retirer la couverture."));
+    } finally {
+      setUploadingCover(false);
+    }
   }
 
   async function addChapter() {
@@ -140,6 +199,19 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     <div className="writer-editor">
       <div className="writer-editor-top"><Link href="/ecrire"><ArrowLeft size={15} /> Mes manuscrits</Link><span><BookOpen size={14} /> {story.status === "published" ? (locale === "en" ? "PUBLISHED" : locale === "es" ? "PUBLICADO" : locale === "pt" ? "PUBLICADO" : "PUBLIÉ") : (locale === "en" ? "PRIVATE DRAFT" : locale === "es" ? "BORRADOR PRIVADO" : locale === "pt" ? "RASCUNHO PRIVADO" : "BROUILLON PRIVÉ")}</span></div>
       <label className="writer-work-title">Titre de l'œuvre<input value={story.title} onChange={e => setStory({ ...story, title: e.target.value })} onBlur={async () => { const s = getSupabaseBrowserClient() as any; const { error: e } = await s.from("stories").update({ title: story.title.trim() }).eq("id", story.id); if (e) setError(e.message); }} maxLength={160} /></label>
+      <section className="writer-cover-settings">
+        <div className="writer-cover-preview">
+          {story.cover_url ? <img src={story.cover_url} alt={locale === "en" ? "Book cover preview" : locale === "es" ? "Vista previa de la portada" : locale === "pt" ? "Prévia da capa" : "Aperçu de la couverture"} /> : <div className="writer-cover-placeholder"><BookOpen size={28}/><span>{locale === "en" ? "Automatic cover" : locale === "es" ? "Portada automática" : locale === "pt" ? "Capa automática" : "Couverture automatique"}</span></div>}
+        </div>
+        <div className="writer-cover-copy">
+          <strong>{locale === "en" ? "Your book cover" : locale === "es" ? "La portada de tu obra" : locale === "pt" ? "A capa da sua obra" : "La couverture de votre œuvre"}</strong>
+          <p>{locale === "en" ? "Optional · JPG, PNG or WebP · 5 MB maximum. Without an image, Book-A-Boo creates a typographic cover." : locale === "es" ? "Opcional · JPG, PNG o WebP · máximo 5 MB. Sin imagen, Book-A-Boo crea una portada tipográfica." : locale === "pt" ? "Opcional · JPG, PNG ou WebP · máximo 5 MB. Sem imagem, Book-A-Boo cria uma capa tipográfica." : "Facultative · JPG, PNG ou WebP · 5 Mo maximum. Sans image, Book-A-Boo crée une couverture typographique."}</p>
+          <label className="writer-cover-upload">{uploadingCover ? (locale === "en" ? "Uploading…" : locale === "es" ? "Subiendo…" : locale === "pt" ? "Enviando…" : "Envoi…") : story.cover_url ? (locale === "en" ? "Replace image" : locale === "es" ? "Cambiar imagen" : locale === "pt" ? "Trocar imagem" : "Remplacer l'image") : (locale === "en" ? "Choose a cover" : locale === "es" ? "Elegir portada" : locale === "pt" ? "Escolher capa" : "Choisir une couverture")}
+            <input type="file" accept="image/jpeg,image/png,image/webp" onChange={uploadCover} disabled={uploadingCover} />
+          </label>
+          {story.cover_url && <button type="button" className="writer-cover-remove" onClick={removeCover} disabled={uploadingCover}>{locale === "en" ? "Remove cover" : locale === "es" ? "Quitar portada" : locale === "pt" ? "Remover capa" : "Retirer la couverture"}</button>}
+        </div>
+      </section>
       <div className="writer-publication-row">
         <div><strong>{story.status === "published" ? (locale === "en" ? "Your story is public." : locale === "es" ? "Tu historia es pública." : locale === "pt" ? "Sua história está pública." : "Votre histoire est publique.") : (locale === "en" ? "Ready to share your story?" : locale === "es" ? "¿Lista para compartir tu historia?" : locale === "pt" ? "Pronto para compartilhar sua história?" : "Prêt à partager votre histoire ?")}</strong><small>{story.status === "published" ? (locale === "en" ? "It appears in Explorer and can be saved by readers." : locale === "es" ? "Aparece en Explorar y los lectores pueden guardarla." : locale === "pt" ? "Aparece em Explorar e os leitores podem salvá-la." : "Elle apparaît dans Explorer et les lecteurs peuvent l'enregistrer.") : (locale === "en" ? "Publishing makes it visible to everyone." : locale === "es" ? "Al publicar, será visible para todos." : locale === "pt" ? "Ao publicar, ela ficará visível para todos." : "La publication la rend visible par tout le monde.")}</small></div>
         <button type="button" className="writer-publish-button" onClick={togglePublication} disabled={publishing || saving}>{publishing ? (locale === "en" ? "Please wait…" : locale === "es" ? "Un momento…" : locale === "pt" ? "Aguarde…" : "Patientez…") : story.status === "published" ? (locale === "en" ? "Unpublish" : locale === "es" ? "Retirar" : locale === "pt" ? "Retirar" : "Dépublier") : (locale === "en" ? "Publish my story" : locale === "es" ? "Publicar mi historia" : locale === "pt" ? "Publicar minha história" : "Publier mon histoire")}</button>
