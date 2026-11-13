@@ -15,7 +15,7 @@ const items = [
 
 type HeaderProfile = { id: string; avatarUrl: string | null; displayName: string | null };
 
-export function SiteHeader({ active = "/" }: { active?: string }) {
+export function SiteHeader({ active = "/", hideGuestActions = false }: { active?: string; hideGuestActions?: boolean }) {
   const [profile, setProfile] = useState<HeaderProfile | null>(null);
   const [authReady, setAuthReady] = useState(false);
 
@@ -73,12 +73,12 @@ export function SiteHeader({ active = "/" }: { active?: string }) {
           <Link className="header-profile-link" href="/profil" aria-label={profile.displayName ? `Ouvrir le profil de ${profile.displayName}` : "Ouvrir mon profil"} title="Mon profil">
             {profile.avatarUrl ? <img className="header-profile-avatar" src={profile.avatarUrl} alt="" /> : <span className="header-profile-fallback"><UserRound size={20}/></span>}
           </Link>
-        ) : (
+        ) : !hideGuestActions ? (
           <>
             <Link className="login-link" href="/connexion"><LogIn size={15}/> Connexion</Link>
             <Link className="signup-button" href="/inscription">Rejoindre <span>→</span></Link>
           </>
-        )}
+        ) : null}
       </div>
     </header>
     <nav className="mobile-nav" aria-label="Navigation mobile">
