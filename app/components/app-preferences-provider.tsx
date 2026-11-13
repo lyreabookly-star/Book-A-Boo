@@ -273,6 +273,41 @@ const dictionary: Record<string, Record<Locale, string>> = {
   "Titre de l'œuvre": { fr:"Titre de l'œuvre", en:"Story title", es:"Título de la historia", pt:"Título da história" },
 
 
+
+  "Être averti lorsqu’un membre commence à vous suivre.": { fr:"Être averti lorsqu’un membre commence à vous suivre.", en:"Get notified when a member starts following you.", es:"Recibe una notificación cuando un miembro comience a seguirte.", pt:"Receba uma notificação quando alguém começar a seguir você." },
+  "Être averti lorsqu’un auteur que vous suivez publie une histoire publique.": { fr:"Être averti lorsqu’un auteur que vous suivez publie une histoire publique.", en:"Get notified when an author you follow publishes a public story.", es:"Recibe una notificación cuando un autor que sigues publique una historia pública.", pt:"Receba uma notificação quando um autor que você segue publicar uma história pública." },
+  "Choisissez les alertes que vous souhaitez recevoir sur Book-A-Boo et par e-mail.": { fr:"Choisissez les alertes que vous souhaitez recevoir sur Book-A-Boo et par e-mail.", en:"Choose the alerts you want to receive on Book-A-Boo and by email.", es:"Elige las alertas que deseas recibir en Book-A-Boo y por correo electrónico.", pt:"Escolha os alertas que deseja receber no Book-A-Boo e por e-mail." },
+  "Nouveaux abonnés": { fr:"Nouveaux abonnés", en:"New followers", es:"Nuevos seguidores", pt:"Novos seguidores" },
+  "Nouvelles publications": { fr:"Nouvelles publications", en:"New publications", es:"N nuevas publicaciones", pt:"Novas publicações" },
+  "BOOK-A-BOO · ESPACE ÉDITORIAL": { fr:"BOOK-A-BOO · ESPACE ÉDITORIAL", en:"BOOK-A-BOO · EDITORIAL SPACE", es:"BOOK-A-BOO · ESPACIO EDITORIAL", pt:"BOOK-A-BOO · ESPAÇO EDITORIAL" },
+  "Composer la sélection.": { fr:"Composer la sélection.", en:"Build the selection.", es:"Crear la selección.", pt:"Montar a seleção." },
+  "Choisissez les histoires publiques à mettre en lumière sur la page d’accueil. Jusqu’à 12 œuvres peuvent être présentées.": { fr:"Choisissez les histoires publiques à mettre en lumière sur la page d’accueil. Jusqu’à 12 œuvres peuvent être présentées.", en:"Choose public stories to feature on the homepage. Up to 12 works can be featured.", es:"Elige historias públicas para destacar en la página de inicio. Se pueden presentar hasta 12 obras.", pt:"Escolha histórias públicas para destacar na página inicial. Até 12 obras podem ser apresentadas." },
+  "Connectez-vous avec votre compte de rédaction pour continuer.": { fr:"Connectez-vous avec votre compte de rédaction pour continuer.", en:"Sign in with your editorial account to continue.", es:"Inicia sesión con tu cuenta editorial para continuar.", pt:"Entre com sua conta editorial para continuar." },
+  "Impossible de charger les histoires publiées.": { fr:"Impossible de charger les histoires publiées.", en:"Unable to load published stories.", es:"No se pudieron cargar las historias publicadas.", pt:"Não foi possível carregar as histórias publicadas." },
+  "Impossible de charger la sélection éditoriale.": { fr:"Impossible de charger la sélection éditoriale.", en:"Unable to load the editorial selection.", es:"No se pudo cargar la selección editorial.", pt:"Não foi possível carregar a seleção editorial." },
+  "Cette histoire figure déjà dans la sélection.": { fr:"Cette histoire figure déjà dans la sélection.", en:"This story is already in the selection.", es:"Esta historia ya está en la selección.", pt:"Esta história já faz parte da seleção." },
+  "L’histoire a rejoint la sélection de la rédaction.": { fr:"L’histoire a rejoint la sélection de la rédaction.", en:"The story has been added to the editorial selection.", es:"La historia se ha añadido a la selección editorial.", pt:"A história foi adicionada à seleção editorial." },
+  "Impossible de retirer cette histoire.": { fr:"Impossible de retirer cette histoire.", en:"Unable to remove this story.", es:"No se pudo quitar esta historia.", pt:"Não foi possível remover esta história." },
+  "Histoire retirée de la sélection.": { fr:"Histoire retirée de la sélection.", en:"Story removed from the selection.", es:"Historia eliminada de la selección.", pt:"História removida da seleção." },
+  "Chargement de l’espace rédaction…": { fr:"Chargement de l’espace rédaction…", en:"Loading the editorial workspace…", es:"Cargando el espacio editorial…", pt:"Carregando o espaço editorial…" },
+  "Accès réservé à la rédaction": { fr:"Accès réservé à la rédaction", en:"Editorial team access only", es:"Acceso reservado al equipo editorial", pt:"Acesso reservado à equipe editorial" },
+  "Connectez-vous avec le compte autorisé à gérer la sélection éditoriale.": { fr:"Connectez-vous avec le compte autorisé à gérer la sélection éditoriale.", en:"Sign in with an account authorized to manage the editorial selection.", es:"Inicia sesión con una cuenta autorizada para gestionar la selección editorial.", pt:"Entre com uma conta autorizada a gerenciar a seleção editorial." },
+  "Aller à la connexion": { fr:"Aller à la connexion", en:"Go to login", es:"Ir al inicio de sesión", pt:"Ir para o login" },
+  "Retour à l’accueil": { fr:"Retour à l’accueil", en:"Back to homepage", es:"Volver al inicio", pt:"Voltar à página inicial" },
+  "Histoire publiée": { fr:"Histoire publiée", en:"Published story", es:"Historia publicada", pt:"História publicada" },
+  "Choisir une histoire…": { fr:"Choisir une histoire…", en:"Choose a story…", es:"Elegir una historia…", pt:"Escolher uma história…" },
+  "Position": { fr:"Position", en:"Position", es:"Posición", pt:"Posição" },
+  "Mot de la rédaction (facultatif)": { fr:"Mot de la rédaction (facultatif)", en:"Editor's note (optional)", es:"Nota editorial (opcional)", pt:"Nota editorial (opcional)" },
+  "Pourquoi cette histoire mérite-t-elle d’être découverte ?": { fr:"Pourquoi cette histoire mérite-t-elle d’être découverte ?", en:"Why does this story deserve to be discovered?", es:"¿Por qué merece la pena descubrir esta historia?", pt:"Por que esta história merece ser descoberta?" },
+  "Ajout…": { fr:"Ajout…", en:"Adding…", es:"Añadiendo…", pt:"Adicionando…" },
+  "Ajouter à la sélection": { fr:"Ajouter à la sélection", en:"Add to selection", es:"Añadir a la selección", pt:"Adicionar à seleção" },
+  "La sélection actuelle": { fr:"La sélection actuelle", en:"Current selection", es:"Selección actual", pt:"Seleção atual" },
+  "Aucune histoire sélectionnée pour le moment.": { fr:"Aucune histoire sélectionnée pour le moment.", en:"No stories selected yet.", es:"Todavía no hay historias seleccionadas.", pt:"Nenhuma história selecionada ainda." },
+  "Les œuvres ajoutées ici apparaîtront automatiquement sur l’accueil.": { fr:"Les œuvres ajoutées ici apparaîtront automatiquement sur l’accueil.", en:"Works added here will automatically appear on the homepage.", es:"Las obras añadidas aquí aparecerán automáticamente en la página de inicio.", pt:"As obras adicionadas aqui aparecerão automaticamente na página inicial." },
+  "Histoire indisponible": { fr:"Histoire indisponible", en:"Story unavailable", es:"Historia no disponible", pt:"História indisponível" },
+  "Retirer de la sélection": { fr:"Retirer de la sélection", en:"Remove from selection", es:"Quitar de la selección", pt:"Remover da seleção" },
+  "Aucune histoire publique publiée n’est disponible pour le moment. Les brouillons et histoires privées ne sont pas proposés.": { fr:"Aucune histoire publique publiée n’est disponible pour le moment. Les brouillons et histoires privées ne sont pas proposés.", en:"No published public stories are available yet. Drafts and private stories are not shown.", es:"Todavía no hay historias públicas publicadas. No se muestran borradores ni historias privadas.", pt:"Ainda não há histórias públicas publicadas. Rascunhos e histórias privadas não são exibidos." }
+
 };
 
 function translateNode(value: string, locale: Locale) {
