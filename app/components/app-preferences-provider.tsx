@@ -110,7 +110,7 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
     if (storedTheme && ["light","dark"].includes(storedTheme)) setPreferences(p => ({...p, theme:storedTheme}));
     (async () => {
       try {
-        const supabase = getSupabaseBrowserClient();
+        const supabase = getSupabaseBrowserClient() as any;
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
         const { data } = await supabase.from("user_settings").select("theme,preferred_language").eq("user_id", user.id).maybeSingle();
