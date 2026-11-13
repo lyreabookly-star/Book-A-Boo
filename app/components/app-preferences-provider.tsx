@@ -240,6 +240,9 @@ const dictionary: Record<string, Record<Locale, string>> = {
   "Cette image n'a pas pu être ouverte.": { fr:"Cette image n'a pas pu être ouverte.", en:"This image could not be opened.", es:"No se pudo abrir esta imagen.", pt:"Não foi possível abrir esta imagem." },
   "Impossible de préparer cette photo.": { fr:"Impossible de préparer cette photo.", en:"Unable to prepare this photo.", es:"No se pudo preparar esta foto.", pt:"Não foi possível preparar esta foto." },
   "Le recadrage de l'image est indisponible.": { fr:"Le recadrage de l'image est indisponible.", en:"Image cropping is unavailable.", es:"El recorte de imagen no está disponible.", pt:"O recorte da imagem não está disponível." },
+  // Compléments du studio d'écriture
+  "(facultatif)": { fr:"(facultatif)", en:"(optional)", es:"(opcional)", pt:"(opcional)" },
+  "Vos brouillons sont privés.": { fr:"Vos brouillons sont privés.", en:"Your drafts are private.", es:"Tus borradores son privados.", pt:"Seus rascunhos são privados." },
 };
 
 function translateNode(value: string, locale: Locale) {
