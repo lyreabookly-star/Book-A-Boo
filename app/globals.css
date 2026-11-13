@@ -548,3 +548,9 @@ html[data-theme="dark"] .public-profile-book{background:#272925;color:#eeeae2}
 html[data-theme="dark"] .public-profile-heading h2{color:#eeeae2}
 html[data-theme="dark"] .public-profile-avatar{background:#3b3d36;color:#e3b09c}
 @media(max-width:620px){.public-profile-heading{align-items:flex-start;gap:15px}.public-profile-heading>img,.public-profile-avatar{width:72px;height:72px;flex-basis:72px}.public-profile-heading h2{font-size:29px}.public-profile-books{grid-template-columns:1fr}}
+
+
+.header-profile-link{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;overflow:hidden;border:1px solid var(--line);background:var(--surface,var(--paper));transition:transform .18s ease,border-color .18s ease}
+.header-profile-link:hover{transform:scale(1.04);border-color:var(--accent)}
+.header-profile-avatar{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
+.header-profile-fallback{display:grid;place-items:center;width:100%;height:100%;color:var(--ink);background:var(--soft,var(--line))}
