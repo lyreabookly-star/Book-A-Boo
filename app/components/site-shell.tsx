@@ -32,11 +32,12 @@ export function SiteHeader({ active = "/" }: { active?: string }) {
         .select("avatar_url, display_name")
         .eq("id", userId)
         .maybeSingle();
+      const profileData = data as { avatar_url?: string | null; display_name?: string | null } | null;
       if (alive) {
         setProfile({
           id: userId,
-          avatarUrl: data?.avatar_url ?? null,
-          displayName: data?.display_name ?? null,
+          avatarUrl: profileData?.avatar_url ?? null,
+          displayName: profileData?.display_name ?? null,
         });
       }
     }
