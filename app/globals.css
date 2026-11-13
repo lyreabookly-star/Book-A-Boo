@@ -445,3 +445,6 @@ html[data-theme="dark"] .story-meta span:last-child,html[data-theme="dark"] .pro
 .avatar-crop-sliders button{align-self:flex-start}
 html[data-theme="dark"] .avatar-crop-stage{background:#343630}
 @media(max-width:620px){.avatar-crop-controls{grid-template-columns:1fr}.avatar-crop-stage{width:min(100%,220px);justify-self:center}.avatar-crop-sliders{width:100%}}
+
+/* Le sélecteur natif est masqué : le libellé personnalisé est traduit selon la langue choisie. */
+.settings-file-picker input[type="file"]{display:none!important}
