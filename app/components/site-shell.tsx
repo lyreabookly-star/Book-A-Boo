@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Compass, Feather, House, UserRound, LogIn } from "lucide-react";
+import { Activity, Compass, Feather, House, UserRound, LogIn } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 
 const items = [
   { href: "/", label: "Accueil", icon: House },
   { href: "/explorer", label: "Explorer", icon: Compass },
+  { href: "/actualites", label: "Actualités", icon: Activity },
   { href: "/ecrire", label: "Écrire", icon: Feather },
   { href: "/profil", label: "Profil", icon: UserRound },
 ];
