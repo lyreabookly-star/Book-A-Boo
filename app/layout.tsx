@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AppPreferencesProvider } from "./components/app-preferences-provider";
 
 export const metadata: Metadata = {
   title: "Book-A-Boo — Stories have no limits",
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr">
-      <body>{children}</body>
+      <body><AppPreferencesProvider>{children}</AppPreferencesProvider></body>
     </html>
   );
 }
