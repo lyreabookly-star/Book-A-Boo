@@ -7,7 +7,7 @@ import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { StorySaveButton } from "./story-save-button";
 import { useAppPreferences } from "./app-preferences-provider";
 
-type Story = { id: string; title: string; synopsis: string; genre: string; language: string; author_id: string; published_at: string | null };
+type Story = { id: string; title: string; synopsis: string; genre: string; language: string; author_id: string; published_at: string | null; cover_url: string | null };
 type Chapter = { id: string; title: string; chapter_number: number; content: string };
 type Author = { username: string; display_name: string | null };
 
@@ -26,7 +26,7 @@ export function StoryDetail({ storyId }: { storyId: string }) {
       try {
         const supabase = getSupabaseBrowserClient() as any;
         const { data, error: storyError } = await supabase.from("stories")
-          .select("id,title,synopsis,genre,language,author_id,published_at")
+          .select("id,title,synopsis,genre,language,author_id,published_at,cover_url")
           .eq("id", storyId).eq("status", "published").eq("visibility", "public").single();
         if (storyError) throw storyError;
         const [authorResult, chapterResult] = await Promise.all([
@@ -54,7 +54,7 @@ export function StoryDetail({ storyId }: { storyId: string }) {
 
   return <div className="story-detail-page">
     <Link href="/explorer" className="story-detail-back"><ArrowLeft size={15}/>{locale === "en" ? "Back to Explorer" : locale === "es" ? "Volver a Explorar" : locale === "pt" ? "Voltar a Explorar" : "Retour à Explorer"}</Link>
-    <div className="story-detail-hero"><div className="story-detail-cover"><BookOpen size={40}/><span>{story.genre || "BOOK-A-BOO"}</span><strong>{story.title}</strong><small>{locale === "en" ? "A BOOK-A-BOO STORY" : locale === "es" ? "UNA HISTORIA BOOK-A-BOO" : locale === "pt" ? "UMA HISTÓRIA BOOK-A-BOO" : "UNE HISTOIRE BOOK-A-BOO"}</small></div>
+    <div className="story-detail-hero"><div className={`story-detail-cover${story.cover_url ? " has-custom-cover" : ""}`}>{story.cover_url ? <img src={story.cover_url} alt={locale === "en" ? `Cover of ${story.title}` : locale === "es" ? `Portada de ${story.title}` : locale === "pt" ? `Capa de ${story.title}` : `Couverture de ${story.title}`} /> : <><BookOpen size={40}/><span>{story.genre || "BOOK-A-BOO"}</span><strong>{story.title}</strong><small>{locale === "en" ? "A BOOK-A-BOO STORY" : locale === "es" ? "UNA HISTORIA BOOK-A-BOO" : locale === "pt" ? "UMA HISTÓRIA BOOK-A-BOO" : "UNE HISTOIRE BOOK-A-BOO"}</small></>}</div>
       <div className="story-detail-copy"><span className="catalogue-overline">{story.genre || (locale === "en" ? "LITERATURE" : "LITTÉRATURE")} · {story.language.toUpperCase()}</span><h2>{story.title}</h2><p className="story-detail-byline">{locale === "en" ? "By" : locale === "es" ? "Por" : locale === "pt" ? "Por" : "Par"} {author?.display_name || author?.username || "Book-A-Boo"}</p><p>{story.synopsis || (locale === "en" ? "A story waiting to be discovered." : locale === "es" ? "Una historia esperando ser descubierta." : locale === "pt" ? "Uma história esperando para ser descoberta." : "Une histoire qui attend d'être découverte.")}</p><StorySaveButton storyId={story.id}/></div>
     </div>
     <section className="story-detail-reading"><div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> {locale === "en" ? "THE STORY" : locale === "es" ? "LA HISTORIA" : locale === "pt" ? "A HISTÓRIA" : "L'HISTOIRE"}</span><h2>{locale === "en" ? "Turn the page." : locale === "es" ? "Pasa la página." : locale === "pt" ? "Vire a página." : "Tournez la page."}</h2></div><span className="shelf-index">{chapters.length} {locale === "en" ? "CHAPTERS" : locale === "es" ? "CAPÍTULOS" : locale === "pt" ? "CAPÍTULOS" : "CHAPITRES"}</span></div>
