@@ -815,3 +815,15 @@ html[data-palette] :is(.settings-palette-block,.profile-preview,.profile-detail,
 html[data-palette] :is(input,textarea,select){background:var(--surface)!important;color:var(--ink)!important;border-color:var(--line)!important}
 html[data-palette] input::placeholder,html[data-palette] textarea::placeholder{color:var(--muted)!important;opacity:1}
 html[data-palette] :is(.settings-section-heading p,.settings-form small,.settings-inline-form small,.settings-choice-row small,.settings-toggle small,.settings-footnote,.profile-kicker,.profile-private,.profile-counts,.profile-empty p,.profile-detail p,.catalogue-overline,.writer-welcome,.small-note,.eyebrow,.hero-description,.story-meta,.story-byline){color:var(--muted)}
+
+
+/* Le logo source est noir : ne jamais l'inverser en palette claire */
+html[data-palette="classic"] .site-header-app .brand-logo,
+html[data-palette="frost"] .site-header-app .brand-logo{
+  filter:none!important;
+  -webkit-filter:none!important;
+  mix-blend-mode:normal!important;
+  opacity:1!important;
+  background:transparent!important;
+  padding:0!important;
+}
