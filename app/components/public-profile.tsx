@@ -2,19 +2,41 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { BookOpen, Bookmark, LoaderCircle, UserRound } from "lucide-react";
+import { BookOpen, Bookmark, LoaderCircle, UserRound, Users } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { useAppPreferences } from "./app-preferences-provider";
+import { AuthorFollowButton } from "./author-follow-button";
 
 type Profile = { id: string; username: string; display_name: string | null; bio: string; avatar_url: string | null; is_public: boolean; show_library_on_profile: boolean };
 type LibraryStory = { id: string; story: { id: string; title: string; synopsis: string; genre: string; language: string } | null };
+type PublishedStory = { id: string; slug: string; title: string; synopsis: string; genre: string; language: string; cover_url: string | null; published_at: string | null };
+type Follower = { id: string; username: string; display_name: string | null; avatar_url: string | null };
 
 export function PublicProfile({ username }: { username: string }) {
   const { locale } = useAppPreferences();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [books, setBooks] = useState<LibraryStory[]>([]);
+  const [works, setWorks] = useState<PublishedStory[]>([]);
+  const [followers, setFollowers] = useState<Follower[]>([]);
+  const [followerCount, setFollowerCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const isEn = locale === "en";
+  const isEs = locale === "es";
+  const isPt = locale === "pt";
+  const words = {
+    author: isEn ? "BOOK-A-BOO AUTHOR" : isEs ? "AUTOR BOOK-A-BOO" : isPt ? "AUTOR BOOK-A-BOO" : "AUTEUR BOOK-A-BOO",
+    followers: isEn ? "followers" : isEs ? "seguidores" : isPt ? "seguidores" : "abonnés",
+    works: isEn ? "PUBLISHED WORKS" : isEs ? "OBRAS PUBLICADAS" : isPt ? "OBRAS PUBLICADAS" : "ŒUVRES PUBLIÉES",
+    emptyWorks: isEn ? "No public work has been published yet." : isEs ? "Aún no hay obras públicas." : isPt ? "Nenhuma obra pública foi publicada ainda." : "Aucune œuvre publique n'a encore été publiée.",
+    library: isEn ? "READING SHELF" : isEs ? "BIBLIOTECA" : isPt ? "BIBLIOTECA" : "BIBLIOTHÈQUE",
+    libraryTitle: isEn ? "Stories in this library." : isEs ? "Historias de esta biblioteca." : isPt ? "Histórias nesta biblioteca." : "Les histoires de cette bibliothèque.",
+    emptyLibrary: isEn ? "This library is waiting for its first story." : isEs ? "Esta biblioteca espera su primera historia." : isPt ? "Esta biblioteca está esperando sua primeira história." : "Cette bibliothèque attend sa première histoire.",
+    unavailable: isEn ? "Profile unavailable" : isEs ? "Perfil no disponible" : isPt ? "Perfil indisponível" : "Profil indisponible",
+    private: isEn ? "This profile is private or does not exist." : isEs ? "Este perfil es privado o no existe." : isPt ? "Este perfil é privado ou não existe." : "Ce profil est privé ou n'existe pas.",
+    explore: isEn ? "Explore stories" : isEs ? "Explorar historias" : isPt ? "Explorar histórias" : "Explorer les histoires",
+  };
 
   useEffect(() => {
     let active = true;
@@ -26,6 +48,26 @@ export function PublicProfile({ username }: { username: string }) {
           .eq("username", username).maybeSingle();
         if (profileError) throw profileError;
         if (!data || !data.is_public) throw new Error("PROFILE_NOT_AVAILABLE");
+
+        const [workResult, followerResult] = await Promise.all([
+          supabase.from("stories")
+            .select("id,slug,title,synopsis,genre,language,cover_url,published_at")
+            .eq("author_id", data.id).eq("status", "published").eq("visibility", "public")
+            .order("published_at", { ascending: false }),
+          supabase.from("author_follows").select("follower_id", { count: "exact" }).eq("author_id", data.id)
+        ]);
+        if (workResult.error) throw workResult.error;
+        if (followerResult.error) throw followerResult.error;
+
+        const followerIds = (followerResult.data ?? []).map((item: { follower_id: string }) => item.follower_id);
+        let publicFollowers: Follower[] = [];
+        if (followerIds.length) {
+          const { data: followerProfiles, error: followerProfilesError } = await supabase.from("profiles")
+            .select("id,username,display_name,avatar_url").in("id", followerIds).eq("is_public", true);
+          if (followerProfilesError) throw followerProfilesError;
+          publicFollowers = followerProfiles ?? [];
+        }
+
         let library: LibraryStory[] = [];
         if (data.show_library_on_profile) {
           const { data: items, error: libraryError } = await supabase.from("user_library")
@@ -34,7 +76,13 @@ export function PublicProfile({ username }: { username: string }) {
           if (libraryError) throw libraryError;
           library = (items ?? []).filter((item: LibraryStory) => item.story !== null);
         }
-        if (active) { setProfile(data); setBooks(library); }
+        if (active) {
+          setProfile(data);
+          setWorks(workResult.data ?? []);
+          setFollowerCount(followerResult.count ?? followerIds.length);
+          setFollowers(publicFollowers);
+          setBooks(library);
+        }
       } catch (e) {
         if (active) setError(e instanceof Error && e.message !== "PROFILE_NOT_AVAILABLE" ? e.message : "");
       } finally { if (active) setLoading(false); }
@@ -43,16 +91,39 @@ export function PublicProfile({ username }: { username: string }) {
     return () => { active = false; };
   }, [username]);
 
-  if (loading) return <div className="library-live-state"><LoaderCircle className="spin" size={20}/>{locale === "en" ? "Loading profile…" : locale === "es" ? "Cargando perfil…" : locale === "pt" ? "Carregando perfil…" : "Chargement du profil…"}</div>;
-  if (!profile) return <div className="personal-library-empty"><UserRound size={25}/><h2>{locale === "en" ? "Profile unavailable" : locale === "es" ? "Perfil no disponible" : locale === "pt" ? "Perfil indisponível" : "Profil indisponible"}</h2><p>{locale === "en" ? "This profile is private or does not exist." : locale === "es" ? "Este perfil es privado o no existe." : locale === "pt" ? "Este perfil é privado ou não existe." : "Ce profil est privé ou n'existe pas."}</p><Link href="/explorer" className="primary-button">{locale === "en" ? "Explore stories" : locale === "es" ? "Explorar historias" : locale === "pt" ? "Explorar histórias" : "Explorer les histoires"}</Link></div>;
+  if (loading) return <div className="library-live-state"><LoaderCircle className="spin" size={20}/>{isEn ? "Loading profile…" : isEs ? "Cargando perfil…" : isPt ? "Carregando perfil…" : "Chargement du profil…"}</div>;
+  if (!profile) return <div className="personal-library-empty"><UserRound size={25}/><h2>{words.unavailable}</h2><p>{words.private}</p><Link href="/explorer" className="primary-button">{words.explore}</Link></div>;
 
   return <div className="public-profile-page">
     <section className="public-profile-heading">
       {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : <span className="public-profile-avatar"><UserRound size={28}/></span>}
-      <div><span className="catalogue-overline">{locale === "en" ? "BOOK-A-BOO READER" : locale === "es" ? "LECTOR BOOK-A-BOO" : locale === "pt" ? "LEITOR BOOK-A-BOO" : "LECTEUR BOOK-A-BOO"}</span><h2>{profile.display_name || profile.username}</h2><p>@{profile.username}</p>{profile.bio && <div className="public-profile-bio">{profile.bio}</div>}</div>
+      <div className="public-profile-identity"><span className="catalogue-overline">{words.author}</span><h2>{profile.display_name || profile.username}</h2><p>@{profile.username}</p>{profile.bio && <div className="public-profile-bio">{profile.bio}</div>}
+        <div className="public-profile-stats"><span><strong>{followerCount}</strong> {words.followers}</span></div>
+        <AuthorFollowButton authorId={profile.id}/>
+      </div>
     </section>
-    {profile.show_library_on_profile && <section className="public-profile-library"><div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> {locale === "en" ? "READING SHELF" : locale === "es" ? "ESTANTERÍA DE LECTURA" : locale === "pt" ? "ESTANTE DE LEITURA" : "BIBLIOTHÈQUE"}</span><h2>{locale === "en" ? "Stories in this library." : locale === "es" ? "Historias en esta biblioteca." : locale === "pt" ? "Histórias nesta biblioteca." : "Les histoires de cette bibliothèque."}</h2></div></div>
-      {books.length ? <div className="public-profile-books">{books.map(item => item.story && <Link href={`/histoire/${item.story.id}`} className="public-profile-book" key={item.id}><BookOpen size={20}/><span><strong>{item.story.title}</strong><small>{item.story.genre || "Book-A-Boo"} · {item.story.language.toUpperCase()}</small></span><Bookmark size={15}/></Link>)}</div> : <p className="explore-live-empty">{locale === "en" ? "This library is waiting for its first story." : locale === "es" ? "Esta biblioteca espera su primera historia." : locale === "pt" ? "Esta biblioteca está esperando sua primeira história." : "Cette bibliothèque attend sa première histoire."}</p>}
+
+    <section className="public-profile-works">
+      <div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> {words.works}</span><h2>{isEn ? "The author's stories." : isEs ? "Las historias del autor." : isPt ? "As histórias do autor." : "Les œuvres de cet auteur."}</h2></div><span className="shelf-index">{works.length} {isEn ? "WORKS" : isEs ? "OBRAS" : isPt ? "OBRAS" : "ŒUVRES"}</span></div>
+      {works.length ? <div className="public-profile-work-grid">{works.map((work) => <Link href={`/histoire/${work.slug || work.id}`} className="public-profile-work" key={work.id}>
+        <div className="public-profile-work-cover">{work.cover_url ? <img src={work.cover_url} alt="" loading="lazy"/> : <><BookOpen size={28}/><strong>{work.title}</strong></>}</div>
+        <span className="public-profile-work-meta">{work.genre || "Book-A-Boo"} · {work.language.toUpperCase()}</span>
+        <strong className="public-profile-work-title">{work.title}</strong>
+        {work.synopsis && <p>{work.synopsis}</p>}
+      </Link>)}</div> : <p className="explore-live-empty">{words.emptyWorks}</p>}
+    </section>
+
+    <section className="public-profile-followers">
+      <div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> {words.followers.toUpperCase()}</span><h2>{isEn ? "Readers following this author." : isEs ? "Lectores que siguen a este autor." : isPt ? "Leitores que seguem este autor." : "Les lecteurs qui suivent cet auteur."}</h2></div><span className="shelf-index">{followerCount}</span></div>
+      {followers.length ? <div className="public-profile-follower-list">{followers.map((follower) => <Link href={`/u/${encodeURIComponent(follower.username)}`} className="public-profile-follower" key={follower.id}>
+        {follower.avatar_url ? <img src={follower.avatar_url} alt="" loading="lazy"/> : <span><UserRound size={16}/></span>}
+        <strong>{follower.display_name || follower.username}</strong><small>@{follower.username}</small>
+      </Link>)}</div> : <p className="explore-live-empty">{isEn ? "No public follower to show yet." : isEs ? "Aún no hay seguidores públicos." : isPt ? "Ainda não há seguidores públicos para mostrar." : "Aucun abonné public à afficher pour le moment."}</p>}
+      {followers.length < followerCount && <p className="public-profile-privacy-note">{isEn ? "Some followers have chosen to keep their profiles private." : isEs ? "Algunos seguidores han elegido mantener sus perfiles privados." : isPt ? "Alguns seguidores escolheram manter seus perfis privados." : "Certains abonnés ont choisi de garder leur profil privé."}</p>}
+    </section>
+
+    {profile.show_library_on_profile && <section className="public-profile-library"><div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> {words.library}</span><h2>{words.libraryTitle}</h2></div></div>
+      {books.length ? <div className="public-profile-books">{books.map(item => item.story && <Link href={`/histoire/${item.story.id}`} className="public-profile-book" key={item.id}><BookOpen size={20}/><span><strong>{item.story.title}</strong><small>{item.story.genre || "Book-A-Boo"} · {item.story.language.toUpperCase()}</small></span><Bookmark size={15}/></Link>)}</div> : <p className="explore-live-empty">{words.emptyLibrary}</p>}
     </section>}
     {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
   </div>;
