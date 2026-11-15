@@ -1245,3 +1245,19 @@ html[data-theme="dark"] .public-profile-work,html[data-theme="dark"] .public-pro
 html[data-theme="dark"] .public-profile-work-title,html[data-theme="dark"] .public-profile-stats strong{color:#eeeae2}
 @media(max-width:760px){.public-profile-work-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){.public-profile-work-grid{grid-template-columns:1fr}.public-profile-work-cover{height:220px}.public-profile-follower{min-width:100%}}
+
+
+/* Recherche des membres dans Explorer */
+.explore-member-results{margin:0 0 28px;padding:20px 0 24px;border-bottom:1px solid var(--line)}
+.explore-member-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+.explore-member-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.explore-member-card{display:flex;align-items:center;gap:12px;min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--paper);transition:border-color .2s,background .2s}
+.explore-member-card:hover{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 5%,var(--paper))}
+.explore-member-card>img,.explore-member-avatar{width:42px;height:42px;flex:0 0 42px;border-radius:50%;object-fit:cover}
+.explore-member-avatar{display:grid;place-items:center;background:var(--line);color:var(--muted)}
+.explore-member-identity{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.explore-member-identity strong{font-size:12px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.explore-member-identity small{font-size:10px;color:var(--muted)}
+.explore-member-card>svg{flex:0 0 auto;color:var(--accent)}
+.explore-member-empty{font-size:12px;color:var(--muted);padding:8px 0}
+@media(max-width:620px){.explore-member-grid{grid-template-columns:1fr}.explore-member-card{padding:11px 12px}}
