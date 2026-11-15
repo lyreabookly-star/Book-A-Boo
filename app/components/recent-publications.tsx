@@ -36,7 +36,7 @@ export function RecentPublications() {
           .eq("visibility", "public")
           .order("published_at", { ascending: false, nullsFirst: false })
           .order("created_at", { ascending: false })
-          .limit(6);
+          .limit(3);
         if (error) throw error;
         const rows = (data ?? []) as Story[];
         const authorIds = [...new Set(rows.map(story => story.author_id))];
