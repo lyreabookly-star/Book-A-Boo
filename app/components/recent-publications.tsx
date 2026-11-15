@@ -30,10 +30,21 @@ export function RecentPublications() {
     async function load() {
       try {
         const supabase = getSupabaseBrowserClient() as any;
-        const { data, error } = await supabase.from("stories")
+        // Keep the homepage sections complementary: a story featured by the
+        // editorial team should not be repeated in the recent-publications list.
+        const { data: editorialRows, error: editorialError } = await supabase
+          .from("editorial_selections")
+          .select("story_id")
+          .eq("is_active", true);
+        if (editorialError) throw editorialError;
+        const editorialIds = [...new Set((editorialRows ?? []).map((row: { story_id: string }) => row.story_id))];
+
+        let query = supabase.from("stories")
           .select("id,slug,title,synopsis,genre,language,author_id,cover_url,published_at,created_at")
           .eq("status", "published")
-          .eq("visibility", "public")
+          .eq("visibility", "public");
+        if (editorialIds.length) query = query.not("id", "in", `(${editorialIds.join(",")})`);
+        const { data, error } = await query
           .order("published_at", { ascending: false, nullsFirst: false })
           .order("created_at", { ascending: false })
           .limit(3);
