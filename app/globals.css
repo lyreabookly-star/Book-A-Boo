@@ -1017,3 +1017,13 @@ html[data-palette="noctis"] .brand-logo {
   background:transparent!important;
   padding:0!important;
 }
+
+
+/* Une palette claire garde son logo sombre même si le thème système est sombre. */
+html[data-theme="dark"][data-palette="classic"] .brand-logo,
+html[data-theme="dark"][data-palette="frost"] .brand-logo {
+  filter:brightness(0)!important;
+  -webkit-filter:brightness(0)!important;
+  background:transparent!important;
+  padding:0!important;
+}
