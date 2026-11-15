@@ -11,7 +11,7 @@ const defaults: Settings = { theme: "light", preferred_language: "fr", email_not
 
 export function SettingsPanel() {
   const router = useRouter();
-  const { setLocale, setTheme, locale } = useAppPreferences();
+  const { setLocale, setTheme, setPalette, palette, locale } = useAppPreferences();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -245,6 +245,13 @@ export function SettingsPanel() {
     <section className="settings-section">
       <div className="settings-section-heading"><span>03 / EXPÉRIENCE</span><h2>Apparence et langue</h2><p>Choisissez vos préférences de lecture et de navigation.</p></div>
       <div className="settings-choice-row"><div><strong>Thème de l'interface</strong><small>Clair ou sombre</small></div><div className="settings-choice-buttons"><button type="button" className={settings.theme==="light"?"chosen":""} onClick={()=>update("theme","light")}>Clair</button><button type="button" className={settings.theme==="dark"?"chosen":""} onClick={()=>update("theme","dark")}>Sombre</button></div></div>
+      <div className="settings-palette-block"><strong>Palette de couleurs</strong><small>Le choix transforme les couleurs de tout le site, uniquement pour vous.</small><div className="settings-palette-grid">
+        <button type="button" className={palette==="classic"?"chosen":""} onClick={()=>setPalette("classic")}><i style={{background:"#f7f6f2",borderColor:"#a34f3e"}}/>Classique</button>
+        <button type="button" className={palette==="crimson"?"chosen":""} onClick={()=>setPalette("crimson")}><i style={{background:"#1a1a1a",borderColor:"#fb3640"}}/>Crimson</button>
+        <button type="button" className={palette==="azure"?"chosen":""} onClick={()=>setPalette("azure")}><i style={{background:"#000f0f",borderColor:"#68c7ec"}}/>Azure</button>
+        <button type="button" className={palette==="frost"?"chosen":""} onClick={()=>setPalette("frost")}><i style={{background:"#f1faee",borderColor:"#212529"}}/>Frost</button>
+        <button type="button" className={palette==="noctis"?"chosen":""} onClick={()=>setPalette("noctis")}><i style={{background:"#1f2235",borderColor:"#e3a419"}}/>Noctis</button>
+      </div></div>
       <div className="settings-choice-row"><div><strong>Langue préférée</strong><small>Votre choix est enregistré dans votre compte</small></div><select value={settings.preferred_language} onChange={e=>update("preferred_language",e.target.value as Settings["preferred_language"])}><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option><option value="pt">Português</option></select></div>
       <button className="settings-save" onClick={savePreferences} disabled={saving}>{saving ? "Enregistrement…" : "Enregistrer mes préférences"}</button>
     </section>
