@@ -871,3 +871,106 @@ html[data-palette="frost"] .site-header .brand-logo,
 html[data-palette="frost"] .site-header-app .brand-logo { background:transparent!important; }
 html[data-palette] :is(.hero,.writer-banner,.interior-hero,.interior-content) { color:var(--ink); }
 html[data-palette] :is(.hero-description,.writer-banner p,.eyebrow,.small-note,.muted) { color:var(--muted); }
+
+
+/* Correctif prioritaire : les anciennes règles du thème sombre ne doivent
+   jamais imposer leurs surfaces vert/gris aux palettes. */
+html[data-palette][data-theme] {
+  color-scheme: light;
+}
+html[data-palette="crimson"][data-theme],
+html[data-palette="azure"][data-theme],
+html[data-palette="noctis"][data-theme] {
+  color-scheme: dark;
+}
+html[data-palette][data-theme] body,
+html[data-palette][data-theme] .site-header,
+html[data-palette][data-theme] .mobile-nav,
+html[data-palette][data-theme] .app-footer,
+html[data-palette][data-theme] footer {
+  background:var(--paper)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+html[data-palette][data-theme] :is(
+  .hero-art,.writer-banner,.empty-state,.auth-placeholder,.notice-panel,
+  .catalogue-disclaimer,.explore-note,.writer-security-note,
+  .catalogue-bottom-cta,.writer-coming-note,.explore-feature,
+  .explore-genre,.genre-tile,.genre-card,.genre-item,.feature-panel,
+  .profile-preview,.profile-detail,.catalogue-search,.catalogue-filter,
+  .catalogue-toolbar,.writer-start-card,.writer-project-panel,.writer-side-panel,
+  .writer-login-panel,.writer-create-form,.writer-project-list,.writer-empty-real,
+  .writer-editor,.writer-chapter-list,.reading-page,.reading-demo-note,
+  .personal-library-tab,.personal-library-empty,.personal-library-note,
+  .auth-card,.auth-form,.settings-form,.settings-inline-form,
+  .settings-choice-row,.settings-palette-block,.settings-card,.settings-panel,
+  .explore-live-card,.library-live-card,.story-detail-chapter,
+  .public-profile-book,.reading-lists-panel,.activity-feed-card,
+  .editorial-card,.editorial-empty-state,.editorial-manager-form,
+  .editorial-manager-item,.editorial-manager-empty,.editorial-manager-denied,
+  .writer-publication-row
+) {
+  background:var(--surface)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+  box-shadow:none;
+}
+html[data-palette][data-theme] :is(
+  .explore-violet,.explore-rose,.explore-ochre,.explore-night,
+  .explore-sage,.explore-blue,.explore-plum,.writer-chapter-list,
+  .writer-chapter.active,.writer-project-row:hover,.writer-start-primary,
+  .writer-start-icon,.writer-empty-icon,.writer-project-icon,.writer-avatar,
+  .profile-detail-icon,.profile-avatar-placeholder,.personal-library-empty-icon,
+  .editorial-empty-icon,.editorial-manager-cover,.settings-avatar-preview,
+  .writer-side-icon,.writer-empty-icon
+) {
+  background:var(--surface-soft)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+html[data-palette][data-theme] :is(
+  .hero-art,.writer-banner,.empty-state,.auth-placeholder,.notice-panel,
+  .catalogue-disclaimer,.explore-note,.writer-security-note,
+  .catalogue-bottom-cta,.writer-coming-note,.explore-feature,
+  .explore-genre,.genre-tile,.genre-card,.genre-item,.feature-panel,
+  .profile-preview,.profile-detail,.catalogue-search,.catalogue-filter,
+  .catalogue-toolbar,.writer-start-card,.writer-project-panel,.writer-side-panel,
+  .writer-login-panel,.writer-create-form,.writer-project-list,.writer-empty-real,
+  .writer-editor,.writer-chapter-list,.reading-page,.reading-demo-note,
+  .personal-library-tab,.personal-library-empty,.personal-library-note,
+  .auth-card,.auth-form,.settings-form,.settings-inline-form,
+  .settings-choice-row,.settings-palette-block,.settings-card,.settings-panel,
+  .explore-live-card,.library-live-card,.story-detail-chapter,
+  .public-profile-book,.reading-lists-panel,.activity-feed-card,
+  .editorial-card,.editorial-empty-state,.editorial-manager-form,
+  .editorial-manager-item,.editorial-manager-empty,.editorial-manager-denied,
+  .writer-publication-row
+) :is(h1,h2,h3,h4,p,span,label,strong,small,legend,td,th,li) {
+  color:var(--ink)!important;
+}
+html[data-palette][data-theme] :is(
+  .hero-description,.eyebrow,.small-note,.muted,.story-meta,.story-byline,
+  .settings-form small,.settings-inline-form small,.settings-choice-row small,
+  .settings-footnote,.profile-kicker,.profile-private,.profile-counts,
+  .catalogue-overline,.writer-welcome,.editorial-manager-heading p,
+  .editorial-manager-hint,.editorial-manager-empty small,.editorial-manager-item small
+) { color:var(--muted)!important; }
+html[data-palette][data-theme] :is(input,textarea,select) {
+  background:var(--surface)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+  caret-color:var(--accent);
+}
+html[data-palette][data-theme] :is(input,textarea,select)::placeholder {
+  color:var(--muted)!important;
+  opacity:1;
+}
+html[data-palette="classic"][data-theme] .brand-logo,
+html[data-palette="frost"][data-theme] .brand-logo {
+  filter:none!important;
+  opacity:1!important;
+  mix-blend-mode:normal!important;
+}
+html[data-palette][data-theme] .mobile-nav a.active {
+  color:var(--accent)!important;
+}
