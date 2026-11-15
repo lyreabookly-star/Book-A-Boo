@@ -62,19 +62,18 @@ export function EditorialSelection() {
     ? { eyebrow: "LA MESA EDITORIAL", title: "Selección de la redacción", intro: "Historias elegidas con cariño por el equipo de Book-A-Boo.", empty: "Nuestra primera selección está tomando forma.", emptyText: "Pronto compartiremos aquí nuestras historias favoritas.", discover: "Descubrir la historia", by: "Por", preparing: "Preparando la selección…" }
     : locale === "pt"
     ? { eyebrow: "DA REDAÇÃO", title: "Seleção editorial", intro: "Histórias escolhidas com carinho pela equipe Book-A-Boo.", empty: "Nossa primeira seleção está tomando forma.", emptyText: "Em breve compartilharemos aqui nossas histórias favoritas.", discover: "Descobrir a história", by: "Por", preparing: "Preparando a seleção…" }
-    : { eyebrow: "LE CHOIX DE BAB", title: "Sélection de la rédaction", intro: "Des histoires choisies avec soin par l’équipe de Book-A-Boo.", empty: "Notre première sélection prend forme.", emptyText: "L’équipe éditoriale partagera bientôt ici ses coups de cœur littéraires.", discover: "Découvrir l’histoire", by: "Par", preparing: "Préparation de la sélection…" };
+    : { eyebrow: "", title: "", intro: "", empty: "", emptyText: "", discover: "Découvrir l’histoire", by: "Par", preparing: "Préparation de la sélection…" };
 
-  return <section className="editorial-section" aria-labelledby="editorial-title">
-    <div className="editorial-heading">
-      <div><span className="eyebrow"><span className="eyebrow-line"/>{copy.eyebrow}</span><h2 id="editorial-title">{copy.title}</h2><p>{copy.intro}</p></div>
-    </div>
-    {loading ? <p className="editorial-empty">{copy.preparing}</p> : picks.length ? <div className="editorial-grid">
+  if (loading || !picks.length) return null;
+
+  return <section className="editorial-section" aria-label="Publications à découvrir">
+    <div className="editorial-grid">
       {picks.map(({ pick, story, author }, index) => <article className={index === 0 ? "editorial-card editorial-card-featured" : "editorial-card"} key={pick.id}>
-        <Link href={`/histoire/${story.slug}`} className={`editorial-cover editorial-cover-${index % 3}${story.cover_url ? " has-cover" : ""}`}>
-          {story.cover_url ? <img src={story.cover_url} alt={`Couverture de ${story.title}`}/> : <><span>BAB / {String(index + 1).padStart(2, "0")}</span><BookOpen size={29}/><strong>{story.title}</strong><small>{story.genre || "Book-A-Boo"}</small></>}
+        <Link href={"/histoire/" + story.slug} className={"editorial-cover editorial-cover-" + (index % 3) + (story.cover_url ? " has-cover" : "")}>
+          {story.cover_url ? <img src={story.cover_url} alt={"Couverture de " + story.title}/> : <><span>BAB / {String(index + 1).padStart(2, "0")}</span><BookOpen size={29}/><strong>{story.title}</strong><small>{story.genre || "Book-A-Boo"}</small></>}
         </Link>
-        <div className="editorial-card-copy"><span className="editorial-kicker">{pick.eyebrow || copy.eyebrow}</span><h3><Link href={`/histoire/${story.id}`}>{story.title}</Link></h3><small>{copy.by} {author?.display_name || author?.username || "Book-A-Boo"}</small><p>{pick.editorial_note || story.synopsis}</p><Link className="editorial-discover" href={`/histoire/${story.id}`}>{copy.discover}<ArrowUpRight size={15}/></Link></div>
+        <div className="editorial-card-copy"><h3><Link href={"/histoire/" + story.id}>{story.title}</Link></h3><small>{copy.by} {author?.display_name || author?.username || "Book-A-Boo"}</small><p>{pick.editorial_note || story.synopsis}</p><Link className="editorial-discover" href={"/histoire/" + story.id}>{copy.discover}<ArrowUpRight size={15}/></Link></div>
       </article>)}
-    </div> : <div className="editorial-empty editorial-empty-state"><span className="editorial-empty-icon"><BookOpen size={25}/></span><div><strong>{copy.empty}</strong><p>{copy.emptyText}</p></div><span className="editorial-empty-signature">Book-A-Boo · Édition</span></div>}
+    </div>
   </section>;
 }
