@@ -792,3 +792,26 @@ html[data-palette="noctis"] :is(.settings-save,.writer-cta){background:#6f5bb5}
 html[data-palette="frost"] :is(.site-header,.mobile-nav){background:var(--surface);color:var(--ink);border-color:var(--line)}
 html[data-palette] :is(.main-nav,.main-nav a,.genre-list a,.header-actions,.login-link,.icon-button,.secondary-button,.text-link,.all-genres,.story-detail-back,.work-save-link,.reading-toolbar button,.reading-bottom button,.reading-bottom a){color:var(--ink)}
 html[data-palette] :is(button,a,select,input,textarea):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+
+/* Harmonisation finale des surfaces, bords d'écran et identité visuelle */
+html[data-palette="classic"]{--paper:#f7f6f2;--surface:#fffefa;--surface-soft:#efede6;--ink:#242320;--muted:#625f58;--line:#dedbd3;--accent:#a34f3e}
+html[data-palette="frost"]{--paper:#f1faee;--surface:#ffffff;--surface-soft:#e7f1e7;--ink:#202529;--muted:#4e5b60;--line:#cbd9ce;--accent:#a4133c}
+html[data-palette="crimson"]{--paper:#1a1a1a;--surface:#292323;--surface-soft:#342a2b;--ink:#fff7f5;--muted:#d6c5c5;--line:#574143;--accent:#fb3640}
+html[data-palette="azure"]{--paper:#000f0f;--surface:#102326;--surface-soft:#183238;--ink:#f0fbff;--muted:#c0d9df;--line:#34545b;--accent:#68c7ec}
+html[data-palette="noctis"]{--paper:#1f2235;--surface:#292d46;--surface-soft:#343954;--ink:#fff9ed;--muted:#d4cde0;--line:#505674;--accent:#e3a419}
+html[data-palette] ,html[data-palette] body{min-height:100%;background:var(--paper)!important;color:var(--ink)}
+html[data-palette] body{margin:0}
+html[data-palette] :is(#__next,[data-nextjs-scroll-focus-boundary],main){background:transparent;color:var(--ink)}
+html[data-palette] :is(.site-header,.site-header-app,.app-footer,footer,.mobile-nav){background:var(--surface)!important;color:var(--ink);border-color:var(--line)!important}
+html[data-palette] :is(.interior-hero,.interior-content,.profile-page,.profile-settings-page,.settings-page,.settings-content,.account-page,.account-content){background:transparent;color:var(--ink)}
+html[data-palette] :is(.brand-symbol,.brand-mark,.logo-mark){background:#252622!important;color:#fffefa!important;border-color:#252622!important}
+html[data-palette="classic"] :is(.brand-logo,.site-header .brand-logo,.site-header-app .brand-logo){background:#252622;border-radius:4px;padding:5px 8px}
+html[data-palette="classic"] .site-header :is(.brand,.brand-period){color:#242320}
+html[data-palette] :is(.mobile-nav a,.mobile-nav a span){color:var(--muted)}
+html[data-palette] .mobile-nav a.active{color:var(--accent)}
+html[data-palette] :is(.settings-palette-block,.profile-preview,.profile-detail,.feature-panel,.genre-tile,.catalogue-search,.catalogue-filter,.catalogue-toolbar,.auth-card,.auth-form,.settings-card,.settings-panel,.settings-form,.settings-inline-form,.settings-choice-row,.writer-workspace,.writer-panel,.writer-editor,.activity-feed-card,.editorial-card,.profile-tabs,.profile-preview-top,.story-detail-chapter,.reading-lists-panel,.public-profile-book,.explore-live-card,.library-live-card){background:var(--surface);color:var(--ink);border-color:var(--line)}
+html[data-palette] :is(.settings-palette-block,.profile-preview,.profile-detail,.feature-panel,.genre-tile,.catalogue-search,.catalogue-filter,.catalogue-toolbar,.auth-card,.auth-form,.settings-card,.settings-panel,.settings-form,.settings-inline-form,.settings-choice-row,.writer-workspace,.writer-panel,.writer-editor,.activity-feed-card,.editorial-card,.profile-tabs,.profile-preview-top,.story-detail-chapter,.reading-lists-panel,.public-profile-book,.explore-live-card,.library-live-card) :is(h1,h2,h3,h4,p,span,label,strong,small,td,th){color:inherit}
+html[data-palette] :is(input,textarea,select){background:var(--surface)!important;color:var(--ink)!important;border-color:var(--line)!important}
+html[data-palette] input::placeholder,html[data-palette] textarea::placeholder{color:var(--muted)!important;opacity:1}
+html[data-palette] :is(.settings-section-heading p,.settings-form small,.settings-inline-form small,.settings-choice-row small,.settings-toggle small,.settings-footnote,.profile-kicker,.profile-private,.profile-counts,.profile-empty p,.profile-detail p,.catalogue-overline,.writer-welcome,.small-note,.eyebrow,.hero-description,.story-meta,.story-byline){color:var(--muted)}
