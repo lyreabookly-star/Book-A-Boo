@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, BookOpen, Sparkles } from "lucide-react";
+import { ArrowUpRight, BookOpen } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { useAppPreferences } from "./app-preferences-provider";
 
@@ -66,8 +66,7 @@ export function EditorialSelection() {
 
   return <section className="editorial-section" aria-labelledby="editorial-title">
     <div className="editorial-heading">
-      <div><span className="eyebrow"><span className="eyebrow-line"/><Sparkles size={13}/>{copy.eyebrow}</span><h2 id="editorial-title">{copy.title}</h2><p>{copy.intro}</p></div>
-      <span className="editorial-mark">BAB <i>✳</i></span>
+      <div><span className="eyebrow"><span className="eyebrow-line"/>{copy.eyebrow}</span><h2 id="editorial-title">{copy.title}</h2><p>{copy.intro}</p></div>
     </div>
     {loading ? <p className="editorial-empty">{copy.preparing}</p> : picks.length ? <div className="editorial-grid">
       {picks.map(({ pick, story, author }, index) => <article className={index === 0 ? "editorial-card editorial-card-featured" : "editorial-card"} key={pick.id}>
