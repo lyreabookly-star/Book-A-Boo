@@ -827,3 +827,47 @@ html[data-palette="frost"] .site-header-app .brand-logo{
   background:transparent!important;
   padding:0!important;
 }
+
+
+/* Palette is authoritative: the light/dark preference must not recolor components. */
+html[data-palette] body,
+html[data-palette] #__next,
+html[data-palette] main { background:var(--paper)!important; color:var(--ink)!important; }
+html[data-palette] :is(.site-header,.site-header-app,.mobile-nav,.app-footer,footer) {
+  background:var(--surface)!important; color:var(--ink)!important; border-color:var(--line)!important;
+}
+html[data-palette] :is(.genre-tile,.genre-card,.genre-item,.feature-panel,.catalogue-search,.catalogue-filter,.catalogue-toolbar,
+  .empty-state,.auth-placeholder,.notice-panel,.profile-detail,.profile-details-grid,.profile-tabs,.profile-preview-top,
+  .story-detail-chapter,.explore-live-card,.library-live-card,.public-profile-book,.reading-lists-panel,
+  .activity-feed-card,.editorial-card,.settings-card,.settings-panel,.settings-form,.settings-inline-form,
+  .settings-choice-row,.settings-palette-block,.writer-workspace,.writer-project-row,.writer-chapter-list,
+  .writer-editor,.writer-panel,.auth-card,.auth-form,.editorial-manager-form,.editorial-manager-item,
+  .editorial-manager-empty,.editorial-manager-denied) {
+  background:var(--surface)!important; color:var(--ink)!important; border-color:var(--line)!important;
+}
+html[data-palette] :is(.genre-tile,.genre-card,.genre-item,.feature-panel,.catalogue-search,.catalogue-filter,.catalogue-toolbar,
+  .empty-state,.auth-placeholder,.notice-panel,.profile-detail,.profile-details-grid,.profile-tabs,.profile-preview-top,
+  .story-detail-chapter,.explore-live-card,.library-live-card,.public-profile-book,.reading-lists-panel,
+  .activity-feed-card,.editorial-card,.settings-card,.settings-panel,.settings-form,.settings-inline-form,
+  .settings-choice-row,.settings-palette-block,.writer-workspace,.writer-project-row,.writer-chapter-list,
+  .writer-editor,.writer-panel,.auth-card,.auth-form,.editorial-manager-form,.editorial-manager-item,
+  .editorial-manager-empty,.editorial-manager-denied) :is(h1,h2,h3,h4,p,span,label,strong,small,td,th,legend) {
+  color:var(--ink)!important;
+}
+html[data-palette] :is(.editorial-manager-form,.settings-form,.settings-inline-form,.auth-form) :is(input,textarea,select),
+html[data-palette] :is(input,textarea,select) {
+  background:var(--surface)!important; color:var(--ink)!important; border-color:var(--line)!important;
+}
+html[data-palette] :is(.editorial-manager-form,.settings-form,.settings-inline-form,.auth-form) :is(label,small),
+html[data-palette] :is(.editorial-manager-heading p,.editorial-manager-hint,.editorial-manager-empty small,.editorial-manager-item small) {
+  color:var(--muted)!important;
+}
+html[data-palette] :is(.editorial-manager-form button,.settings-palette-grid button) { color:var(--ink); border-color:var(--line); }
+html[data-palette] .editorial-manager-form button:hover { border-color:var(--accent); }
+html[data-palette] .brand-logo { filter:none!important; -webkit-filter:none!important; mix-blend-mode:normal!important; opacity:1!important; }
+html[data-palette="classic"] .site-header .brand-logo,
+html[data-palette="classic"] .site-header-app .brand-logo,
+html[data-palette="frost"] .site-header .brand-logo,
+html[data-palette="frost"] .site-header-app .brand-logo { background:transparent!important; }
+html[data-palette] :is(.hero,.writer-banner,.interior-hero,.interior-content) { color:var(--ink); }
+html[data-palette] :is(.hero-description,.writer-banner p,.eyebrow,.small-note,.muted) { color:var(--muted); }
