@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Activity, Compass, Feather, House, UserRound, LogIn } from "lucide-react";
+import { Activity, Compass, Feather, House, UserRound, LogIn, ShieldCheck } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 
 const items = [
@@ -17,7 +17,7 @@ type HeaderProfile = { id: string; avatarUrl: string | null; displayName: string
 
 export function SiteHeader({ active = "/", hideGuestActions = false }: { active?: string; hideGuestActions?: boolean }) {
   const [profile, setProfile] = useState<HeaderProfile | null>(null);
-  const [canManageEditorial, setCanManageEditorial] = useState(false);
+  const [canManageEditorial, setCanManageEditorial] = useState(false);\n  const [canManageAdministration, setCanManageAdministration] = useState(false);
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
@@ -28,13 +28,13 @@ export function SiteHeader({ active = "/", hideGuestActions = false }: { active?
       if (!userId) {
         if (alive) {
           setProfile(null);
-          setCanManageEditorial(false);
+          setCanManageEditorial(false);\n          setCanManageAdministration(false);
         }
         return;
       }
-      const [{ data: profileData }, { data: membership }] = await Promise.all([
+      const [{ data: profileData }, { data: membership }, { data: adminMembership }] = await Promise.all([
         supabase.from("profiles").select("avatar_url, display_name").eq("id", userId).maybeSingle(),
-        supabase.from("editorial_members").select("can_manage").eq("user_id", userId).eq("can_manage", true).maybeSingle(),
+        supabase.from("editorial_members").select("can_manage").eq("user_id", userId).eq("can_manage", true).maybeSingle(),\n        supabase.from("platform_admins").select("user_id").eq("user_id", userId).maybeSingle(),
       ]);
       const profileRecord = profileData as { avatar_url?: string | null; display_name?: string | null } | null;
       const membershipRecord = membership as { can_manage?: boolean } | null;
@@ -44,7 +44,7 @@ export function SiteHeader({ active = "/", hideGuestActions = false }: { active?
           avatarUrl: profileRecord?.avatar_url ?? null,
           displayName: profileRecord?.display_name ?? null,
         });
-        setCanManageEditorial(membershipRecord?.can_manage === true);
+        setCanManageEditorial(membershipRecord?.can_manage === true);\n        setCanManageAdministration(Boolean(adminMembership));
       }
     }
 
