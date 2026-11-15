@@ -7,7 +7,7 @@ import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { useAppPreferences } from "./app-preferences-provider";
 
 type Profile = { id: string; username: string; display_name: string | null; bio: string; avatar_url: string | null; is_public: boolean; show_library_on_profile: boolean };
-type LibraryStory = { id: string; status: string; story: { id: string; title: string; synopsis: string; genre: string; language: string } | null };
+type LibraryStory = { id: string; story: { id: string; title: string; synopsis: string; genre: string; language: string } | null };
 
 export function PublicProfile({ username }: { username: string }) {
   const { locale } = useAppPreferences();
@@ -29,10 +29,10 @@ export function PublicProfile({ username }: { username: string }) {
         let library: LibraryStory[] = [];
         if (data.show_library_on_profile) {
           const { data: items, error: libraryError } = await supabase.from("user_library")
-            .select("id,status,story:stories(id,title,synopsis,genre,language)")
+            .select("id,story:stories(id,title,synopsis,genre,language)")
             .eq("user_id", data.id).order("updated_at", { ascending: false });
           if (libraryError) throw libraryError;
-          library = items ?? [];
+          library = (items ?? []).filter((item: LibraryStory) => item.story !== null);
         }
         if (active) { setProfile(data); setBooks(library); }
       } catch (e) {
