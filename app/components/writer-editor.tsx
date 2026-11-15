@@ -4,11 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, BookOpen, Check, LoaderCircle, Plus, Save } from "lucide-react";
+import { ArrowLeft, BookOpen, Check, Copy, LoaderCircle, Plus, Save } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { useAppPreferences } from "./app-preferences-provider";
 
-type Story = { id: string; title: string; synopsis: string; status: "draft" | "published"; visibility: "private" | "public"; published_at: string | null; cover_url: string | null };
+type Story = { id: string; slug: string; title: string; synopsis: string; status: "draft" | "published"; visibility: "private" | "public"; published_at: string | null; cover_url: string | null };
 type Chapter = { id: string; title: string; content: string; chapter_number: number; updated_at: string };
 
 export function WriterEditor({ storyId }: { storyId: string }) {
@@ -25,6 +25,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   const [error, setError] = useState("");
   const [publishing, setPublishing] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   const load = useCallback(async () => {
     const supabase = getSupabaseBrowserClient() as any;
@@ -35,7 +36,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       return;
     }
     const { data: storyData, error: storyError } = await supabase
-      .from("stories").select("id,title,synopsis,status,visibility,published_at,cover_url").eq("id", storyId).eq("author_id", user.id).single();
+      .from("stories").select("id,slug,title,synopsis,status,visibility,published_at,cover_url").eq("id", storyId).eq("author_id", user.id).single();
     if (storyError) throw storyError;
     const { data: chapterData, error: chapterError } = await supabase
       .from("chapters").select("id,title,content,chapter_number,updated_at").eq("story_id", storyId).order("chapter_number");
@@ -166,6 +167,13 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     setChapter(item); setTitle(item.title); setContent(item.content); setSaved(false);
   }
 
+  async function copyPublishedLink() {
+    if (!story) return;
+    await navigator.clipboard.writeText(`${window.location.origin}/histoire/${story.slug}`);
+    setShareCopied(true);
+    window.setTimeout(() => setShareCopied(false), 2200);
+  }
+
   async function togglePublication() {
     if (!story) return;
     setPublishing(true); setError("");
@@ -212,6 +220,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
           {story.cover_url && <button type="button" className="writer-cover-remove" onClick={removeCover} disabled={uploadingCover}>{locale === "en" ? "Remove cover" : locale === "es" ? "Quitar portada" : locale === "pt" ? "Remover capa" : "Retirer la couverture"}</button>}
         </div>
       </section>
+      {story.status === "published" && <div className="writer-publication-row"><div><strong>{locale === "en" ? "Your public link" : locale === "es" ? "Tu enlace público" : locale === "pt" ? "Seu link público" : "Le lien de votre œuvre"}</strong><small>{window.location.origin}/histoire/{story.slug}</small></div><button type="button" className="auth-secondary" onClick={copyPublishedLink}>{shareCopied ? <Check size={15}/> : <Copy size={15}/>} {shareCopied ? (locale === "en" ? "Copied" : locale === "es" ? "Copiado" : locale === "pt" ? "Copiado" : "Copié") : (locale === "en" ? "Copy link" : locale === "es" ? "Copiar enlace" : locale === "pt" ? "Copiar link" : "Copier le lien")}</button></div>}
       <div className="writer-publication-row">
         <div><strong>{story.status === "published" ? (locale === "en" ? "Your story is public." : locale === "es" ? "Tu historia es pública." : locale === "pt" ? "Sua história está pública." : "Votre histoire est publique.") : (locale === "en" ? "Ready to share your story?" : locale === "es" ? "¿Lista para compartir tu historia?" : locale === "pt" ? "Pronto para compartilhar sua história?" : "Prêt à partager votre histoire ?")}</strong><small>{story.status === "published" ? (locale === "en" ? "It appears in Explorer and can be saved by readers." : locale === "es" ? "Aparece en Explorar y los lectores pueden guardarla." : locale === "pt" ? "Aparece em Explorar e os leitores podem salvá-la." : "Elle apparaît dans Explorer et les lecteurs peuvent l'enregistrer.") : (locale === "en" ? "Publishing makes it visible to everyone." : locale === "es" ? "Al publicar, será visible para todos." : locale === "pt" ? "Ao publicar, ela ficará visível para todos." : "La publication la rend visible par tout le monde.")}</small></div>
         <button type="button" className="writer-publish-button" onClick={togglePublication} disabled={publishing || saving}>{publishing ? (locale === "en" ? "Please wait…" : locale === "es" ? "Un momento…" : locale === "pt" ? "Aguarde…" : "Patientez…") : story.status === "published" ? (locale === "en" ? "Unpublish" : locale === "es" ? "Retirar" : locale === "pt" ? "Retirar" : "Dépublier") : (locale === "en" ? "Publish my story" : locale === "es" ? "Publicar mi historia" : locale === "pt" ? "Publicar minha história" : "Publier mon histoire")}</button>
