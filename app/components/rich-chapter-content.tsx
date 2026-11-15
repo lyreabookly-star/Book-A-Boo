@@ -10,6 +10,16 @@ function cleanMarkup(value: string) {
   }
   const doc = new DOMParser().parseFromString(value, "text/html");
   doc.body.querySelectorAll("*").forEach(node => {
+    if (node.tagName === "FONT") {
+      const span = doc.createElement("span");
+      span.innerHTML = node.innerHTML;
+      const face = node.getAttribute("face") || "";
+      const fontSize = ({"1":"10px","2":"13px","3":"16px","4":"18px","5":"24px","6":"32px","7":"48px"} as Record<string,string>)[node.getAttribute("size") || ""];
+      span.style.fontFamily = face;
+      if (fontSize) span.style.fontSize = fontSize;
+      node.replaceWith(span);
+      return;
+    }
     if (!allowedTags.has(node.tagName)) {
       node.replaceWith(...Array.from(node.childNodes));
       return;
