@@ -7,7 +7,7 @@ import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { useAppPreferences } from "./app-preferences-provider";
 
 type PickRow = { id: string; story_id: string; position: number; eyebrow: string; editorial_note: string | null };
-type Story = { id: string; title: string; synopsis: string; genre: string; language: string; author_id: string; cover_url: string | null };
+type Story = { id: string; slug: string; title: string; synopsis: string; genre: string; language: string; author_id: string; cover_url: string | null };
 type Author = { id: string; username: string; display_name: string | null };
 
 export function EditorialSelection() {
@@ -28,7 +28,7 @@ export function EditorialSelection() {
         const ids = rows.map(row => row.story_id);
         if (!ids.length) { if (active) setPicks([]); return; }
         const { data: stories, error: storiesError } = await supabase.from("stories")
-          .select("id,title,synopsis,genre,language,author_id,cover_url")
+          .select("id,slug,title,synopsis,genre,language,author_id,cover_url")
           .in("id", ids).eq("status", "published").eq("visibility", "public");
         if (storiesError) throw storiesError;
         const list = (stories ?? []) as Story[];
@@ -71,7 +71,7 @@ export function EditorialSelection() {
     </div>
     {loading ? <p className="editorial-empty">{copy.preparing}</p> : picks.length ? <div className="editorial-grid">
       {picks.map(({ pick, story, author }, index) => <article className={index === 0 ? "editorial-card editorial-card-featured" : "editorial-card"} key={pick.id}>
-        <Link href={`/histoire/${story.id}`} className={`editorial-cover editorial-cover-${index % 3}${story.cover_url ? " has-cover" : ""}`}>
+        <Link href={`/histoire/${story.slug}`} className={`editorial-cover editorial-cover-${index % 3}${story.cover_url ? " has-cover" : ""}`}>
           {story.cover_url ? <img src={story.cover_url} alt={`Couverture de ${story.title}`}/> : <><span>BAB / {String(index + 1).padStart(2, "0")}</span><BookOpen size={29}/><strong>{story.title}</strong><small>{story.genre || "Book-A-Boo"}</small></>}
         </Link>
         <div className="editorial-card-copy"><span className="editorial-kicker">{pick.eyebrow || copy.eyebrow}</span><h3><Link href={`/histoire/${story.id}`}>{story.title}</Link></h3><small>{copy.by} {author?.display_name || author?.username || "Book-A-Boo"}</small><p>{pick.editorial_note || story.synopsis}</p><Link className="editorial-discover" href={`/histoire/${story.id}`}>{copy.discover}<ArrowUpRight size={15}/></Link></div>
