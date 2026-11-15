@@ -5,6 +5,7 @@ import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 
 type Locale = "fr" | "en" | "es" | "pt";
 type Theme = "light" | "dark";
+type Palette = "classic" | "crimson" | "azure" | "frost" | "noctis";
 type Preferences = { locale: Locale; theme: Theme };
 const defaults: Preferences = { locale: "fr", theme: "light" };
 
@@ -342,19 +343,22 @@ function translateNode(value: string, locale: Locale) {
   return value;
 }
 
-type LocaleContextValue = Preferences & { setLocale: (locale: Locale) => void; setTheme: (theme: Theme) => void };
-const LocaleContext = createContext<LocaleContextValue>({ ...defaults, setLocale: () => {}, setTheme: () => {} });
+type LocaleContextValue = Preferences & { palette: Palette; setLocale: (locale: Locale) => void; setTheme: (theme: Theme) => void; setPalette: (palette: Palette) => void };
+const LocaleContext = createContext<LocaleContextValue>({ ...defaults, palette: "classic", setLocale: () => {}, setTheme: () => {}, setPalette: () => {} });
 export function useAppPreferences() { return useContext(LocaleContext); }
 
 export function AppPreferencesProvider({ children }: { children: ReactNode }) {
   const [preferences, setPreferences] = useState<Preferences>(defaults);
+  const [palette, setPaletteState] = useState<Palette>("classic");
 
   useEffect(() => {
     let alive = true;
     const storedLocale = localStorage.getItem("bab-locale") as Locale | null;
     const storedTheme = localStorage.getItem("bab-theme") as Theme | null;
+    const storedPalette = localStorage.getItem("bab-palette") as Palette | null;
     if (storedLocale && ["fr","en","es","pt"].includes(storedLocale)) setPreferences(p => ({...p, locale:storedLocale}));
     if (storedTheme && ["light","dark"].includes(storedTheme)) setPreferences(p => ({...p, theme:storedTheme}));
+    if (storedPalette && ["classic","crimson","azure","frost","noctis"].includes(storedPalette)) setPaletteState(storedPalette);
     (async () => {
       try {
         const supabase = getSupabaseBrowserClient() as any;
@@ -369,9 +373,11 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.dataset.theme = preferences.theme;
+    document.documentElement.dataset.palette = palette;
     document.documentElement.lang = preferences.locale;
     localStorage.setItem("bab-locale", preferences.locale);
     localStorage.setItem("bab-theme", preferences.theme);
+    localStorage.setItem("bab-palette", palette);
     let applying = false;
     const apply = () => {
       if (applying || !document.body) return;
@@ -396,13 +402,15 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
     const observer = new MutationObserver(() => apply());
     observer.observe(document.body, { childList:true, subtree:true });
     return () => observer.disconnect();
-  }, [preferences]);
+  }, [preferences, palette]);
 
   const value = useMemo(() => ({
     ...preferences,
     setLocale: (locale: Locale) => setPreferences(p => ({ ...p, locale })),
     setTheme: (theme: Theme) => setPreferences(p => ({ ...p, theme })),
-  }), [preferences]);
+    palette,
+    setPalette: (next: Palette) => setPaletteState(next),
+  }), [preferences, palette]);
 
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }
