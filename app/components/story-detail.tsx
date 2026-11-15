@@ -8,6 +8,7 @@ import { StorySaveButton } from "./story-save-button";
 import { useAppPreferences } from "./app-preferences-provider";
 import { AuthorFollowButton } from "./author-follow-button";
 import { RichChapterContent } from "./rich-chapter-content";
+import { StoryInteractions } from "./story-interactions";
 
 type Story = { id: string; slug: string; title: string; synopsis: string; genre: string; language: string; author_id: string; published_at: string | null; cover_url: string | null };
 type Chapter = { id: string; title: string; chapter_number: number; content: string };
@@ -71,5 +72,6 @@ export function StoryDetail({ storyId }: { storyId: string }) {
     <section className="story-detail-reading"><div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> {locale === "en" ? "THE STORY" : locale === "es" ? "LA HISTORIA" : locale === "pt" ? "A HISTÓRIA" : "L'HISTOIRE"}</span><h2>{locale === "en" ? "Turn the page." : locale === "es" ? "Pasa la página." : locale === "pt" ? "Vire a página." : "Tournez la page."}</h2></div><span className="shelf-index">{chapters.length} {locale === "en" ? "CHAPTERS" : locale === "es" ? "CAPÍTULOS" : locale === "pt" ? "CAPÍTULOS" : "CHAPITRES"}</span></div>
       {chapters.length ? <><div className="story-detail-chapter-list">{chapters.map(item => <button key={item.id} type="button" className={activeChapter?.id === item.id ? "active" : ""} onClick={() => setActiveChapter(item)}>{String(item.chapter_number).padStart(2,"0")} · {item.title}</button>)}</div><article className="story-detail-chapter"><span className="catalogue-overline">{activeChapter?.title}</span><div>{activeChapter?.content?.trim() ? <RichChapterContent content={activeChapter.content}/> : <p>{locale === "en" ? "This chapter is being prepared by its author." : locale === "es" ? "El autor está preparando este capítulo." : locale === "pt" ? "O autor está preparando este capítulo." : "Ce chapitre est en cours de préparation par son auteur."}</p>}</div></article></> : <p className="explore-live-empty">{locale === "en" ? "Chapters are not available yet." : locale === "es" ? "Los capítulos aún no están disponibles." : locale === "pt" ? "Os capítulos ainda não estão disponíveis." : "Les chapitres ne sont pas encore disponibles."}</p>}
     </section>
+    <StoryInteractions storyId={story.id} />
   </div>;
 }
