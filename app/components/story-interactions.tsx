@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 
@@ -118,7 +118,7 @@ export function StoryInteractions({ storyId }: { storyId: string }) {
     setBusy("");
   }
 
-  async function submitComment(event: React.FormEvent<HTMLFormElement>) {
+  async function submitComment(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!userId) return requireLogin();
     const content = draft.trim();
