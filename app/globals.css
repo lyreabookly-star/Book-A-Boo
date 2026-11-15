@@ -993,3 +993,27 @@ html[data-theme="dark"] .brand-logo {
   mix-blend-mode:normal!important;
   opacity:1!important;
 }
+
+
+/* Logo: contraste déterminé par le fond réellement affiché, jamais par hasard. */
+html:not([data-palette])[data-theme="light"] .brand-logo,
+html[data-palette="classic"] .brand-logo,
+html[data-palette="frost"] .brand-logo {
+  filter:brightness(0)!important;
+  -webkit-filter:brightness(0)!important;
+  mix-blend-mode:normal!important;
+  opacity:1!important;
+  background:transparent!important;
+  padding:0!important;
+}
+html:not([data-palette])[data-theme="dark"] .brand-logo,
+html[data-palette="crimson"] .brand-logo,
+html[data-palette="azure"] .brand-logo,
+html[data-palette="noctis"] .brand-logo {
+  filter:brightness(0) invert(1)!important;
+  -webkit-filter:brightness(0) invert(1)!important;
+  mix-blend-mode:normal!important;
+  opacity:1!important;
+  background:transparent!important;
+  padding:0!important;
+}
