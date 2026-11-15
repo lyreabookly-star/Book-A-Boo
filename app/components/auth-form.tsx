@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -13,6 +14,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   const isSignup = mode === "signup";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -73,7 +75,20 @@ export function AuthForm({ mode }: AuthFormProps) {
         router.refresh();
       }
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Une erreur est survenue. Réessayez.");
+      const authError = caught as { message?: string; code?: string; errorCode?: string };
+      const code = authError?.code || authError?.errorCode || "";
+      const rawMessage = authError?.message || "";
+      if (code === "over_email_send_rate_limit" || rawMessage.toLowerCase().includes("email rate limit exceeded")) {
+        setError("Book-A-Boo a atteint la limite temporaire d’envoi d’e-mails. Attendez avant de redemander un e-mail de confirmation. Nous devons configurer un service d’envoi dédié pour permettre les inscriptions de tous les lecteurs.");
+      } else if (code === "email_not_confirmed") {
+        setError("Votre adresse e-mail n’est pas encore confirmée. Consultez le message de confirmation reçu, puis réessayez.");
+      } else if (code === "invalid_credentials") {
+        setError("Adresse e-mail ou mot de passe incorrect. Vérifiez vos informations puis réessayez.");
+      } else if (code === "over_request_rate_limit") {
+        setError("Trop de tentatives en peu de temps. Patientez quelques minutes avant de réessayer.");
+      } else {
+        setError(rawMessage || "Une erreur est survenue. Réessayez.");
+      }
     } finally {
       setBusy(false);
     }
@@ -105,7 +120,12 @@ export function AuthForm({ mode }: AuthFormProps) {
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" placeholder="vous@exemple.com" required />
         </label>
         <label>Mot de passe
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete={isSignup ? "new-password" : "current-password"} minLength={8} placeholder={isSignup ? "8 caractères minimum" : "Votre mot de passe"} required />
+          <span className="auth-password-wrap">
+            <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} autoComplete={isSignup ? "new-password" : "current-password"} minLength={8} placeholder={isSignup ? "8 caractères minimum" : "Votre mot de passe"} required />
+            <button className="auth-password-toggle" type="button" onClick={() => setShowPassword(value => !value)} aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"} aria-pressed={showPassword}>
+              {showPassword ? <EyeOff size={17}/> : <Eye size={17}/>}
+            </button>
+          </span>
         </label>
         {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
         {message && <p className="auth-feedback auth-success" role="status">{message}</p>}
