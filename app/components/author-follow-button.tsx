@@ -5,7 +5,7 @@ import Link from "next/link";
 import { BellPlus, BellMinus, LoaderCircle } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 
-export function AuthorFollowButton({ authorId, label = "Suivre l'auteur" }: { authorId: string; label?: string }) {
+export function AuthorFollowButton({ authorId, label = "Suivre l'auteur", onFollowChange }: { authorId: string; label?: string; onFollowChange?: (delta: number) => void }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [following, setFollowing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -36,7 +36,7 @@ export function AuthorFollowButton({ authorId, label = "Suivre l'auteur" }: { au
       ? await supabase.from("author_follows").delete().eq("follower_id", userId).eq("author_id", authorId)
       : await supabase.from("author_follows").insert({ follower_id: userId, author_id: authorId });
     if (result.error) setError("Impossible de modifier cet abonnement pour le moment.");
-    else setFollowing(!following);
+    else { setFollowing(!following); onFollowChange?.(following ? -1 : 1); }
     setSaving(false);
   }
 
