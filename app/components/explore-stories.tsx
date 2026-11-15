@@ -28,7 +28,8 @@ export function ExploreStories({ initialGenre = "" }: { initialGenre?: string })
         const { data, error } = await supabase.from("stories")
           .select("id,slug,title,synopsis,genre,language,author_id,created_at,cover_url")
           .eq("status", "published").eq("visibility", "public")
-          .order("published_at", { ascending: false });
+          .order("published_at", { ascending: false, nullsFirst: false })
+          .order("created_at", { ascending: false });
         if (error) throw error;
         const list = (data ?? []) as Story[];
         const ids = [...new Set(list.map(item => item.author_id))];
@@ -49,7 +50,8 @@ export function ExploreStories({ initialGenre = "" }: { initialGenre?: string })
   }, []);
 
   const filtered = useMemo(() => stories.filter(story => {
-    const text = `${story.title} ${story.synopsis} ${story.genre}`.toLocaleLowerCase();
+    const author = authors[story.author_id];
+    const text = `${story.title} ${story.synopsis} ${story.genre} ${author?.display_name ?? ""} ${author?.username ?? ""}`.toLocaleLowerCase();
     return (!genre || story.genre?.toLocaleLowerCase() === genre.toLocaleLowerCase()) &&
       (!query || text.includes(query.toLocaleLowerCase()));
   }), [stories, genre, query]);
