@@ -1027,3 +1027,17 @@ html[data-theme="dark"][data-palette="frost"] .brand-logo {
   background:transparent!important;
   padding:0!important;
 }
+
+/* Éditeur de texte enrichi */
+.writer-rich-manuscript{white-space:normal;overflow-wrap:anywhere;min-height:420px;line-height:1.85;outline:none}
+.writer-rich-manuscript p{margin:0 0 1em}
+.writer-rich-manuscript:empty:before{content:attr(data-placeholder);color:#aaa69d;pointer-events:none}
+.writer-format-actions{display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+.writer-format-actions button{width:32px;height:32px;display:grid;place-items:center;border:1px solid transparent;background:transparent;color:var(--ink);border-radius:4px}
+.writer-format-actions button:hover{background:var(--line)}
+.writer-format-actions select{min-width:65px}
+.writer-toolbar-separator{width:1px;height:22px;background:var(--line);margin:0 4px}
+.story-rich-content p,.story-rich-content div{margin:0 0 1.25em}
+.story-rich-content blockquote{margin:1.5em 0;padding-left:1em;border-left:2px solid var(--accent);color:var(--muted)}
+.story-rich-content ul,.story-rich-content ol{padding-left:1.5em}
+@media(max-width:620px){.writer-font-toolbar{align-items:flex-start;flex-direction:column}.writer-format-actions{gap:1px}.writer-format-actions button{width:30px;height:30px}.writer-rich-manuscript{min-height:360px}}
