@@ -5,7 +5,7 @@ import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 
 type Locale = "fr" | "en" | "es" | "pt";
 type Theme = "light" | "dark";
-type Palette = "classic" | "crimson" | "azure" | "frost" | "noctis";
+type Palette = "none" | "classic" | "crimson" | "azure" | "frost" | "noctis";
 type Preferences = { locale: Locale; theme: Theme };
 const defaults: Preferences = { locale: "fr", theme: "light" };
 
@@ -353,12 +353,12 @@ function translateNode(value: string, locale: Locale) {
 }
 
 type LocaleContextValue = Preferences & { palette: Palette; setLocale: (locale: Locale) => void; setTheme: (theme: Theme) => void; setPalette: (palette: Palette) => void };
-const LocaleContext = createContext<LocaleContextValue>({ ...defaults, palette: "classic", setLocale: () => {}, setTheme: () => {}, setPalette: () => {} });
+const LocaleContext = createContext<LocaleContextValue>({ ...defaults, palette: "none", setLocale: () => {}, setTheme: () => {}, setPalette: () => {} });
 export function useAppPreferences() { return useContext(LocaleContext); }
 
 export function AppPreferencesProvider({ children }: { children: ReactNode }) {
   const [preferences, setPreferences] = useState<Preferences>(defaults);
-  const [palette, setPaletteState] = useState<Palette>("classic");
+  const [palette, setPaletteState] = useState<Palette>("none");
 
   useEffect(() => {
     let alive = true;
@@ -367,7 +367,7 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
     const storedPalette = localStorage.getItem("bab-palette") as Palette | null;
     if (storedLocale && ["fr","en","es","pt"].includes(storedLocale)) setPreferences(p => ({...p, locale:storedLocale}));
     if (storedTheme && ["light","dark"].includes(storedTheme)) setPreferences(p => ({...p, theme:storedTheme}));
-    if (storedPalette && ["classic","crimson","azure","frost","noctis"].includes(storedPalette)) setPaletteState(storedPalette);
+    if (storedPalette && ["none","classic","crimson","azure","frost","noctis"].includes(storedPalette)) setPaletteState(storedPalette === "classic" ? "none" : storedPalette);
     (async () => {
       try {
         const supabase = getSupabaseBrowserClient() as any;
@@ -382,7 +382,8 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.dataset.theme = preferences.theme;
-    document.documentElement.dataset.palette = palette;
+    if (palette === "none") delete document.documentElement.dataset.palette;
+    else document.documentElement.dataset.palette = palette;
     document.documentElement.lang = preferences.locale;
     localStorage.setItem("bab-locale", preferences.locale);
     localStorage.setItem("bab-theme", preferences.theme);
