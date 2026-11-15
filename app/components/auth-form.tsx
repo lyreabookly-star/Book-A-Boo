@@ -127,6 +127,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             </button>
           </span>
         </label>
+        {!isSignup && <p className="auth-forgot-link"><Link href="/mot-de-passe-oublie">Mot de passe oublié ?</Link></p>}
         {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
         {message && <p className="auth-feedback auth-success" role="status">{message}</p>}
         <button className="auth-submit" type="submit" disabled={busy}>{busy ? "Un instant…" : isSignup ? "Créer mon compte" : "Me connecter"} <span>→</span></button>
