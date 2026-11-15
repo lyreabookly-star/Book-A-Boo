@@ -99,7 +99,6 @@ export function ProfileAccount() {
 
   if (!email) return (
     <div className="auth-card profile-logged-out">
-      <span className="profile-account-mark">b.</span>
       <h2>Votre univers vous attend.</h2>
       <p>Connectez-vous ou créez un compte pour accéder à votre profil et à votre bibliothèque personnelle.</p>
       <div className="profile-account-actions"><Link className="auth-submit" href="/connexion">Me connecter →</Link><Link className="auth-secondary" href="/inscription">Créer un compte</Link></div>
@@ -108,7 +107,7 @@ export function ProfileAccount() {
 
   return (
     <div className="auth-card profile-account-card">
-      <div className="profile-account-top"><span className="profile-account-mark">b.</span><span className="profile-account-status">SESSION ACTIVE</span></div>
+      <div className="profile-account-top"><span className="profile-account-status">SESSION ACTIVE</span></div>
       <span className="auth-form-kicker">VOTRE COMPTE BOOK-A-BOO</span>
       <h2>{profile?.display_name || profile?.username || "Votre profil"}</h2>
       {profile?.avatar_url && <img className="profile-account-avatar" src={profile.avatar_url} alt="Photo de profil" />}
