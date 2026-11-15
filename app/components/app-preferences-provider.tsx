@@ -307,9 +307,7 @@ const dictionary: Record<string, Record<Locale, string>> = {
   "Les œuvres ajoutées ici apparaîtront automatiquement sur l’accueil.": { fr:"Les œuvres ajoutées ici apparaîtront automatiquement sur l’accueil.", en:"Works added here will automatically appear on the homepage.", es:"Las obras añadidas aquí aparecerán automáticamente en la página de inicio.", pt:"As obras adicionadas aqui aparecerão automaticamente na página inicial." },
   "Histoire indisponible": { fr:"Histoire indisponible", en:"Story unavailable", es:"Historia no disponible", pt:"História indisponível" },
   "Retirer de la sélection": { fr:"Retirer de la sélection", en:"Remove from selection", es:"Quitar de la selección", pt:"Remover da seleção" },
-  "Aucune histoire publique publiée n’est disponible pour le moment. Les brouillons et histoires privées ne sont pas proposés.": { fr:"Aucune histoire publique publiée n’est disponible pour le moment. Les brouillons et histoires privées ne sont pas proposés.", en:"No published public stories are available yet. Drafts and private stories are not shown.", es:"Todavía no hay historias públicas publicadas. No se muestran borradores ni historias privadas.", pt:"Ainda não há histórias públicas publicadas. Rascunhos e histórias privadas não são exibidos." }
-
-
+  "Aucune histoire publique publiée n’est disponible pour le moment. Les brouillons et histoires privées ne sont pas proposés.": { fr:"Aucune histoire publique publiée n’est disponible pour le moment. Les brouillons et histoires privées ne sont pas proposés.", en:"No published public stories are available yet. Drafts and private stories are not shown.", es:"Todavía no hay historias públicas publicadas. No se muestran borradores ni historias privadas.", pt:"Ainda não há histórias públicas publicadas. Rascunhos e histórias privadas não são exibidos." },
   "LA VIE DE VOTRE COMMUNAUTÉ": { fr:"LA VIE DE VOTRE COMMUNAUTÉ", en:"YOUR COMMUNITY'S ACTIVITY", es:"LA ACTIVIDAD DE TU COMUNIDAD", pt:"A ATIVIDADE DA SUA COMUNIDADE" },
   "Les mots continuent": { fr:"Les mots continuent", en:"The words keep", es:"Las palabras siguen", pt:"As palavras continuam" },
   "de voyager.": { fr:"de voyager.", en:"travelling.", es:"viajando.", pt:"viajando." },
@@ -327,7 +325,7 @@ const dictionary: Record<string, Record<Locale, string>> = {
   "Une nouvelle histoire à découvrir.": { fr:"Une nouvelle histoire à découvrir.", en:"A new story to discover.", es:"Una nueva historia por descubrir.", pt:"Uma nova história para descobrir." },
   "Lire l'histoire": { fr:"Lire l'histoire", en:"Read the story", es:"Leer la historia", pt:"Ler a história" },
   "Actualités": { fr:"Actualités", en:"News", es:"Novedades", pt:"Novidades" },
-  "Rédaction": { fr:"Rédaction", en:"Editorial", es:"Redacción", pt:"Redação" }
+  "Rédaction": { fr:"Rédaction", en:"Editorial", es:"Redacción", pt:"Redação" },
 
 };
 
