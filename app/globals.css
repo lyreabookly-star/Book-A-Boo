@@ -289,6 +289,10 @@
 .auth-form label{display:flex;flex-direction:column;gap:8px;font-size:10px;font-weight:700;color:#514e47}
 .auth-form label>span{font-weight:400;color:var(--muted)}
 .auth-form input{width:100%;height:46px;border:1px solid #dedbd3;background:#fffefa;padding:0 13px;color:var(--ink);font:12px var(--sans);outline:none;border-radius:0}
+.auth-password-wrap{position:relative;display:flex!important;width:100%;align-items:center;gap:0!important;font:inherit!important;color:inherit!important}
+.auth-form .auth-password-wrap input{padding-right:49px}
+.auth-password-toggle{position:absolute;right:0;top:0;width:46px;height:46px;display:grid;place-items:center;border:0;background:transparent;color:#777168;cursor:pointer}
+.auth-password-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
 .auth-form input:focus{border-color:var(--accent);box-shadow:0 0 0 2px #a34f3e16}
 .auth-form input::placeholder{color:#aaa69d}
 .auth-form label small{font-size:9px;color:var(--muted);font-weight:400}
