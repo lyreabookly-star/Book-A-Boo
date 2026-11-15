@@ -745,3 +745,25 @@ html[data-theme="dark"] .editorial-manager-form,html[data-theme="dark"] .editori
 html[data-theme="dark"] .editorial-manager-heading h2,html[data-theme="dark"] .editorial-manager-list-heading h3,html[data-theme="dark"] .editorial-manager-item strong,html[data-theme="dark"] .editorial-manager-empty p,html[data-theme="dark"] .editorial-manager-denied h2{color:#eeeae2}
 html[data-theme="dark"] .editorial-manager-form select,html[data-theme="dark"] .editorial-manager-form textarea{background:#20221f;border-color:#454840;color:#eeeae2}
 @media(max-width:520px){.editorial-manager{margin:32px auto 50px;padding:0 17px}.editorial-manager-form{grid-template-columns:minmax(0,1fr) 100px;padding:15px;gap:12px}.editorial-manager-item{grid-template-columns:48px minmax(0,1fr) 32px;gap:10px}.editorial-manager-item>img,.editorial-manager-cover{width:48px;height:66px}.editorial-manager-item strong{font-size:16px}}
+
+/* Palettes personnelles Book-A-Boo */
+html[data-palette="crimson"]{--paper:#1a1a1a;--ink:#f7f3f2;--muted:#c2b8b8;--line:#393333;--accent:#fb3640}
+html[data-palette="azure"]{--paper:#000f0f;--ink:#eaf8fb;--muted:#a9c2c7;--line:#1c373b;--accent:#68c7ec}
+html[data-palette="frost"]{--paper:#f1faee;--ink:#212529;--muted:#58636a;--line:#d6e1d5;--accent:#a4133c}
+html[data-palette="noctis"]{--paper:#1f2235;--ink:#f5f0e7;--muted:#c1bacb;--line:#41445a;--accent:#e3a419}
+html[data-palette="crimson"] body,html[data-palette="azure"] body,html[data-palette="noctis"] body{background:var(--paper);color:var(--ink)}
+html[data-palette="crimson"] .site-header,html[data-palette="azure"] .site-header,html[data-palette="noctis"] .site-header,html[data-palette="crimson"] .mobile-nav,html[data-palette="azure"] .mobile-nav,html[data-palette="noctis"] .mobile-nav{background:var(--paper);color:var(--ink);border-color:var(--line)}
+html[data-palette="crimson"] .main-nav,html[data-palette="azure"] .main-nav,html[data-palette="noctis"] .main-nav,html[data-palette="crimson"] .hero-description,html[data-palette="azure"] .hero-description,html[data-palette="noctis"] .hero-description,html[data-palette="crimson"] .story-card p,html[data-palette="azure"] .story-card p,html[data-palette="noctis"] .story-card p{color:var(--muted)}
+html[data-palette="crimson"] .feature-panel,html[data-palette="azure"] .feature-panel,html[data-palette="noctis"] .feature-panel,html[data-palette="crimson"] .genre-tile,html[data-palette="azure"] .genre-tile,html[data-palette="noctis"] .genre-tile,html[data-palette="crimson"] .catalogue-search,html[data-palette="azure"] .catalogue-search,html[data-palette="noctis"] .catalogue-search{background:color-mix(in srgb,var(--paper) 88%,white 12%);border-color:var(--line);color:var(--ink)}
+html[data-palette="crimson"] .writer-banner,html[data-palette="azure"] .writer-banner,html[data-palette="noctis"] .writer-banner{background:color-mix(in srgb,var(--paper) 82%,white 18%);color:var(--ink)}
+html[data-palette="frost"] .site-header,html[data-palette="frost"] .mobile-nav{background:var(--paper);color:var(--ink);border-color:var(--line)}
+.settings-palette-block{display:grid;gap:12px;margin:18px 0 24px;padding:18px;border:1px solid var(--line)}
+.settings-palette-block>strong{font-size:12px;color:var(--ink)}
+.settings-palette-block>small{font-size:10px;color:var(--muted)}
+.settings-palette-grid{display:flex;flex-wrap:wrap;gap:9px}
+.settings-palette-grid button{display:flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid var(--line);background:transparent;color:var(--ink);font:11px var(--sans);cursor:pointer}
+.settings-palette-grid button.chosen{border:2px solid var(--accent);padding:7px 10px}
+.settings-palette-grid i{width:24px;height:24px;border:2px solid;border-radius:50%;display:inline-block}
+.writer-font-toolbar{display:flex;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-bottom:0;background:var(--paper)}
+.writer-font-toolbar label{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--muted)}
+.writer-font-toolbar select{max-width:155px;padding:7px 9px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:11px var(--sans)}
