@@ -27,11 +27,6 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   const [publishing, setPublishing] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
-  const [editorFont, setEditorFont] = useState("Georgia");
-  const [editorSize, setEditorSize] = useState("16");
-  useEffect(() => { setEditorFont(localStorage.getItem("bab-editor-font") || "Georgia"); setEditorSize(localStorage.getItem("bab-editor-size") || "16"); }, []);
-  function changeEditorFont(value: string) { setEditorFont(value); localStorage.setItem("bab-editor-font", value); }
-  function changeEditorSize(value: string) { setEditorSize(value); localStorage.setItem("bab-editor-size", value); }
 
   const load = useCallback(async () => {
     const supabase = getSupabaseBrowserClient() as any;
