@@ -26,6 +26,11 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   const [publishing, setPublishing] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [editorFont, setEditorFont] = useState("Georgia");
+  const [editorSize, setEditorSize] = useState("16");
+  useEffect(() => { setEditorFont(localStorage.getItem("bab-editor-font") || "Georgia"); setEditorSize(localStorage.getItem("bab-editor-size") || "16"); }, []);
+  function changeEditorFont(value: string) { setEditorFont(value); localStorage.setItem("bab-editor-font", value); }
+  function changeEditorSize(value: string) { setEditorSize(value); localStorage.setItem("bab-editor-size", value); }
 
   const load = useCallback(async () => {
     const supabase = getSupabaseBrowserClient() as any;
@@ -231,7 +236,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
         </aside>
         <section className="writer-writing-area">
           <input className="writer-chapter-title" value={/^Chapitre \d+$/.test(title) ? `${locale === "en" ? "Chapter" : locale === "es" ? "Capítulo" : locale === "pt" ? "Capítulo" : "Chapitre"} ${chapter?.chapter_number ?? 1}` : title} onChange={e => { setTitle(e.target.value); setSaved(false); }} placeholder={locale === "en" ? "Chapter title" : locale === "es" ? "Título del capítulo" : locale === "pt" ? "Título do capítulo" : "Titre du chapitre"} maxLength={160} />
-          <textarea className="writer-manuscript" value={content} onChange={e => { setContent(e.target.value); setSaved(false); }} placeholder={locale === "en" ? "Your story begins here…\n\nWrite freely. Remember to save your work." : locale === "es" ? "Tu historia comienza aquí…\n\nEscribe libremente. Recuerda guardar tu trabajo." : locale === "pt" ? "Sua história começa aqui…\n\nEscreva livremente. Lembre-se de salvar seu trabalho." : "Votre histoire commence ici…\n\nÉcrivez librement. Pensez à sauvegarder votre travail."} />
+          <div className="writer-font-toolbar"><label>Police <select value={editorFont} onChange={e=>changeEditorFont(e.target.value)}><option>Georgia</option><option>Arial</option><option>Times New Roman</option><option>Garamond</option><option>Verdana</option><option>Courier New</option><option>Trebuchet MS</option><option>Palatino Linotype</option></select></label><label>Taille <select value={editorSize} onChange={e=>changeEditorSize(e.target.value)}><option value="12">12</option><option value="14">14</option><option value="16">16</option><option value="18">18</option><option value="20">20</option><option value="22">22</option><option value="24">24</option></select></label></div>\n          <textarea className="writer-manuscript" style={{fontFamily:editorFont,fontSize:editorSize+"px"}} value={content} onChange={e => { setContent(e.target.value); setSaved(false); }} placeholder={locale === "en" ? "Your story begins here…\n\nWrite freely. Remember to save your work." : locale === "es" ? "Tu historia comienza aquí…\n\nEscribe libremente. Recuerda guardar tu trabajo." : locale === "pt" ? "Sua história começa aqui…\n\nEscreva livremente. Lembre-se de salvar seu trabalho." : "Votre histoire commence ici…\n\nÉcrivez librement. Pensez à sauvegarder votre travail."} />
           <div className="writer-save-row"><span>{saved ? <><Check size={14} /> {locale === "en" ? "Saved" : locale === "es" ? "Guardado" : locale === "pt" ? "Salvo" : "Enregistré"}</> : (locale === "en" ? "Remember to save your text" : locale === "es" ? "Recuerda guardar tu texto" : locale === "pt" ? "Lembre-se de salvar seu texto" : "Pensez à sauvegarder votre texte")}</span><button className="auth-submit" onClick={save} disabled={saving}>{saving ? <LoaderCircle className="spin" size={15} /> : <Save size={15} />}{saving ? (locale === "en" ? "Saving…" : locale === "es" ? "Guardando…" : locale === "pt" ? "Salvando…" : "Sauvegarde…") : (locale === "en" ? "Save" : locale === "es" ? "Guardar" : locale === "pt" ? "Salvar" : "Enregistrer")}</button></div>
           {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
         </section>
