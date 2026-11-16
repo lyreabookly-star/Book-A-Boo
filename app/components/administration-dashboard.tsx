@@ -35,7 +35,8 @@ export function AdministrationDashboard(){
    db.from("platform_content_reports").select("id,target_type,target_id,reporter_id,reason,details,created_at,status").order("created_at",{ascending:false}).limit(200),
    db.from("profiles").select("id,username,display_name,created_at,is_public").order("created_at",{ascending:false}).limit(100),
    db.from("stories").select("id,title,status,visibility,created_at").order("created_at",{ascending:false}).limit(100),
-   db.from("admin_action_logs").select("id,action_type,target_type,target_id,created_at").order("created_at",{ascending:false}).limit(100)
+   db.from("admin_action_logs").select("id,action_type,target_type,target_id,created_at").order("created_at",{ascending:false}).limit(100),
+   db.from("platform_admins").select("user_id")
   ]);
   const errors=[cr.error,pr.error,m.error,s.error,l.error].filter(Boolean);
   if(errors.length)setError("Certaines données n’ont pas pu être chargées. Vérifie les accès de la base.");
