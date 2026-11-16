@@ -35,6 +35,13 @@ export function StoryDetail({ storyId }: { storyId: string }) {
           .select("id,slug,title,synopsis,genre,language,author_id,published_at,cover_url,author_note,content_warnings,audience_rating")
           .or(`id.eq.${storyId},slug.eq.${storyId}`).eq("status", "published").eq("visibility", "public").single();
         if (storyError) throw storyError;
+        const { data: authData } = await supabase.auth.getUser();
+        if (authData?.user?.id) {
+          void supabase.from("story_reads").upsert(
+            { story_id: data.id, user_id: authData.user.id },
+            { onConflict: "story_id,user_id", ignoreDuplicates: true }
+          );
+        }
         const [authorResult, chapterResult, followerResult] = await Promise.all([
           supabase.from("profiles").select("id,username,display_name,avatar_url").eq("id", data.author_id).eq("is_public", true).maybeSingle(),
           supabase.from("chapters").select("id,title,chapter_number,content,author_note").eq("story_id", data.id).order("chapter_number"),
