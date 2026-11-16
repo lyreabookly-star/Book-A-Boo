@@ -30,20 +30,31 @@ export function StoryDetail({ storyId }: { storyId: string }) {
   const [readerContrast, setReaderContrast] = useState(100);
   const [readerFontSize, setReaderFontSize] = useState(16);
   const [readerTone, setReaderTone] = useState("default");
+  const [readerSettingsLoaded, setReaderSettingsLoaded] = useState(false);
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem("bab-reader-comfort");
-      if (!saved) return;
-      const settings = JSON.parse(saved);
-      if (typeof settings.brightness === "number") setReaderBrightness(Math.min(130, Math.max(70, settings.brightness)));
-      if (typeof settings.contrast === "number") setReaderContrast(Math.min(130, Math.max(70, settings.contrast)));
-      if (typeof settings.fontSize === "number") setReaderFontSize(Math.min(24, Math.max(14, settings.fontSize)));
-      if (["default", "cream", "sepia", "night"].includes(settings.tone)) setReaderTone(settings.tone);
-    } catch {}
+      if (saved) {
+        const settings = JSON.parse(saved);
+        if (typeof settings.brightness === "number") setReaderBrightness(Math.min(130, Math.max(70, settings.brightness)));
+        if (typeof settings.contrast === "number") setReaderContrast(Math.min(130, Math.max(70, settings.contrast)));
+        if (typeof settings.fontSize === "number") setReaderFontSize(Math.min(24, Math.max(14, settings.fontSize)));
+        if (["default", "cream", "sepia", "night"].includes(settings.tone)) setReaderTone(settings.tone);
+      }
+    } catch {
+      // Ignore corrupted local preferences and keep accessible defaults.
+    } finally {
+      setReaderSettingsLoaded(true);
+    }
   }, []);
   useEffect(() => {
-    window.localStorage.setItem("bab-reader-comfort", JSON.stringify({brightness:readerBrightness,contrast:readerContrast,fontSize:readerFontSize,tone:readerTone}));
-  }, [readerBrightness,readerContrast,readerFontSize,readerTone]);
+    if (!readerSettingsLoaded) return;
+    try {
+      window.localStorage.setItem("bab-reader-comfort", JSON.stringify({brightness:readerBrightness,contrast:readerContrast,fontSize:readerFontSize,tone:readerTone}));
+    } catch {
+      // Reading remains available when local storage is disabled or full.
+    }
+  }, [readerSettingsLoaded,readerBrightness,readerContrast,readerFontSize,readerTone]);
   function resetReaderSettings() {
     setReaderBrightness(100); setReaderContrast(100); setReaderFontSize(16); setReaderTone("default");
   }
