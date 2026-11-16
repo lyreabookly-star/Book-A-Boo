@@ -103,7 +103,7 @@ export function AdministrationDashboard(){
  }
  async function suspendMember(member:Member){
   if(adminUserIds.includes(member.id))return;
-  const durationChoice=window.prompt("Choisis la durée de suspension : 1 = 24 heures, 2 = 7 jours, 3 = indéfinie.");
+  const durationChoice=window.prompt("Choisis la durée de suspension : 1 = 24 heures, 2 = 7 jours, 3 = 100 ans.");
   const duration=durationChoice==="1"?"24h":durationChoice==="2"?"168h":durationChoice==="3"?"876000h":null;
   if(!duration)return;
   const reason=window.prompt("Motif de la suspension (au moins 3 caractères) ?");
