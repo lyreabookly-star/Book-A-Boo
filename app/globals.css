@@ -1377,3 +1377,18 @@ html[data-theme="dark"] .admin-member-actions button.secondary{background:#34373
 }
 html[data-theme="dark"] .explore-genre-toggle,html[data-theme="dark"] .explore-genre-menu{background:#20221f;color:#eeeae2;border-color:#4a4d45}
 html[data-theme="dark"] .explore-genre-menu button{color:#eeeae2;border-color:#4a4d45}
+
+
+/* Private publication statistics in the account area */
+.profile-private-publication-stats{margin:24px 0 8px;padding:18px;border:1px solid var(--border,rgba(128,128,128,.25));border-radius:16px;background:var(--card,transparent);color:var(--foreground,inherit)}
+.profile-private-stats-heading{display:flex;align-items:center;gap:9px}
+.profile-private-stats-heading h3{margin:0;font-size:1rem;font-weight:700}
+.profile-private-total-views{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:.95rem}
+.profile-private-total-views strong{font-size:1.25rem;font-variant-numeric:tabular-nums}
+.profile-private-publication-stats ul{list-style:none;padding:0;margin:10px 0}
+.profile-private-publication-stats li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--border,rgba(128,128,128,.2))}
+.profile-private-publication-stats li a{color:var(--foreground,inherit);text-decoration:none;overflow-wrap:anywhere}
+.profile-private-publication-stats li a:hover{text-decoration:underline}
+.profile-private-publication-stats li span{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:.88rem;opacity:.85}
+.profile-private-publication-stats>small,.profile-private-stats-empty{display:block;font-size:.8rem;line-height:1.5;opacity:.75}
+@media(max-width:480px){.profile-private-publication-stats{padding:14px}.profile-private-publication-stats li{align-items:flex-start}.profile-private-publication-stats li span{font-size:.8rem}}
