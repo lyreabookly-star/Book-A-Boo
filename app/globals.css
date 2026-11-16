@@ -1289,3 +1289,13 @@ html[data-theme="dark"] .public-profile-work-title,html[data-theme="dark"] .publ
 .admin-report-missing{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
 @media(max-width:620px){.admin-overview-grid{grid-template-columns:1fr}.admin-member,.admin-work,.admin-log-list article{align-items:flex-start;flex-direction:column}.admin-member button{width:100%}.admin-log-list article time{white-space:normal}.admin-tabs{margin-left:-2px;margin-right:-2px}.admin-tabs button{padding:9px 12px}}
 html[data-theme="dark"] .admin-tabs button:not(.active),html[data-theme="dark"] .admin-member,html[data-theme="dark"] .admin-work,html[data-theme="dark"] .admin-log-list article,html[data-theme="dark"] .admin-overview-grid button,html[data-theme="dark"] .admin-warning-form{background:var(--surface,#292b27);color:var(--ink)}
+
+/* Signalement public et actions de modération */
+.content-report-control{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.content-report-control small{font-size:10px;line-height:1.5;color:var(--muted);max-width:260px}
+.admin-work button{display:inline-flex;align-items:center;gap:7px;flex:none;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);padding:9px 11px;font:inherit;font-size:10px;cursor:pointer}
+.admin-work button:disabled{opacity:.5;cursor:wait}
+.admin-report-actions button.secondary{background:color-mix(in srgb,var(--ink) 8%,var(--paper));color:var(--ink);border:1px solid var(--line)}
+.admin-report-actions button:focus-visible,.admin-work button:focus-visible,.admin-member button:focus-visible,.admin-tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+html[data-theme="dark"] .admin-report-actions button.secondary{background:#343730;color:#f1eee6;border-color:#50534b}
+@media(max-width:620px){.content-report-control{width:100%}.content-report-control .auth-secondary{width:100%;justify-content:center}}
