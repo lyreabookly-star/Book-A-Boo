@@ -1413,3 +1413,149 @@ html[data-theme="dark"] .explore-genre-menu button{color:#eeeae2;border-color:#4
 html[data-theme="dark"] .reader-settings-panel,html[data-theme="dark"] .reader-settings-toggle{background:#20221f;color:#eeeae2;border-color:#4a4d45}
 html[data-theme="dark"] .reader-settings-panel>label{color:#eeeae2}
 @media(max-width:620px){.reader-heading-actions{width:100%;justify-content:space-between}.reader-settings-panel{padding:13px}.reader-settings-toggle{font-size:10px;padding:9px 10px}}
+
+
+/* Audit contraste global — surfaces, textes, formulaires et nouvelles options */
+html {
+  --card:var(--surface,var(--paper));
+  --foreground:var(--ink);
+  --border:var(--line);
+}
+html[data-theme="dark"]:not([data-palette]) {
+  --surface:#242621;
+  --surface-soft:#2d302a;
+  --card:#242621;
+  --foreground:#f1eee7;
+  --border:#45483f;
+}
+html:not([data-theme="dark"]):not([data-palette]) {
+  --surface:#fffefa;
+  --surface-soft:#efede6;
+  --card:#fffefa;
+  --foreground:#20201e;
+  --border:#dedbd3;
+}
+
+/* Toutes les surfaces interactives récentes héritent du thème actif. */
+html :is(
+  .reader-settings-panel,.reader-settings-toggle,.explore-genre-menu,
+  .explore-genre-menu button,.explore-genre-toggle,.profile-private-publication-stats,
+  .explore-member-card,.public-profile-work,.public-profile-follower,
+  .admin-tabs button,.admin-overview-grid button,.admin-member,.admin-work,
+  .admin-log-list article,.admin-warning-form,.admin-report,.admin-reported-content,
+  .writer-create-form,.writer-project-row,.writer-empty-real,.writer-security-note,
+  .story-content-warnings,.story-author-note,.story-chapter-author-note,
+  .story-audience-rating,.profile-preview,.profile-detail,.profile-tabs,
+  .catalogue-search,.catalogue-filter,.catalogue-toolbar,.feature-panel,
+  .genre-tile,.auth-card,.auth-form,.settings-card,.settings-panel,
+  .settings-form,.settings-inline-form,.settings-choice-row,.settings-palette-block
+) {
+  background-color:var(--surface,var(--paper));
+  color:var(--ink);
+  border-color:var(--line);
+}
+
+/* Les contenus internes ne doivent pas conserver une ancienne couleur fixe. */
+html :is(
+  .reader-settings-panel,.explore-genre-menu,.profile-private-publication-stats,
+  .explore-member-card,.public-profile-work,.public-profile-follower,
+  .admin-tabs,.admin-overview-grid,.admin-member,.admin-work,.admin-log-list,
+  .admin-warning-form,.admin-report,.admin-reported-content,
+  .writer-create-form,.writer-project-row,.writer-empty-real,
+  .story-content-warnings,.story-author-note,.story-chapter-author-note,
+  .profile-detail,.profile-preview,.feature-panel,.genre-tile,
+  .auth-card,.auth-form,.settings-card,.settings-panel,.settings-form,
+  .settings-inline-form,.settings-choice-row,.settings-palette-block
+) :is(h1,h2,h3,h4,p,span,strong,small,label,legend,li,td,th,time) {
+  color:inherit;
+}
+html :is(
+  .reader-settings-panel,.profile-private-publication-stats,
+  .explore-member-card,.public-profile-work,.public-profile-follower,
+  .admin-member,.admin-work,.admin-log-list article,.admin-warning-form,
+  .admin-report,.admin-reported-content,.writer-create-form,
+  .story-content-warnings,.story-author-note,.story-chapter-author-note
+) :is(small,.muted,.hint,.description,time) {
+  color:var(--muted)!important;
+}
+
+/* Formulaires : même contraste dans inscription, connexion, rédaction,
+   administration, recherche et réglages. */
+html :is(input,textarea,select),
+html :is(.writer-create-form,.writer-metadata-grid,.writer-chapter-note,
+         .admin-warning-form,.auth-form,.settings-form,.settings-inline-form) :is(input,textarea,select) {
+  background-color:var(--surface,var(--paper))!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+  caret-color:var(--accent);
+}
+html :is(input,textarea)::placeholder {
+  color:var(--muted)!important;
+  opacity:1;
+}
+html select,html option {
+  color:var(--ink);
+  background-color:var(--surface,var(--paper));
+}
+html :is(button,a,[role="button"],input,textarea,select):focus-visible {
+  outline:2px solid var(--accent);
+  outline-offset:3px;
+}
+
+/* Les boutons secondaires et options ne restent jamais noirs sur un fond sombre. */
+html[data-theme="dark"]:not([data-palette]) :is(
+  .auth-secondary,.reader-settings-toggle,.reader-tone-options button,
+  .explore-genre-menu button,.explore-genre-toggle,.admin-tabs button:not(.active),
+  .admin-member button,.admin-work button,.work-icon-button,.catalogue-filter,
+  .settings-palette-grid button
+) {
+  background-color:var(--surface)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+html[data-palette] :is(
+  .reader-settings-toggle,.reader-tone-options button,.explore-genre-menu button,
+  .explore-genre-toggle,.admin-tabs button:not(.active),.admin-member button,
+  .admin-work button,.work-icon-button,.catalogue-filter,.settings-palette-grid button
+) {
+  background-color:var(--surface)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+html :is(.admin-tabs button.active,.primary-button,.signup-button,.auth-submit,.settings-save) {
+  color:#fff!important;
+}
+html :is(.auth-error,.settings-error,[data-feedback="error"]) {
+  background:var(--feedback-error-bg)!important;
+  color:var(--feedback-error-text)!important;
+}
+html :is(.auth-success,.settings-success,[data-feedback="success"]) {
+  background:var(--feedback-success-bg)!important;
+  color:var(--feedback-success-text)!important;
+}
+
+/* Correctifs spécifiques aux composants ajoutés récemment. */
+html[data-theme="dark"]:not([data-palette]) :is(
+  .reader-settings-panel,.reader-settings-toggle,.explore-genre-menu,
+  .explore-genre-menu button,.explore-genre-toggle,.profile-private-publication-stats,
+  .explore-member-card,.public-profile-work,.public-profile-follower,
+  .admin-tabs button:not(.active),.admin-overview-grid button,.admin-member,
+  .admin-work,.admin-log-list article,.admin-warning-form,.admin-report,
+  .admin-reported-content,.writer-create-form,.writer-project-row,
+  .writer-empty-real,.story-content-warnings,.story-author-note,
+  .story-chapter-author-note
+) {
+  background-color:var(--surface)!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+}
+html[data-theme="dark"]:not([data-palette]) :is(
+  .reader-settings-panel,.explore-genre-menu,.profile-private-publication-stats,
+  .explore-member-card,.public-profile-work,.public-profile-follower,
+  .admin-overview-grid,.admin-member,.admin-work,.admin-log-list,
+  .admin-warning-form,.admin-report,.admin-reported-content,.writer-create-form,
+  .writer-project-row,.writer-empty-real,.story-content-warnings,
+  .story-author-note,.story-chapter-author-note
+) :is(h1,h2,h3,h4,p,span,strong,small,label,legend,li,time) {
+  color:inherit!important;
+}
