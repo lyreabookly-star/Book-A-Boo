@@ -34,7 +34,7 @@ export function RichTextEditor({ content, chapterId, onChange }: Props) {
   function setFontSize(value: string) {
     setSize(value); localStorage.setItem("bab-editor-size", value);
     const n = Number(value);
-    command("fontSize", n <= 14 ? "2" : n <= 16 ? "3" : n <= 18 ? "4" : n <= 22 ? "5" : n <= 28 ? "6" : "7");
+    command("fontSize", n <= 14 ? "2" : n <= 16 ? "3" : n <= 18 ? "4" : n <= 24 ? "5" : "5");
   }
   function stepSize(direction: number) {
     const values = [12,14,16,18,20,22,24];
