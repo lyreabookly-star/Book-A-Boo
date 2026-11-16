@@ -6,6 +6,7 @@ import { BookOpen, Bookmark, LoaderCircle, UserRound, Users } from "lucide-react
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { useAppPreferences } from "./app-preferences-provider";
 import { AuthorFollowButton } from "./author-follow-button";
+import { ContentReportButton } from "./content-report-button";
 
 type Profile = { id: string; username: string; display_name: string | null; bio: string; avatar_url: string | null; is_public: boolean; show_library_on_profile: boolean };
 type LibraryStory = { id: string; story: { id: string; title: string; synopsis: string; genre: string; language: string } | null };
@@ -115,7 +116,7 @@ export function PublicProfile({ username }: { username: string }) {
       {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : <span className="public-profile-avatar"><UserRound size={28}/></span>}
       <div className="public-profile-identity"><span className="catalogue-overline">{words.author}</span><h2>{profile.display_name || profile.username}</h2><p>@{profile.username}</p>{profile.bio && <div className="public-profile-bio">{profile.bio}</div>}
         <div className="public-profile-stats"><span><strong>{followerCount}</strong> {words.followers}</span><span><strong>{followingCount}</strong> {words.following}</span></div>
-        <AuthorFollowButton authorId={profile.id} onFollowChange={(delta: number) => setFollowerCount((count) => Math.max(0, count + delta))}/>
+        <AuthorFollowButton authorId={profile.id} onFollowChange={(delta: number) => setFollowerCount((count) => Math.max(0, count + delta))}/><ContentReportButton targetType="profile" targetId={profile.id}/>
       </div>
     </section>
 
