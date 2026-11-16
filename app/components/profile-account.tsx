@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Eye, BookOpen } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 
 type Profile = {
@@ -19,10 +20,25 @@ export function ProfileAccount() {
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [publicationStats, setPublicationStats] = useState<{ id: string; title: string; slug: string; views: number }[]>([]);
+  const [totalViews, setTotalViews] = useState(0);
   const [error, setError] = useState("");
 
   useEffect(() => {
     let active = true;
+    async function loadPublicationStats(userId: string, supabase: any) {
+      const { data: stories, error: storiesError } = await supabase.from("stories")
+        .select("id,title,slug").eq("author_id", userId).eq("status", "published").eq("visibility", "public")
+        .order("published_at", { ascending: false });
+      if (storiesError) throw storiesError;
+      const rows = await Promise.all((stories ?? []).map(async (story: { id: string; title: string; slug: string }) => {
+        const { count, error: countError } = await supabase.from("story_reads")
+          .select("id", { count: "exact", head: true }).eq("story_id", story.id);
+        if (countError) throw countError;
+        return { ...story, views: count ?? 0 };
+      }));
+      if (active) { setPublicationStats(rows); setTotalViews(rows.reduce((sum, row) => sum + row.views, 0)); }
+    }
     async function load() {
       try {
         const supabase = getSupabaseBrowserClient();
@@ -44,6 +60,7 @@ export function ProfileAccount() {
         if (active) {
           setEmail(user.email ?? "");
           setProfile(data);
+          await loadPublicationStats(user.id, supabase);
         }
       } catch (caught) {
         if (active) setError(caught instanceof Error ? caught.message : "Impossible de charger votre profil.");
@@ -57,26 +74,23 @@ export function ProfileAccount() {
       if (!session) {
         setEmail("");
         setProfile(null);
+        setPublicationStats([]);
+        setTotalViews(0);
         return;
       }
       setLoading(true);
-      void supabase
-        .from("profiles")
-        .select("username, display_name, bio, avatar_url, is_public, show_library_on_profile")
-        .eq("id", session.user.id)
-        .maybeSingle()
-        .then(({ data, error: profileError }) => {
+      void (async () => {
+        try {
+          const { data, error: profileError } = await supabase.from("profiles")
+            .select("username, display_name, bio, avatar_url, is_public, show_library_on_profile")
+            .eq("id", session.user.id).maybeSingle();
+          if (profileError) throw profileError;
           if (!active) return;
-          if (profileError) {
-            setError(profileError.message);
-            setProfile(null);
-          } else {
-            setError("");
-            setProfile(data);
-            setEmail(session.user.email ?? "");
-          }
-          setLoading(false);
-        });
+          setError(""); setProfile(data); setEmail(session.user.email ?? "");
+          await loadPublicationStats(session.user.id, supabase);
+        } catch (caught) { if (active) setError(caught instanceof Error ? caught.message : "Impossible de charger vos statistiques."); }
+        finally { if (active) setLoading(false); }
+      })();
     });
     return () => {
       active = false;
@@ -114,6 +128,12 @@ export function ProfileAccount() {
       {profile?.username && <p className="profile-account-handle">@{profile.username}</p>}
       <p className="profile-account-email">{email}</p>
       {profile?.bio && <p>{profile.bio}</p>}
+      <section className="profile-private-publication-stats" aria-label="Statistiques de mes publications">
+        <div className="profile-private-stats-heading"><BookOpen size={18}/><h3>Statistiques de mes publications</h3></div>
+        <p className="profile-private-total-views"><Eye size={17}/> <strong>{totalViews}</strong> vues au total</p>
+        {publicationStats.length ? <ul>{publicationStats.map((story) => <li key={story.id}><Link href={`/histoire/${story.slug || story.id}`}>{story.title}</Link><span><Eye size={14}/> {story.views} vues</span></li>)}</ul> : <p className="profile-private-stats-empty">Vos œuvres publiées apparaîtront ici avec leur nombre de vues.</p>}
+        <small>Une vue correspond à un membre connecté ayant ouvert l’œuvre. Chaque membre est compté une seule fois par œuvre.</small>
+      </section>
       {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
       <div className="profile-account-actions">
         <Link className="auth-submit" href="/bibliotheque">Ma bibliothèque →</Link><Link className="auth-secondary" href="/notifications">Mes notifications ♡</Link>{profile?.is_public && profile.username && <Link className="auth-secondary" href={`/u/${encodeURIComponent(profile.username)}`}>Voir mon profil public ↗</Link>}<Link className="auth-secondary" href="/parametres">Paramètres du compte ⚙</Link>
