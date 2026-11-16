@@ -11,6 +11,20 @@ type Story = { id: string; slug: string; title: string; synopsis: string; genre:
 type Author = { id: string; username: string; display_name: string | null };
 type Member = { id: string; username: string; display_name: string | null; avatar_url: string | null };
 
+const genreOptions = [
+  { name: "Romance", note: "Les liens, les élans et les secondes chances" },
+  { name: "Fantasy", note: "Des mondes à inventer, des règles à briser" },
+  { name: "Drame", note: "Des émotions qui restent après la dernière page" },
+  { name: "Thriller", note: "Le frisson de ne pas tout savoir" },
+  { name: "Psychologie", note: "Explorer les nuances de l'esprit humain" },
+  { name: "Fanfiction", note: "Retrouver des univers que l'on aime" },
+  { name: "Poésie", note: "Quand quelques mots ouvrent un monde" },
+  { name: "Science-fiction", note: "Imaginer ce qui n'existe pas encore" },
+  { name: "Horreur", note: "Frôler l'inconnu, page après page" },
+  { name: "Historique", note: "Voyager à travers les époques" },
+  { name: "Littérature générale", note: "Des histoires inclassables et libres" }
+];
+
 export function ExploreStories({ initialGenre = "" }: { initialGenre?: string }) {
   const { locale } = useAppPreferences();
   const [stories, setStories] = useState<Story[]>([]);
@@ -112,6 +126,14 @@ export function ExploreStories({ initialGenre = "" }: { initialGenre?: string })
         <option value="">{labels.all}</option>
         {["Romance","Fantasy","Drame","Thriller","Psychologie","Fanfiction","Poésie","Science-fiction","Horreur","Historique","Littérature générale"].map(item => <option key={item} value={item}>{item}</option>)}
       </select>
+    </div>
+    <div className="explore-genres-after explore-genres-functional"><div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> CHOISIR UNE DIRECTION</span><h2>Explorer par <em>genre.</em></h2></div><span className="shelf-index">{genreOptions.length} GENRES</span></div>
+      <div className="explore-genre-grid">{genreOptions.map((item, index) => {
+        const count = stories.filter(story => story.genre?.toLocaleLowerCase() === item.name.toLocaleLowerCase()).length;
+        return <button type="button" key={item.name} onClick={() => setGenre(current => current === item.name ? "" : item.name)} className={`explore-genre explore-genre-button explore-${["rose","violet","ochre","night","sage","blue","rose","night","plum","ochre","sage"][index]}${genre === item.name ? " active" : ""}`}>
+          <span className="explore-genre-number">{String(count).padStart(2,"0")}</span><div><h3>{item.name}</h3><p>{item.note}</p><small>{count} {count > 1 ? "œuvres publiées" : "œuvre publiée"}</small></div><ArrowUpRight size={19}/>
+        </button>;
+      })}</div>
     </div>
     {query.trim().length >= 2 && <section className="explore-member-results" aria-live="polite">
       <div className="explore-member-heading"><span className="eyebrow"><span className="eyebrow-line"/> {labels.members}</span><span className="shelf-index">{members.length}</span></div>
