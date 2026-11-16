@@ -37,7 +37,7 @@ export function RichTextEditor({ content, chapterId, onChange }: Props) {
     command("fontSize", n <= 14 ? "2" : n <= 16 ? "3" : n <= 18 ? "4" : n <= 22 ? "5" : n <= 28 ? "6" : "7");
   }
   function stepSize(direction: number) {
-    const values = [12,14,16,18,20,22,24,28,32,36];
+    const values = [12,14,16,18,20,22,24];
     const index = values.indexOf(Number(size));
     setFontSize(String(values[Math.max(0, Math.min(values.length - 1, index + direction))]));
   }
@@ -58,7 +58,7 @@ export function RichTextEditor({ content, chapterId, onChange }: Props) {
         <button type="button" title="Justifier" aria-label="Justifier" onMouseDown={e=>e.preventDefault()} onClick={()=>command("justifyFull")}><AlignJustify size={16}/></button>
         <span className="writer-toolbar-separator"/>
         <button type="button" title="Diminuer la taille" aria-label="Diminuer la taille" onMouseDown={e=>e.preventDefault()} onClick={()=>stepSize(-1)}><Minus size={16}/></button>
-        <select aria-label="Taille du texte" value={size} onChange={e=>setFontSize(e.target.value)}>{[12,14,16,18,20,22,24,28,32,36].map(n=><option key={n} value={n}>{n}px</option>)}</select>
+        <select aria-label="Taille du texte" value={size} onChange={e=>setFontSize(e.target.value)}>{[12,14,16,18,20,22,24].map(n=><option key={n} value={n}>{n}px</option>)}</select>
         <button type="button" title="Augmenter la taille" aria-label="Augmenter la taille" onMouseDown={e=>e.preventDefault()} onClick={()=>stepSize(1)}><Plus size={16}/></button>
       </div>
     </div>
