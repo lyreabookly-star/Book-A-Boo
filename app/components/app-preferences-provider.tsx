@@ -454,7 +454,7 @@ const dictionary: Record<string, Record<Locale, string>> = {
   "[Ce commentaire a été retiré par la modération.]": { fr:"[Ce commentaire a été retiré par la modération.]", en:"[This comment was removed by moderation.]", es:"[Este comentario fue retirado por moderación.]", pt:"[Este comentário foi removido pela moderação.]" },
   "L’avertissement n’a pas pu être enregistré.": { fr:"L’avertissement n’a pas pu être enregistré.", en:"The warning could not be saved.", es:"No se pudo guardar la advertencia.", pt:"Não foi possível salvar o aviso." },
   "Motif de la suspension (au moins 3 caractères) ?": { fr:"Motif de la suspension (au moins 3 caractères) ?", en:"Reason for suspension (at least 3 characters)?", es:"¿Motivo de la suspensión (al menos 3 caracteres)?", pt:"Motivo da suspensão (pelo menos 3 caracteres)?" },
-  "Confort de lecture": { fr:"Confort de lecture", en:"Reading comfort", es:"Comodidad de lectura", pt:"Conforto de leitura" },
+
   "a publié «": { fr:"a publié «", en:"published “", es:"ha publicado «", pt:"publicou “" },
   "Ajouter un chapitre": { fr:"Ajouter un chapitre", en:"Add a chapter", es:"Añadir un capítulo", pt:"Adicionar capítulo" },
   "Note de l’auteur pour ce chapitre": { fr:"Note de l’auteur pour ce chapitre", en:"Author's note for this chapter", es:"Nota del autor para este capítulo", pt:"Nota do autor para este capítulo" },
