@@ -1299,3 +1299,9 @@ html[data-theme="dark"] .admin-tabs button:not(.active),html[data-theme="dark"] 
 .admin-report-actions button:focus-visible,.admin-work button:focus-visible,.admin-member button:focus-visible,.admin-tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 html[data-theme="dark"] .admin-report-actions button.secondary{background:#343730;color:#f1eee6;border-color:#50534b}
 @media(max-width:620px){.content-report-control{width:100%}.content-report-control .auth-secondary{width:100%;justify-content:center}}
+
+.admin-member-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.admin-member-actions button.secondary{background:color-mix(in srgb,var(--ink) 8%,var(--paper))}
+.admin-member-actions button:disabled{opacity:.45;cursor:not-allowed}
+html[data-theme="dark"] .admin-member-actions button.secondary{background:#343730;color:#f1eee6;border-color:#50534b}
+@media(max-width:620px){.admin-member-actions{width:100%;display:grid;grid-template-columns:1fr}.admin-member-actions button{width:100%}}
