@@ -147,7 +147,12 @@ export function StoryInteractions({ storyId }: { storyId: string }) {
   }
 
   async function deleteComment(id: string) {
-    if (!userId || !window.confirm("Supprimer ce commentaire ?")) return;
+    if (!userId) return;
+    if (comments.some(comment => comment.parent_id === id)) {
+      setNotice("Ce commentaire a déjà reçu des réponses. Pour préserver la discussion, il ne peut pas être supprimé pour le moment.");
+      return;
+    }
+    if (!window.confirm("Supprimer ce commentaire ?")) return;
     const supabase = getSupabaseBrowserClient() as any;
     const { error } = await supabase.from("story_comments").delete().eq("id", id).eq("author_id", userId);
     if (error) setNotice("Impossible de supprimer ce commentaire.");
