@@ -9,8 +9,8 @@ import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { useAppPreferences } from "./app-preferences-provider";
 import { RichTextEditor } from "./rich-text-editor";
 
-type Story = { id: string; slug: string; title: string; synopsis: string; status: "draft" | "published"; visibility: "private" | "public"; published_at: string | null; cover_url: string | null };
-type Chapter = { id: string; title: string; content: string; chapter_number: number; updated_at: string };
+type Story = { id: string; slug: string; title: string; synopsis: string; genre: string; author_note: string; content_warnings: string[]; audience_rating: string; status: "draft" | "published"; visibility: "private" | "public"; published_at: string | null; cover_url: string | null };
+type Chapter = { id: string; title: string; content: string; author_note: string; chapter_number: number; updated_at: string };
 
 export function WriterEditor({ storyId }: { storyId: string }) {
   const router = useRouter();
@@ -19,7 +19,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState("");\n  const [chapterAuthorNote, setChapterAuthorNote] = useState("");\n  const [warningsText, setWarningsText] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -37,15 +37,15 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       return;
     }
     const { data: storyData, error: storyError } = await supabase
-      .from("stories").select("id,slug,title,synopsis,status,visibility,published_at,cover_url").eq("id", storyId).eq("author_id", user.id).single();
+      .from("stories").select("id,slug,title,synopsis,genre,author_note,content_warnings,audience_rating,status,visibility,published_at,cover_url").eq("id", storyId).eq("author_id", user.id).single();
     if (storyError) throw storyError;
     const { data: chapterData, error: chapterError } = await supabase
-      .from("chapters").select("id,title,content,chapter_number,updated_at").eq("story_id", storyId).order("chapter_number");
+      .from("chapters").select("id,title,content,author_note,chapter_number,updated_at").eq("story_id", storyId).order("chapter_number");
     if (chapterError) throw chapterError;
     let list = chapterData ?? [];
     if (list.length === 0) {
       const { data: created, error: createError } = await supabase
-        .from("chapters").insert({ story_id: storyId, author_id: user.id, title: "Chapitre 1", chapter_number: 1, content: "" })
+        .from("chapters").insert({ story_id: storyId, author_id: user.id, title: "Chapitre 1", chapter_number: 1, content: "", author_note: "" })
         .select("id,title,content,chapter_number,updated_at").single();
       if (createError) throw createError;
       list = [created];
@@ -54,7 +54,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     setChapters(list);
     setChapter(list[0]);
     setTitle(list[0].title);
-    setContent(list[0].content);
+    setContent(list[0].content);\n    setChapterAuthorNote(list[0].author_note || "");\n    setWarningsText((storyData.content_warnings || []).join(", "));
   }, [router, storyId]);
 
   useEffect(() => {
@@ -70,11 +70,11 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     try {
       const supabase = getSupabaseBrowserClient() as any;
       const { error: chapterError } = await supabase.from("chapters")
-        .update({ title: title.trim() || "Chapitre", content, updated_at: new Date().toISOString() })
+        .update({ title: title.trim() || "Chapitre", content, author_note: chapterAuthorNote, updated_at: new Date().toISOString() })
         .eq("id", chapter.id);
       if (chapterError) throw chapterError;
       const { error: storyError } = await supabase.from("stories")
-        .update({ updated_at: new Date().toISOString() }).eq("id", story.id);
+        .update({ title: story.title.trim(), synopsis: story.synopsis, genre: story.genre, author_note: story.author_note, content_warnings: warningsText.split(",").map(value => value.trim()).filter(Boolean), audience_rating: story.audience_rating, updated_at: new Date().toISOString() }).eq("id", story.id);
       if (storyError) throw storyError;
       setSaved(true);
       setChapters(items => items.map(item => item.id === chapter.id ? { ...item, title: title.trim() || "Chapitre", content } : item));
@@ -155,7 +155,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
         .select("id,title,content,chapter_number,updated_at").single();
       if (insertError) throw insertError;
       setChapters(items => [...items, data]);
-      setChapter(data); setTitle(data.title); setContent("");
+      setChapter(data); setTitle(data.title); setContent(""); setChapterAuthorNote("");
       setSaved(false);
     } catch (e) { setError(e instanceof Error ? e.message : "Impossible d'ajouter ce chapitre."); }
   }
@@ -165,7 +165,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       const savedCurrent = await save();
       if (!savedCurrent) return;
     }
-    setChapter(item); setTitle(item.title); setContent(item.content); setSaved(false);
+    setChapter(item); setTitle(item.title); setContent(item.content); setChapterAuthorNote(item.author_note || ""); setSaved(false);
   }
 
   async function copyPublishedLink() {
@@ -232,7 +232,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
         </aside>
         <section className="writer-writing-area">
           <input className="writer-chapter-title" value={/^Chapitre \d+$/.test(title) ? `${locale === "en" ? "Chapter" : locale === "es" ? "Capítulo" : locale === "pt" ? "Capítulo" : "Chapitre"} ${chapter?.chapter_number ?? 1}` : title} onChange={e => { setTitle(e.target.value); setSaved(false); }} placeholder={locale === "en" ? "Chapter title" : locale === "es" ? "Título del capítulo" : locale === "pt" ? "Título do capítulo" : "Titre du chapitre"} maxLength={160} />
-          <RichTextEditor key={chapter?.id || "new"} chapterId={chapter?.id || "new"} content={content} onChange={value=>{setContent(value);setSaved(false);}} />
+          <RichTextEditor key={chapter?.id || "new"} chapterId={chapter?.id || "new"} content={content} onChange={value=>{setContent(value);setSaved(false);}} />\n          <label className="writer-chapter-note">Note de l’auteur pour ce chapitre <span>(facultatif)</span><textarea value={chapterAuthorNote} onChange={e => { setChapterAuthorNote(e.target.value); setSaved(false); }} maxLength={2000} rows={3} placeholder="Un mot avant ou après la lecture de ce chapitre…" /></label>
           <div className="writer-save-row"><span>{saved ? <><Check size={14} /> {locale === "en" ? "Saved" : locale === "es" ? "Guardado" : locale === "pt" ? "Salvo" : "Enregistré"}</> : (locale === "en" ? "Remember to save your text" : locale === "es" ? "Recuerda guardar tu texto" : locale === "pt" ? "Lembre-se de salvar seu texto" : "Pensez à sauvegarder votre texte")}</span><button className="auth-submit" onClick={save} disabled={saving}>{saving ? <LoaderCircle className="spin" size={15} /> : <Save size={15} />}{saving ? (locale === "en" ? "Saving…" : locale === "es" ? "Guardando…" : locale === "pt" ? "Salvando…" : "Sauvegarde…") : (locale === "en" ? "Save" : locale === "es" ? "Guardar" : locale === "pt" ? "Salvar" : "Enregistrer")}</button></div>
           {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
         </section>
