@@ -1129,6 +1129,17 @@ html[data-theme="dark"] .recent-publication-cover{background:#3b3d36;color:#e3b0
 .story-comment-form-footer small{font-size:10px;color:var(--muted)}
 .story-comment-form-footer .primary-button{border:0;border-radius:999px;padding:10px 15px;cursor:pointer}
 .story-comment-list{margin-top:18px}
+.story-comment-thread{padding:0 0 4px;border-bottom:1px solid var(--line)}
+.story-comment-thread>.story-comment{border-bottom:0}
+.story-comment-replies{margin:0 0 10px 48px;padding-left:14px;border-left:2px solid color-mix(in srgb,var(--accent) 24%,var(--line))}
+.story-comment-reply{padding:10px 0;border-bottom:0}
+.story-comment-reply .story-comment-avatar{width:29px;height:29px;flex-basis:29px;font-size:11px}
+.story-reply-form{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--paper) 82%,var(--accent) 4%)}
+.story-reply-form textarea{width:100%;resize:vertical;min-height:54px;border:0;outline:0;background:transparent;color:var(--ink);font:12px/1.7 var(--sans)}
+.story-reply-form>div{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:7px}
+.story-reply-form small{font-size:10px;color:var(--muted)}
+.story-reply-form button{padding:8px 12px;border-radius:999px}
+.story-reply-form button:disabled{opacity:.5;cursor:not-allowed}
 .story-comment{display:flex;gap:12px;padding:17px 0;border-bottom:1px solid var(--line)}
 .story-comment-avatar{width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;border-radius:50%;background:color-mix(in srgb,var(--accent) 13%,var(--paper));color:var(--accent);font-weight:700}
 .story-comment-body{min-width:0;flex:1}
