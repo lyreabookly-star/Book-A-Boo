@@ -26,6 +26,8 @@ export function StoryInteractions({ storyId }: { storyId: string }) {
   const [ratingCount, setRatingCount] = useState(0);
   const [myRating, setMyRating] = useState(0);
   const [draft, setDraft] = useState("");
+  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [replyDraft, setReplyDraft] = useState("");
   const [busy, setBusy] = useState("");
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(true);
@@ -131,6 +133,19 @@ export function StoryInteractions({ storyId }: { storyId: string }) {
     setBusy("");
   }
 
+  async function submitReply(event: FormEvent<HTMLFormElement>, parentId: string) {
+    event.preventDefault();
+    if (!userId) return requireLogin();
+    const content = replyDraft.trim();
+    if (!content) return;
+    setBusy(`reply-${parentId}`); setNotice("");
+    const supabase = getSupabaseBrowserClient() as any;
+    const { error } = await supabase.from("story_comments").insert({ story_id: storyId, author_id: userId, parent_id: parentId, content });
+    if (error) setNotice("Ta réponse n’a pas pu être publiée.");
+    else { setReplyDraft(""); setReplyTo(null); await load(); }
+    setBusy("");
+  }
+
   async function deleteComment(id: string) {
     if (!userId || !window.confirm("Supprimer ce commentaire ?")) return;
     const supabase = getSupabaseBrowserClient() as any;
@@ -192,18 +207,42 @@ export function StoryInteractions({ storyId }: { storyId: string }) {
         </form>
         {notice ? <p className="story-interaction-notice" role="status">{notice}</p> : null}
         {loading ? <p className="explore-live-empty">Chargement des commentaires…</p> : comments.length ? <div className="story-comment-list">
-          {comments.map((comment) => {
+          {comments.filter(comment => !comment.parent_id).map((comment) => {
             const person = profiles[comment.author_id];
-            return <article className="story-comment" key={comment.id}>
-              <div className="story-comment-avatar">{(person?.display_name || person?.username || "?").slice(0,1).toUpperCase()}</div>
-              <div className="story-comment-body">
-                <div className="story-comment-meta"><strong>{person?.display_name || person?.username || "Lecteur Book-A-Boo"}</strong><time>{dateLabel(comment.created_at)}</time></div>
-                <p>{comment.content}</p>
-                <div className="story-comment-actions">
-                  {userId === comment.author_id ? <button type="button" onClick={() => deleteComment(comment.id)}>Supprimer</button> : null}
-                  {userId && userId !== comment.author_id ? <button type="button" onClick={() => reportComment(comment.id)}>Signaler</button> : null}
+            const replies = comments.filter(reply => reply.parent_id === comment.id);
+            return <article className="story-comment-thread" key={comment.id}>
+              <div className="story-comment">
+                <div className="story-comment-avatar">{(person?.display_name || person?.username || "?").slice(0,1).toUpperCase()}</div>
+                <div className="story-comment-body">
+                  <div className="story-comment-meta"><strong>{person?.display_name || person?.username || "Lecteur Book-A-Boo"}</strong><time>{dateLabel(comment.created_at)}</time></div>
+                  <p>{comment.content}</p>
+                  <div className="story-comment-actions">
+                    {userId ? <button type="button" onClick={() => { setReplyTo(replyTo === comment.id ? null : comment.id); setReplyDraft(""); }}>Répondre</button> : null}
+                    {userId === comment.author_id ? <button type="button" onClick={() => deleteComment(comment.id)}>Supprimer</button> : null}
+                    {userId && userId !== comment.author_id ? <button type="button" onClick={() => reportComment(comment.id)}>Signaler</button> : null}
+                  </div>
+                  {replyTo === comment.id && <form className="story-reply-form" onSubmit={event => submitReply(event, comment.id)}>
+                    <textarea value={replyDraft} onChange={event => setReplyDraft(event.target.value)} maxLength={2000} rows={2} placeholder="Écris ta réponse…" autoFocus />
+                    <div><small>{replyDraft.length}/2000</small><button type="submit" className="auth-secondary" disabled={!replyDraft.trim() || busy === `reply-${comment.id}`}>{busy === `reply-${comment.id}` ? "Envoi…" : "Répondre"}</button></div>
+                  </form>}
                 </div>
               </div>
+              {replies.length > 0 && <div className="story-comment-replies">
+                {replies.map(reply => {
+                  const replyPerson = profiles[reply.author_id];
+                  return <article className="story-comment story-comment-reply" key={reply.id}>
+                    <div className="story-comment-avatar">{(replyPerson?.display_name || replyPerson?.username || "?").slice(0,1).toUpperCase()}</div>
+                    <div className="story-comment-body">
+                      <div className="story-comment-meta"><strong>{replyPerson?.display_name || replyPerson?.username || "Lecteur Book-A-Boo"}</strong><time>{dateLabel(reply.created_at)}</time></div>
+                      <p>{reply.content}</p>
+                      <div className="story-comment-actions">
+                        {userId === reply.author_id ? <button type="button" onClick={() => deleteComment(reply.id)}>Supprimer</button> : null}
+                        {userId && userId !== reply.author_id ? <button type="button" onClick={() => reportComment(reply.id)}>Signaler</button> : null}
+                      </div>
+                    </div>
+                  </article>;
+                })}
+              </div>}
             </article>;
           })}
         </div> : <p className="explore-live-empty">Aucun commentaire pour le moment. Lance la conversation !</p>}
