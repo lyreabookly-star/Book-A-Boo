@@ -9,6 +9,7 @@ import { useAppPreferences } from "./app-preferences-provider";
 import { AuthorFollowButton } from "./author-follow-button";
 import { RichChapterContent } from "./rich-chapter-content";
 import { StoryInteractions } from "./story-interactions";
+import { ContentReportButton } from "./content-report-button";
 
 type Story = { id: string; slug: string; title: string; synopsis: string; genre: string; language: string; author_id: string; published_at: string | null; cover_url: string | null };
 type Chapter = { id: string; title: string; chapter_number: number; content: string };
