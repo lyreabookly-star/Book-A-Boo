@@ -616,7 +616,7 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
         let node: Node | null;
         while ((node = walker.nextNode())) {
           const parent = node.parentElement;
-          if (!parent || parent.closest("script,style,textarea,input,select,option,[data-no-translate]")) continue;
+          if (!parent || parent.closest("script,style,textarea,input,[data-no-translate]")) continue;
           const currentText = node.textContent ?? "";
           const translated = translateNode(currentText, preferences.locale);
           if (translated !== currentText) node.textContent = translated;
