@@ -6,7 +6,7 @@ import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 
 type Notice = { id: string; actor_id: string | null; type: "new_follower" | "new_story"; story_id: string | null; created_at: string; read_at: string | null };
 type Person = { username: string; display_name: string | null; avatar_url: string | null };
-type Story = { title: string };
+type Story = { title: string; slug: string };
 
 export function NotificationsPanel() {
   const [items, setItems] = useState<Notice[]>([]);
@@ -27,7 +27,7 @@ export function NotificationsPanel() {
       const storyIds = [...new Set(rows.map(n => n.story_id).filter((v): v is string => Boolean(v)))];
       const [p, s] = await Promise.all([
         actorIds.length ? supabase.from("profiles").select("id,username,display_name,avatar_url").in("id", actorIds) : Promise.resolve({ data: [] }),
-        storyIds.length ? supabase.from("stories").select("id,title").in("id", storyIds) : Promise.resolve({ data: [] })
+        storyIds.length ? supabase.from("stories").select("id,title,slug").in("id", storyIds) : Promise.resolve({ data: [] })
       ]);
       if (!active) return;
       setItems(rows);
@@ -50,6 +50,7 @@ export function NotificationsPanel() {
     {items.length === 0 ? <p>Vous n’avez pas encore de notification. Les nouvelles arriveront ici.</p> : <div className="notification-list">
       {items.map(n => { const person = n.actor_id ? people[n.actor_id] : null; const label = person?.display_name || (person?.username ? "@"+person.username : "Un membre"); return <article className={n.read_at ? "notification-item" : "notification-item is-unread"} key={n.id}>
         <p>{n.type === "new_follower" ? <><strong>{label}</strong> a commencé à vous suivre.</> : <><strong>{label}</strong> a publié « {n.story_id ? stories[n.story_id]?.title || "une nouvelle histoire" : "une nouvelle histoire"} ».</>}</p>
+        {n.type === "new_story" && n.story_id && stories[n.story_id]?.slug && <Link href={`/histoire/${encodeURIComponent(stories[n.story_id].slug)}`}>Lire cette histoire ↗</Link>}
         <small>{new Date(n.created_at).toLocaleString("fr-FR")}</small>
         {!n.read_at && <button className="auth-secondary" type="button" onClick={() => void markRead(n.id)}>Marquer comme lu</button>}
         {person?.username && <Link href={`/u/${encodeURIComponent(person.username)}`}>Voir le profil ↗</Link>}
