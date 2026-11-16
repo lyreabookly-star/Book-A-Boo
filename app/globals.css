@@ -1559,3 +1559,23 @@ html[data-theme="dark"]:not([data-palette]) :is(
 ) :is(h1,h2,h3,h4,p,span,strong,small,label,legend,li,time) {
   color:inherit!important;
 }
+
+
+/* Reader tone backgrounds must control every line of chapter text, not the site palette. */
+.story-detail-chapter .story-rich-content,
+.story-detail-chapter .story-rich-content :is(p,div,span,strong,b,em,i,u,h1,h2,h3,li,blockquote){
+  color:inherit !important;
+}
+.story-detail-chapter .story-rich-content blockquote{
+  border-left-color:currentColor;
+  opacity:.88;
+}
+.story-detail-chapter .story-chapter-author-note{
+  background:rgba(127,127,127,.10);
+  color:inherit;
+  border-color:currentColor;
+}
+.story-detail-chapter .story-chapter-author-note p{
+  color:inherit;
+  opacity:.9;
+}
