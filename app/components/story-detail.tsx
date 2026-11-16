@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Check, Copy, LoaderCircle, UserRound, Users } from "lucide-react";
+import { ArrowLeft, BookOpen, Check, Copy, LoaderCircle, UserRound, Users, SlidersHorizontal, RotateCcw } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { StorySaveButton } from "./story-save-button";
 import { useAppPreferences } from "./app-preferences-provider";
@@ -25,6 +25,34 @@ export function StoryDetail({ storyId }: { storyId: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [readerSettingsOpen, setReaderSettingsOpen] = useState(false);
+  const [readerBrightness, setReaderBrightness] = useState(100);
+  const [readerContrast, setReaderContrast] = useState(100);
+  const [readerFontSize, setReaderFontSize] = useState(16);
+  const [readerTone, setReaderTone] = useState("default");
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("bab-reader-comfort");
+      if (!saved) return;
+      const settings = JSON.parse(saved);
+      if (typeof settings.brightness === "number") setReaderBrightness(Math.min(130, Math.max(70, settings.brightness)));
+      if (typeof settings.contrast === "number") setReaderContrast(Math.min(130, Math.max(70, settings.contrast)));
+      if (typeof settings.fontSize === "number") setReaderFontSize(Math.min(24, Math.max(14, settings.fontSize)));
+      if (["default", "cream", "sepia", "night"].includes(settings.tone)) setReaderTone(settings.tone);
+    } catch {}
+  }, []);
+  useEffect(() => {
+    window.localStorage.setItem("bab-reader-comfort", JSON.stringify({brightness:readerBrightness,contrast:readerContrast,fontSize:readerFontSize,tone:readerTone}));
+  }, [readerBrightness,readerContrast,readerFontSize,readerTone]);
+  function resetReaderSettings() {
+    setReaderBrightness(100); setReaderContrast(100); setReaderFontSize(16); setReaderTone("default");
+  }
+  const readerToneColors: Record<string,{background:string;color:string}> = {
+    default:{background:"var(--paper)",color:"var(--ink)"},
+    cream:{background:"#f4ecd9",color:"#382f24"},
+    sepia:{background:"#e8d6b5",color:"#493723"},
+    night:{background:"#171a20",color:"#e7e3da"}
+  };
 
   useEffect(() => {
     let active = true;
@@ -81,8 +109,16 @@ export function StoryDetail({ storyId }: { storyId: string }) {
     <div className="story-detail-hero"><div className={`story-detail-cover${story.cover_url ? " has-custom-cover" : ""}`}>{story.cover_url ? <img src={story.cover_url} alt={locale === "en" ? `Cover of ${story.title}` : locale === "es" ? `Portada de ${story.title}` : locale === "pt" ? `Capa de ${story.title}` : `Couverture de ${story.title}`} /> : <><BookOpen size={40}/><span>{story.genre || "BOOK-A-BOO"}</span><strong>{story.title}</strong><small>{locale === "en" ? "A BOOK-A-BOO STORY" : locale === "es" ? "UNA HISTORIA BOOK-A-BOO" : locale === "pt" ? "UMA HISTÓRIA BOOK-A-BOO" : "UNE HISTOIRE BOOK-A-BOO"}</small></>}</div>
       <div className="story-detail-copy"><span className="catalogue-overline">{story.genre || (locale === "en" ? "LITERATURE" : "LITTÉRATURE")} · {story.language.toUpperCase()}</span><h2>{story.title}</h2><div className="story-detail-author-card"><span className="story-detail-author-label">{locale === "en" ? "PUBLISHED BY" : locale === "es" ? "PUBLICADO POR" : locale === "pt" ? "PUBLICADO POR" : "PUBLIÉ PAR"}</span>{author ? <Link href={`/u/${encodeURIComponent(author.username)}`} className="story-detail-author-profile-link">{author.avatar_url ? <img src={author.avatar_url} alt="" /> : <span className="story-detail-author-avatar"><UserRound size={19}/></span>}<span className="story-detail-author-info"><strong>{author.display_name || author.username}</strong><small>@{author.username}</small><small className="story-detail-author-followers"><Users size={12}/>{authorFollowerCount} {locale === "en" ? "followers" : locale === "es" ? "seguidores" : locale === "pt" ? "seguidores" : "abonnés"}</small></span><span className="story-detail-author-view">{locale === "en" ? "View profile" : locale === "es" ? "Ver perfil" : locale === "pt" ? "Ver perfil" : "Voir le profil"} →</span></Link> : <div className="story-detail-author-private"><UserRound size={19}/><strong>{locale === "en" ? "Book-A-Boo author" : locale === "es" ? "Autor de Book-A-Boo" : locale === "pt" ? "Autor Book-A-Boo" : "Auteur Book-A-Boo"}</strong></div>}</div><p>{story.synopsis || (locale === "en" ? "A story waiting to be discovered." : locale === "es" ? "Una historia esperando ser descubierta." : locale === "pt" ? "Uma história esperando para ser descoberta." : "Une histoire qui attend d'être découverte.")}</p>{story.audience_rating && <span className="story-audience-rating">{story.audience_rating}</span>}{story.content_warnings?.length > 0 && <div className="story-content-warnings"><strong>Avertissements au public</strong><ul>{story.content_warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></div>}{story.author_note?.trim() && <aside className="story-author-note"><strong>Note de l’auteur</strong><p>{story.author_note}</p></aside>}<div className="story-detail-social-actions"><StorySaveButton storyId={story.id}/><AuthorFollowButton authorId={story.author_id}/><button type="button" className="auth-secondary" onClick={copyStoryLink}><>{copied ? <Check size={15}/> : <Copy size={15}/>} {copied ? (locale === "en" ? "Link copied" : locale === "es" ? "Enlace copiado" : locale === "pt" ? "Link copiado" : "Lien copié") : (locale === "en" ? "Share story" : locale === "es" ? "Compartir historia" : locale === "pt" ? "Compartilhar história" : "Partager l’œuvre")}</></button><ContentReportButton targetType="story" targetId={story.id}/></div></div>
     </div>
-    <section className="story-detail-reading"><div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> {locale === "en" ? "THE STORY" : locale === "es" ? "LA HISTORIA" : locale === "pt" ? "A HISTÓRIA" : "L'HISTOIRE"}</span><h2>{locale === "en" ? "Turn the page." : locale === "es" ? "Pasa la página." : locale === "pt" ? "Vire a página." : "Tournez la page."}</h2></div><span className="shelf-index">{chapters.length} {locale === "en" ? "CHAPTERS" : locale === "es" ? "CAPÍTULOS" : locale === "pt" ? "CAPÍTULOS" : "CHAPITRES"}</span></div>
-      {chapters.length ? <><div className="story-detail-chapter-list">{chapters.map(item => <button key={item.id} type="button" className={activeChapter?.id === item.id ? "active" : ""} onClick={() => setActiveChapter(item)}>{String(item.chapter_number).padStart(2,"0")} · {item.title}</button>)}</div><article className="story-detail-chapter"><span className="catalogue-overline">{activeChapter?.title}</span><div>{activeChapter?.content?.trim() ? <RichChapterContent content={activeChapter.content}/> : <p>{locale === "en" ? "This chapter is being prepared by its author." : locale === "es" ? "El autor está preparando este capítulo." : locale === "pt" ? "O autor está preparando este capítulo." : "Ce chapitre est en cours de préparation par son auteur."}</p>}</div>{activeChapter?.author_note?.trim() && <aside className="story-chapter-author-note"><strong>Note de l’auteur</strong><p>{activeChapter.author_note}</p></aside>}</article></> : <p className="explore-live-empty">{locale === "en" ? "Chapters are not available yet." : locale === "es" ? "Los capítulos aún no están disponibles." : locale === "pt" ? "Os capítulos ainda não estão disponíveis." : "Les chapitres ne sont pas encore disponibles."}</p>}
+    <section className="story-detail-reading"><div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> {locale === "en" ? "THE STORY" : locale === "es" ? "LA HISTORIA" : locale === "pt" ? "A HISTÓRIA" : "L'HISTOIRE"}</span><h2>{locale === "en" ? "Turn the page." : locale === "es" ? "Pasa la página." : locale === "pt" ? "Vire a página." : "Tournez la page."}</h2></div><div className="reader-heading-actions"><span className="shelf-index">{chapters.length} {locale === "en" ? "CHAPTERS" : locale === "es" ? "CAPÍTULOS" : locale === "pt" ? "CAPÍTULOS" : "CHAPITRES"}</span><button type="button" className="reader-settings-toggle" aria-expanded={readerSettingsOpen} onClick={() => setReaderSettingsOpen(value => !value)}><SlidersHorizontal size={16}/> Confort de lecture</button></div></div>
+      {readerSettingsOpen && <div className="reader-settings-panel">
+        <div className="reader-settings-title"><strong>Personnaliser ma lecture</strong><button type="button" onClick={resetReaderSettings}><RotateCcw size={13}/> Réinitialiser</button></div>
+        <label>Luminosité <strong>{readerBrightness}%</strong><input type="range" min="70" max="130" value={readerBrightness} onChange={event => setReaderBrightness(Number(event.target.value))}/></label>
+        <label>Contraste <strong>{readerContrast}%</strong><input type="range" min="70" max="130" value={readerContrast} onChange={event => setReaderContrast(Number(event.target.value))}/></label>
+        <label>Taille du texte <strong>{readerFontSize}px</strong><input type="range" min="14" max="24" value={readerFontSize} onChange={event => setReaderFontSize(Number(event.target.value))}/></label>
+        <div className="reader-tone-options"><span>Fond de lecture</span>{[["default","Normal"],["cream","Crème"],["sepia","Sépia"],["night","Nuit"]].map(([value,label])=><button key={value} type="button" className={readerTone===value?"active":""} onClick={()=>setReaderTone(value)}>{label}</button>)}</div>
+        <small>Ces réglages sont personnels et enregistrés sur cet appareil.</small>
+      </div>
+      {chapters.length ? <><div className="story-detail-chapter-list">{chapters.map(item => <button key={item.id} type="button" className={activeChapter?.id === item.id ? "active" : ""} onClick={() => setActiveChapter(item)}>{String(item.chapter_number).padStart(2,"0")} · {item.title}</button>)}</div><article className="story-detail-chapter" style={{backgroundColor:readerToneColors[readerTone].background,color:readerToneColors[readerTone].color,filter:`brightness(${readerBrightness}%)`}}><span className="catalogue-overline">{activeChapter?.title}</span><div style={{fontSize:`${readerFontSize}px`,filter:`contrast(${readerContrast}%)`,color:readerToneColors[readerTone].color}}>{activeChapter?.content?.trim() ? <RichChapterContent content={activeChapter.content}/> : <p>{locale === "en" ? "This chapter is being prepared by its author." : locale === "es" ? "El autor está preparando este capítulo." : locale === "pt" ? "O autor está preparando este capítulo." : "Ce chapitre est en cours de préparation par son auteur."}</p>}</div>{activeChapter?.author_note?.trim() && <aside className="story-chapter-author-note"><strong>Note de l’auteur</strong><p>{activeChapter.author_note}</p></aside>}</article></> : <p className="explore-live-empty">{locale === "en" ? "Chapters are not available yet." : locale === "es" ? "Los capítulos aún no están disponibles." : locale === "pt" ? "Os capítulos ainda não estão disponíveis." : "Les chapitres ne sont pas encore disponibles."}</p>}
     </section>
     <StoryInteractions storyId={story.id} />
   </div>;
