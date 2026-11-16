@@ -547,6 +547,15 @@ const dictionary: Record<string, Record<Locale, string>> = {
   "Toutes": { fr:"Toutes", en:"All", es:"Todas", pt:"Todas" },
   "Ajouter à une liste…": { fr:"Ajouter à une liste…", en:"Add to a list…", es:"Añadir a una lista…", pt:"Adicionar a uma lista…" },
   "Confirmer le mot de passe": { fr:"Confirmer le mot de passe", en:"Confirm password", es:"Confirmar contraseña", pt:"Confirmar senha" },
+  "Paramètres du compte": { fr:"Paramètres du compte", en:"Account settings", es:"Configuración de la cuenta", pt:"Configurações da conta" },
+  "La publication a échoué.": { fr:"La publication a échoué.", en:"Publishing failed.", es:"La publicación ha fallado.", pt:"A publicação falhou." },
+  "Me connecter →": { fr:"Me connecter →", en:"Sign in →", es:"Iniciar sesión →", pt:"Entrar →" },
+  "LIRE L’HISTOIRE": { fr:"LIRE L’HISTOIRE", en:"READ THE STORY", es:"LEER LA HISTORIA", pt:"LER A HISTÓRIA" },
+  "Le compte a été suspendu.": { fr:"Le compte a été suspendu.", en:"The account has been suspended.", es:"La cuenta ha sido suspendida.", pt:"A conta foi suspensa." },
+  "La suspension a été levée.": { fr:"La suspension a été levée.", en:"The suspension has been lifted.", es:"Se ha levantado la suspensión.", pt:"A suspensão foi removida." },
+  "Impossible de suspendre ce compte.": { fr:"Impossible de suspendre ce compte.", en:"Unable to suspend this account.", es:"No se pudo suspender esta cuenta.", pt:"Não foi possível suspender esta conta." },
+  "Impossible de lever la suspension.": { fr:"Impossible de lever la suspension.", en:"Unable to lift the suspension.", es:"No se pudo levantar la suspensión.", pt:"Não foi possível remover a suspensão." },
+  "Impossible de charger les données d’administration.": { fr:"Impossible de charger les données d’administration.", en:"Unable to load administration data.", es:"No se pudieron cargar los datos de administración.", pt:"Não foi possível carregar os dados da administração." },
 };
 
 function translateNode(value: string, locale: Locale) {
