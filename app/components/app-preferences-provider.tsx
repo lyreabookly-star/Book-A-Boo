@@ -455,6 +455,23 @@ const dictionary: Record<string, Record<Locale, string>> = {
   "L’avertissement n’a pas pu être enregistré.": { fr:"L’avertissement n’a pas pu être enregistré.", en:"The warning could not be saved.", es:"No se pudo guardar la advertencia.", pt:"Não foi possível salvar o aviso." },
   "Motif de la suspension (au moins 3 caractères) ?": { fr:"Motif de la suspension (au moins 3 caractères) ?", en:"Reason for suspension (at least 3 characters)?", es:"¿Motivo de la suspensión (al menos 3 caracteres)?", pt:"Motivo da suspensão (pelo menos 3 caracteres)?" },
   "Confort de lecture": { fr:"Confort de lecture", en:"Reading comfort", es:"Comodidad de lectura", pt:"Conforto de leitura" },
+  "a publié «": { fr:"a publié «", en:"published “", es:"ha publicado «", pt:"publicou “" },
+  "Ajouter un chapitre": { fr:"Ajouter un chapitre", en:"Add a chapter", es:"Añadir un capítulo", pt:"Adicionar capítulo" },
+  "Note de l’auteur pour ce chapitre": { fr:"Note de l’auteur pour ce chapitre", en:"Author's note for this chapter", es:"Nota del autor para este capítulo", pt:"Nota do autor para este capítulo" },
+  "Un mot avant ou après la lecture de ce chapitre…": { fr:"Un mot avant ou après la lecture de ce chapitre…", en:"A note before or after reading this chapter…", es:"Unas palabras antes o después de leer este capítulo…", pt:"Uma mensagem antes ou depois da leitura deste capítulo…" },
+  "Le lien de votre œuvre": { fr:"Le lien de votre œuvre", en:"Your story link", es:"El enlace de tu obra", pt:"O link da sua obra" },
+  "Votre histoire est publique.": { fr:"Votre histoire est publique.", en:"Your story is public.", es:"Tu historia es pública.", pt:"Sua história está pública." },
+  "Elle apparaît dans Explorer et les lecteurs peuvent l'enregistrer.": { fr:"Elle apparaît dans Explorer et les lecteurs peuvent l'enregistrer.", en:"It appears in Explore and readers can save it.", es:"Aparece en Explorar y los lectores pueden guardarla.", pt:"Ela aparece em Explorar e os leitores podem salvá-la." },
+  "Prêt à partager votre histoire ?": { fr:"Prêt à partager votre histoire ?", en:"Ready to share your story?", es:"¿Listo para compartir tu historia?", pt:"Pronto para compartilhar sua história?" },
+  "La publication la rend visible par tout le monde.": { fr:"La publication la rend visible par tout le monde.", en:"Publishing makes it visible to everyone.", es:"Al publicarla, será visible para todos.", pt:"Ao publicar, ela ficará visível para todos." },
+  "Patientez…": { fr:"Patientez…", en:"Please wait…", es:"Un momento…", pt:"Aguarde…" },
+  "Dépublier": { fr:"Dépublier", en:"Unpublish", es:"Retirar publicación", pt:"Despublicar" },
+  "Publier mon histoire": { fr:"Publier mon histoire", en:"Publish my story", es:"Publicar mi historia", pt:"Publicar minha história" },
+  "Envoi de la photo impossible.": { fr:"Envoi de la photo impossible.", en:"Unable to upload the photo.", es:"No se pudo enviar la foto.", pt:"Não foi possível enviar a foto." },
+  "Enregistrement impossible.": { fr:"Enregistrement impossible.", en:"Unable to save.", es:"No se pudo guardar.", pt:"Não foi possível salvar." },
+  "Modification de l'e-mail impossible.": { fr:"Modification de l'e-mail impossible.", en:"Unable to change the email address.", es:"No se pudo cambiar el correo electrónico.", pt:"Não foi possível alterar o e-mail." },
+  "Modification du mot de passe impossible.": { fr:"Modification du mot de passe impossible.", en:"Unable to change the password.", es:"No se pudo cambiar la contraseña.", pt:"Não foi possível alterar a senha." },
+  "Aucun fichier choisi": { fr:"Aucun fichier choisi", en:"No file selected", es:"Ningún archivo seleccionado", pt:"Nenhum arquivo selecionado" },
 };
 
 function translateNode(value: string, locale: Locale) {
@@ -520,6 +537,14 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
           const translated = translateNode(currentText, preferences.locale);
           if (translated !== currentText) node.textContent = translated;
         }
+        document.body.querySelectorAll<HTMLElement>("input, textarea, select, button, a, img, [role], [title], [aria-label]").forEach(element => {
+          for (const attribute of ["placeholder", "title", "aria-label", "alt"]) {
+            const currentValue = element.getAttribute(attribute);
+            if (!currentValue) continue;
+            const translated = translateNode(currentValue, preferences.locale);
+            if (translated !== currentValue) element.setAttribute(attribute, translated);
+          }
+        });
       } finally {
         applying = false;
       }
@@ -528,7 +553,7 @@ export function AppPreferencesProvider({ children }: { children: ReactNode }) {
     // Observe newly inserted elements only. Watching characterData also observes
     // our own translations and needlessly re-enters React-managed text updates.
     const observer = new MutationObserver(() => apply());
-    observer.observe(document.body, { childList:true, subtree:true });
+    observer.observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:["placeholder","title","aria-label","alt"] });
     return () => observer.disconnect();
   }, [preferences, palette]);
 
