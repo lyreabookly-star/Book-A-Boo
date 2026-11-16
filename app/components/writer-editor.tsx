@@ -207,7 +207,17 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   return (
     <div className="writer-editor">
       <div className="writer-editor-top"><Link href="/ecrire"><ArrowLeft size={15} /> Mes manuscrits</Link><span><BookOpen size={14} /> {story.status === "published" ? (locale === "en" ? "PUBLISHED" : locale === "es" ? "PUBLICADO" : locale === "pt" ? "PUBLICADO" : "PUBLIÉ") : (locale === "en" ? "PRIVATE DRAFT" : locale === "es" ? "BORRADOR PRIVADO" : locale === "pt" ? "RASCUNHO PRIVADO" : "BROUILLON PRIVÉ")}</span></div>
-      <label className="writer-work-title">Titre de l'œuvre<input value={story.title} onChange={e => setStory({ ...story, title: e.target.value })} onBlur={async () => { const s = getSupabaseBrowserClient() as any; const { error: e } = await s.from("stories").update({ title: story.title.trim() }).eq("id", story.id); if (e) setError(e.message); }} maxLength={160} /></label>
+      <section className="writer-work-metadata">
+        <label className="writer-work-title">Titre de l'œuvre<input value={story.title} onChange={e => setStory({ ...story, title: e.target.value })} maxLength={160} /></label>
+        <div className="writer-metadata-grid">
+          <label>Genre littéraire<select value={story.genre || "Littérature générale"} onChange={e => setStory({ ...story, genre: e.target.value })}><option>Romance</option><option>Fantasy</option><option>Drame</option><option>Thriller</option><option>Psychologie</option><option>Fanfiction</option><option>Poésie</option><option>Science-fiction</option><option>Horreur</option><option>Historique</option><option>Littérature générale</option></select></label>
+          <label>Public conseillé<select value={story.audience_rating || "Tout public"} onChange={e => setStory({ ...story, audience_rating: e.target.value })}><option>Tout public</option><option>13 ans et +</option><option>16 ans et +</option><option>18 ans et +</option></select></label>
+          <label className="writer-metadata-wide">Résumé de l'œuvre <span>Jusqu'à 5 000 caractères</span><textarea value={story.synopsis || ""} onChange={e => setStory({ ...story, synopsis: e.target.value })} maxLength={5000} rows={5} placeholder="Présentez votre histoire sans tout dévoiler…" /></label>
+          <label className="writer-metadata-wide">Avertissements au public <span>Séparez les avertissements par des virgules</span><input value={warningsText} onChange={e => setWarningsText(e.target.value)} placeholder="Violence, langage explicite, thèmes sensibles…" /></label>
+          <label className="writer-metadata-wide">Note de l'auteur sur l'œuvre <span>Facultatif</span><textarea value={story.author_note || ""} onChange={e => setStory({ ...story, author_note: e.target.value })} maxLength={3000} rows={3} placeholder="Un mot pour accompagner votre histoire…" /></label>
+        </div>
+        <p className="writer-metadata-hint">Les informations publiques seront visibles sur la fiche de votre œuvre après publication.</p>
+      </section>
       <section className="writer-cover-settings">
         <div className="writer-cover-preview">
           {story.cover_url ? <img src={story.cover_url} alt={locale === "en" ? "Book cover preview" : locale === "es" ? "Vista previa de la portada" : locale === "pt" ? "Prévia da capa" : "Aperçu de la couverture"} /> : <div className="writer-cover-placeholder"><BookOpen size={28}/><span>{locale === "en" ? "Automatic cover" : locale === "es" ? "Portada automática" : locale === "pt" ? "Capa automática" : "Couverture automatique"}</span></div>}
