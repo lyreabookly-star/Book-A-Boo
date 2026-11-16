@@ -19,7 +19,9 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");\n  const [chapterAuthorNote, setChapterAuthorNote] = useState("");\n  const [warningsText, setWarningsText] = useState("");
+  const [content, setContent] = useState("");
+  const [chapterAuthorNote, setChapterAuthorNote] = useState("");
+  const [warningsText, setWarningsText] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -46,7 +48,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     if (list.length === 0) {
       const { data: created, error: createError } = await supabase
         .from("chapters").insert({ story_id: storyId, author_id: user.id, title: "Chapitre 1", chapter_number: 1, content: "", author_note: "" })
-        .select("id,title,content,chapter_number,updated_at").single();
+        .select("id,title,content,author_note,chapter_number,updated_at").single();
       if (createError) throw createError;
       list = [created];
     }
@@ -54,7 +56,9 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     setChapters(list);
     setChapter(list[0]);
     setTitle(list[0].title);
-    setContent(list[0].content);\n    setChapterAuthorNote(list[0].author_note || "");\n    setWarningsText((storyData.content_warnings || []).join(", "));
+    setContent(list[0].content);
+    setChapterAuthorNote(list[0].author_note || "");
+    setWarningsText((storyData.content_warnings || []).join(", "));
   }, [router, storyId]);
 
   useEffect(() => {
@@ -77,7 +81,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
         .update({ title: story.title.trim(), synopsis: story.synopsis, genre: story.genre, author_note: story.author_note, content_warnings: warningsText.split(",").map(value => value.trim()).filter(Boolean), audience_rating: story.audience_rating, updated_at: new Date().toISOString() }).eq("id", story.id);
       if (storyError) throw storyError;
       setSaved(true);
-      setChapters(items => items.map(item => item.id === chapter.id ? { ...item, title: title.trim() || "Chapitre", content } : item));
+      setChapters(items => items.map(item => item.id === chapter.id ? { ...item, title: title.trim() || "Chapitre", content, author_note: chapterAuthorNote } : item));
       return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : "La sauvegarde a échoué.");
@@ -242,7 +246,8 @@ export function WriterEditor({ storyId }: { storyId: string }) {
         </aside>
         <section className="writer-writing-area">
           <input className="writer-chapter-title" value={/^Chapitre \d+$/.test(title) ? `${locale === "en" ? "Chapter" : locale === "es" ? "Capítulo" : locale === "pt" ? "Capítulo" : "Chapitre"} ${chapter?.chapter_number ?? 1}` : title} onChange={e => { setTitle(e.target.value); setSaved(false); }} placeholder={locale === "en" ? "Chapter title" : locale === "es" ? "Título del capítulo" : locale === "pt" ? "Título do capítulo" : "Titre du chapitre"} maxLength={160} />
-          <RichTextEditor key={chapter?.id || "new"} chapterId={chapter?.id || "new"} content={content} onChange={value=>{setContent(value);setSaved(false);}} />\n          <label className="writer-chapter-note">Note de l’auteur pour ce chapitre <span>(facultatif)</span><textarea value={chapterAuthorNote} onChange={e => { setChapterAuthorNote(e.target.value); setSaved(false); }} maxLength={2000} rows={3} placeholder="Un mot avant ou après la lecture de ce chapitre…" /></label>
+          <RichTextEditor key={chapter?.id || "new"} chapterId={chapter?.id || "new"} content={content} onChange={value=>{setContent(value);setSaved(false);}} />
+          <label className="writer-chapter-note">Note de l’auteur pour ce chapitre <span>(facultatif)</span><textarea value={chapterAuthorNote} onChange={e => { setChapterAuthorNote(e.target.value); setSaved(false); }} maxLength={2000} rows={3} placeholder="Un mot avant ou après la lecture de ce chapitre…" /></label>
           <div className="writer-save-row"><span>{saved ? <><Check size={14} /> {locale === "en" ? "Saved" : locale === "es" ? "Guardado" : locale === "pt" ? "Salvo" : "Enregistré"}</> : (locale === "en" ? "Remember to save your text" : locale === "es" ? "Recuerda guardar tu texto" : locale === "pt" ? "Lembre-se de salvar seu texto" : "Pensez à sauvegarder votre texte")}</span><button className="auth-submit" onClick={save} disabled={saving}>{saving ? <LoaderCircle className="spin" size={15} /> : <Save size={15} />}{saving ? (locale === "en" ? "Saving…" : locale === "es" ? "Guardando…" : locale === "pt" ? "Salvando…" : "Sauvegarde…") : (locale === "en" ? "Save" : locale === "es" ? "Guardar" : locale === "pt" ? "Salvar" : "Enregistrer")}</button></div>
           {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
         </section>
