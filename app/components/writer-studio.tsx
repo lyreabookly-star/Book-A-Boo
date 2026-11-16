@@ -23,7 +23,8 @@ export function WriterStudio() {
   const [userId, setUserId] = useState("");
   const [stories, setStories] = useState<Story[]>([]);
   const [title, setTitle] = useState("");
-  const [synopsis, setSynopsis] = useState("");\n  const [genre, setGenre] = useState("Littérature générale");
+  const [synopsis, setSynopsis] = useState("");
+  const [genre, setGenre] = useState("Littérature générale");
   const [creating, setCreating] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState("");
@@ -117,7 +118,8 @@ export function WriterStudio() {
           <span className="catalogue-overline">NOUVEAU MANUSCRIT</span>
           <label>Titre de votre œuvre<input value={title} onChange={e => setTitle(e.target.value)} maxLength={160} placeholder={locale === "en" ? "Your story title" : locale === "es" ? "El título de tu historia" : locale === "pt" ? "O título da sua história" : "Le titre de votre histoire"} required /></label>
           <label>Résumé de l’œuvre <span>(facultatif · jusqu’à 5 000 caractères)</span><textarea value={synopsis} onChange={e => setSynopsis(e.target.value)} maxLength={5000} rows={5} placeholder={locale === "en" ? "A few words about your world…" : locale === "es" ? "Unas palabras sobre tu universo…" : locale === "pt" ? "Algumas palavras sobre seu universo…" : "Quelques mots sur votre univers…"} /></label>
-          <label>Genre littéraire<select value={genre} onChange={e => setGenre(e.target.value)}><option>Romance</option><option>Fantasy</option><option>Drame</option><option>Thriller</option><option>Psychologie</option><option>Fanfiction</option><option>Poésie</option><option>Science-fiction</option><option>Horreur</option><option>Historique</option><option>Littérature générale</option></select></label>\n          {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
+          <label>Genre littéraire<select value={genre} onChange={e => setGenre(e.target.value)}><option>Romance</option><option>Fantasy</option><option>Drame</option><option>Thriller</option><option>Psychologie</option><option>Fanfiction</option><option>Poésie</option><option>Science-fiction</option><option>Horreur</option><option>Historique</option><option>Littérature générale</option></select></label>
+          {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
           <div className="writer-form-actions"><button className="auth-submit" type="submit" disabled={creating}>{creating ? "Création…" : "Créer mon manuscrit"}</button><button className="auth-secondary" type="button" onClick={() => setShowForm(false)}>Annuler</button></div>
         </form>
       )}
