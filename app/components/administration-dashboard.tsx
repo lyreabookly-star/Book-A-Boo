@@ -19,7 +19,7 @@ const tabs:{id:Tab;label:string;icon:typeof Activity}[]=[
 export function AdministrationDashboard(){
  const [loading,setLoading]=useState(true),[allowed,setAllowed]=useState(false),[tab,setTab]=useState<Tab>("overview");
  const [adminId,setAdminId]=useState(""),[commentReports,setCommentReports]=useState<CommentReport[]>([]),[contentReports,setContentReports]=useState<ContentReport[]>([]);
- const [members,setMembers]=useState<Member[]>([]),[stories,setStories]=useState<Story[]>([]),[logs,setLogs]=useState<Log[]>([]);
+ const [members,setMembers]=useState<Member[]>([]),[stories,setStories]=useState<Story[]>([]),[logs,setLogs]=useState<Log[]>([]),[adminUserIds,setAdminUserIds]=useState<string[]>([]);
  const [comments,setComments]=useState<Record<string,CommentInfo>>({}),[titles,setTitles]=useState<Record<string,string>>({}),[memberNames,setMemberNames]=useState<Record<string,string>>({});
  const [warningFor,setWarningFor]=useState<Member|null>(null),[warningReason,setWarningReason]=useState(""),[error,setError]=useState(""),[busy,setBusy]=useState<string|null>(null);
 
@@ -30,7 +30,7 @@ export function AdministrationDashboard(){
   const {data:membership,error:memberError}=await db.from("platform_admins").select("user_id").eq("user_id",user.id).maybeSingle();
   if(memberError||!membership){setAllowed(false);setLoading(false);return;}
   setAdminId(user.id);setAllowed(true);
-  const [cr,pr,m,s,l]=await Promise.all([
+  const [cr,pr,m,s,l,admins]=await Promise.all([
    db.from("story_comment_reports").select("id,comment_id,reporter_id,reason,created_at,status").order("created_at",{ascending:false}).limit(200),
    db.from("platform_content_reports").select("id,target_type,target_id,reporter_id,reason,details,created_at,status").order("created_at",{ascending:false}).limit(200),
    db.from("profiles").select("id,username,display_name,created_at,is_public").order("created_at",{ascending:false}).limit(100),
@@ -41,7 +41,7 @@ export function AdministrationDashboard(){
   if(errors.length)setError("Certaines données n’ont pas pu être chargées. Vérifie les accès de la base.");
   else setError("");
   const crows=(cr.data??[]) as CommentReport[], prows=(pr.data??[]) as ContentReport[], ms=(m.data??[]) as Member[], ss=(s.data??[]) as Story[];
-  setCommentReports(crows);setContentReports(prows);setMembers(ms);setStories(ss);setLogs((l.data??[]) as Log[]);
+  setCommentReports(crows);setContentReports(prows);setMembers(ms);setStories(ss);setLogs((l.data??[]) as Log[]);setAdminUserIds((admins.data??[]).map((x:{user_id:string})=>x.user_id));
   const commentIds=[...new Set(crows.map(x=>x.comment_id))];
   if(commentIds.length){
    const {data:cs}=await db.from("story_comments").select("id,content,story_id").in("id",commentIds);
@@ -101,6 +101,29 @@ export function AdministrationDashboard(){
   else{await logAction("user_warning","user",warningFor.id,{reason:warningReason.trim()});setWarningFor(null);setWarningReason("");await load();}
   setBusy(null);
  }
+ async function suspendMember(member:Member){
+  if(adminUserIds.includes(member.id))return;
+  const durationChoice=window.prompt("Choisis la durée de suspension : 1 = 24 heures, 2 = 7 jours, 3 = indéfinie.");
+  const duration=durationChoice==="1"?"24h":durationChoice==="2"?"168h":durationChoice==="3"?"876000h":null;
+  if(!duration)return;
+  const reason=window.prompt("Motif de la suspension (au moins 3 caractères) ?");
+  if(!reason?.trim()||reason.trim().length<3)return;
+  if(!window.confirm("Confirmer la suspension de @"+member.username+" ?"))return;
+  setBusy(member.id);const db=getSupabaseBrowserClient() as any;
+  const {error:e}=await db.functions.invoke("admin-user-moderation",{body:{action:"ban",targetId:member.id,duration,reason:reason.trim()}});
+  if(e)setError("La suspension n’a pas pu être appliquée. Vérifie ta connexion puis réessaie.");
+  else{await load();}
+  setBusy(null);
+ }
+ async function liftMemberSuspension(member:Member){
+  if(adminUserIds.includes(member.id))return;
+  if(!window.confirm("Lever la suspension de @"+member.username+" ?"))return;
+  setBusy(member.id);const db=getSupabaseBrowserClient() as any;
+  const {error:e}=await db.functions.invoke("admin-user-moderation",{body:{action:"unban",targetId:member.id}});
+  if(e)setError("La suspension n’a pas pu être levée.");
+  else{await load();}
+  setBusy(null);
+ }
  async function unpublishStory(story:Story){
   if(!window.confirm("Repasser « "+story.title+" » en brouillon ? Elle ne sera plus visible publiquement."))return;
   setBusy(story.id);const db=getSupabaseBrowserClient() as any;
@@ -131,9 +154,9 @@ export function AdministrationDashboard(){
   </>}
   {tab==="members"&&<>
    <div className="admin-section-heading"><div><span>COMMUNAUTÉ</span><h3>Utilisateurs</h3></div><span>{members.length} profils récents</span></div>
-   <div className="admin-member-list">{members.map(m=><article className="admin-member" key={m.id}><div><strong>{m.display_name||m.username}</strong><span>@{m.username} · {m.is_public?"Profil public":"Profil privé"}</span><small>Inscrit le {new Date(m.created_at).toLocaleDateString("fr-FR")}</small></div><button onClick={()=>{setWarningFor(m);setWarningReason("");}}>Enregistrer un avertissement</button></article>)}</div>
+   <div className="admin-member-list">{members.map(m=><article className="admin-member" key={m.id}><div><strong>{m.display_name||m.username}</strong><span>@{m.username} · {m.is_public?"Profil public":"Profil privé"}</span><small>Inscrit le {new Date(m.created_at).toLocaleDateString("fr-FR")}</small></div><div className="admin-member-actions"><button onClick={()=>{setWarningFor(m);setWarningReason("");}}>Avertir</button><button disabled={busy===m.id||adminUserIds.includes(m.id)} onClick={()=>void suspendMember(m)}>Suspendre</button><button className="secondary" disabled={busy===m.id||adminUserIds.includes(m.id)} onClick={()=>void liftMemberSuspension(m)}>Lever suspension</button></div></article>)}</div>
    {warningFor&&<div className="admin-warning-form"><h4>Avertissement · {warningFor.display_name||warningFor.username}</h4><label htmlFor="admin-warning-reason">Motif</label><textarea id="admin-warning-reason" rows={3} value={warningReason} onChange={e=>setWarningReason(e.target.value)} placeholder="Explique la raison de cet avertissement…"/><div className="admin-report-actions"><button disabled={!warningReason.trim()||busy===warningFor.id} onClick={()=>void issueWarning()}>Enregistrer</button><button className="secondary" onClick={()=>setWarningFor(null)}>Annuler</button></div></div>}
-   <p className="admin-footnote">Les avertissements sont enregistrés et consultables dans l’historique. La suspension de compte n’est pas activée : elle exige une action serveur sécurisée sur Supabase Auth, pas une simple modification de profil.</p>
+   <p className="admin-footnote">Les avertissements sont enregistrés et consultables dans l’historique. Les suspensions passent par une fonction serveur qui vérifie les droits administrateur et exclut les comptes administrateurs.</p>
   </>}
   {tab==="works"&&<>
    <div className="admin-section-heading"><div><span>CATALOGUE</span><h3>Contenus et publications</h3></div><span>{stories.length} œuvres récentes</span></div>
