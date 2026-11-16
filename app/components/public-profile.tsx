@@ -118,6 +118,9 @@ export function PublicProfile({ username }: { username: string }) {
           setFollowers(publicFollowers);
           setFollowing(publicFollowing);
           setFollowingCount(followingResult.count ?? followingIds.length);
+          setReadCount(totalReads);
+          setVoteCount(totalVotes);
+          setRatingCount(totalRatings);
           setBooks(library);
         }
       } catch (e) {
