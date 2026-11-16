@@ -534,6 +534,19 @@ const dictionary: Record<string, Record<Locale, string>> = {
   "Nous vous enverrons un lien sécurisé pour le réinitialiser.": { fr:"Nous vous enverrons un lien sécurisé pour le réinitialiser.", en:"We'll send you a secure link to reset it.", es:"Te enviaremos un enlace seguro para restablecerla.", pt:"Enviaremos um link seguro para redefini-la." },
   "Choisissez au moins 8 caractères et confirmez votre choix.": { fr:"Choisissez au moins 8 caractères et confirmez votre choix.", en:"Choose at least 8 characters and confirm your choice.", es:"Elige al menos 8 caracteres y confirma tu elección.", pt:"Escolha pelo menos 8 caracteres e confirme sua escolha." },
   "Saisissez-le à nouveau": { fr:"Saisissez-le à nouveau", en:"Enter it again", es:"Introdúcela de nuevo", pt:"Digite novamente" },
+  "abonnés": { fr:"abonnés", en:"followers", es:"seguidores", pt:"seguidores" },
+  "Fond de lecture": { fr:"Fond de lecture", en:"Reading background", es:"Fondo de lectura", pt:"Fundo de leitura" },
+  "Normal": { fr:"Normal", en:"Default", es:"Normal", pt:"Normal" },
+  "Nuit": { fr:"Nuit", en:"Night", es:"Noche", pt:"Noite" },
+  "Les lecteurs qui suivent cet auteur.": { fr:"Les lecteurs qui suivent cet auteur.", en:"Readers following this author.", es:"Lectores que siguen a este autor.", pt:"Leitores que seguem este autor." },
+  "VOS COLLECTIONS": { fr:"VOS COLLECTIONS", en:"YOUR COLLECTIONS", es:"TUS COLECCIONES", pt:"SUAS COLEÇÕES" },
+  "Listes de lecture": { fr:"Listes de lecture", en:"Reading lists", es:"Listas de lectura", pt:"Listas de leitura" },
+  "Ex. : Mes coups de cœur": { fr:"Ex. : Mes coups de cœur", en:"E.g. My favorites", es:"Ej.: Mis favoritos", pt:"Ex.: Meus favoritos" },
+  "Nom de la nouvelle liste": { fr:"Nom de la nouvelle liste", en:"New list name", es:"Nombre de la nueva lista", pt:"Nome da nova lista" },
+  "Créer": { fr:"Créer", en:"Create", es:"Crear", pt:"Criar" },
+  "Toutes": { fr:"Toutes", en:"All", es:"Todas", pt:"Todas" },
+  "Ajouter à une liste…": { fr:"Ajouter à une liste…", en:"Add to a list…", es:"Añadir a una lista…", pt:"Adicionar a uma lista…" },
+  "Confirmer le mot de passe": { fr:"Confirmer le mot de passe", en:"Confirm password", es:"Confirmar contraseña", pt:"Confirmar senha" },
 };
 
 function translateNode(value: string, locale: Locale) {
