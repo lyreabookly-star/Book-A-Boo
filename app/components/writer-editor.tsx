@@ -155,8 +155,8 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       const supabase = getSupabaseBrowserClient() as any;
       const nextNumber = Math.max(0, ...chapters.map(c => c.chapter_number)) + 1;
       const { data, error: insertError } = await supabase.from("chapters")
-        .insert({ story_id: story.id, author_id: (await supabase.auth.getUser()).data.user?.id, title: `Chapitre ${nextNumber}`, chapter_number: nextNumber, content: "" })
-        .select("id,title,content,chapter_number,updated_at").single();
+        .insert({ story_id: story.id, author_id: (await supabase.auth.getUser()).data.user?.id, title: `Chapitre ${nextNumber}`, chapter_number: nextNumber, content: "", author_note: "" })
+        .select("id,title,content,author_note,chapter_number,updated_at").single();
       if (insertError) throw insertError;
       setChapters(items => [...items, data]);
       setChapter(data); setTitle(data.title); setContent(""); setChapterAuthorNote("");
