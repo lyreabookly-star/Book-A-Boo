@@ -23,6 +23,9 @@ export function PublicProfile({ username }: { username: string }) {
   const [followerCount, setFollowerCount] = useState(0);
   const [following, setFollowing] = useState<Following[]>([]);
   const [followingCount, setFollowingCount] = useState(0);
+  const [readCount, setReadCount] = useState(0);
+  const [voteCount, setVoteCount] = useState(0);
+  const [ratingCount, setRatingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -66,6 +69,23 @@ export function PublicProfile({ username }: { username: string }) {
         if (followerResult.error) throw followerResult.error;
         if (followingResult.error) throw followingResult.error;
 
+        const workIds = (workResult.data ?? []).map((item: { id: string }) => item.id);
+        let totalReads = 0;
+        let totalVotes = 0;
+        let totalRatings = 0;
+        if (workIds.length) {
+          const [readsResult, votesResult, ratingsResult] = await Promise.all([
+            supabase.from("story_reads").select("id", { count: "exact" }).in("story_id", workIds),
+            supabase.from("story_votes").select("id", { count: "exact" }).in("story_id", workIds),
+            supabase.from("story_ratings").select("id", { count: "exact" }).in("story_id", workIds),
+          ]);
+          if (readsResult.error) throw readsResult.error;
+          if (votesResult.error) throw votesResult.error;
+          if (ratingsResult.error) throw ratingsResult.error;
+          totalReads = readsResult.count ?? 0;
+          totalVotes = votesResult.count ?? 0;
+          totalRatings = ratingsResult.count ?? 0;
+        }
         const followerIds = (followerResult.data ?? []).map((item: { follower_id: string }) => item.follower_id);
         let publicFollowers: Follower[] = [];
         const followingIds = (followingResult.data ?? []).map((item: { author_id: string }) => item.author_id);
@@ -115,7 +135,7 @@ export function PublicProfile({ username }: { username: string }) {
     <section className="public-profile-heading">
       {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : <span className="public-profile-avatar"><UserRound size={28}/></span>}
       <div className="public-profile-identity"><span className="catalogue-overline">{words.author}</span><h2>{profile.display_name || profile.username}</h2><p>@{profile.username}</p>{profile.bio && <div className="public-profile-bio">{profile.bio}</div>}
-        <div className="public-profile-stats"><span><strong>{followerCount}</strong> {words.followers}</span><span><strong>{followingCount}</strong> {words.following}</span></div>
+        <div className="public-profile-stats"><span><strong>{followerCount}</strong> {words.followers}</span><span><strong>{followingCount}</strong> {words.following}</span><span><strong>{works.length}</strong> {isEn ? "works" : isEs ? "obras" : isPt ? "obras" : "œuvres"}</span><span><strong>{readCount}</strong> {isEn ? "reads" : isEs ? "lecturas" : isPt ? "leituras" : "lectures"}</span><span><strong>{voteCount}</strong> {isEn ? "votes received" : isEs ? "votos" : isPt ? "votos" : "votes reçus"}</span><span><strong>{ratingCount}</strong> {isEn ? "ratings" : isEs ? "valoraciones" : isPt ? "avaliações" : "notes reçues"}</span></div>
         <AuthorFollowButton authorId={profile.id} onFollowChange={(delta: number) => setFollowerCount((count) => Math.max(0, count + delta))}/><ContentReportButton targetType="profile" targetId={profile.id}/>
       </div>
     </section>
