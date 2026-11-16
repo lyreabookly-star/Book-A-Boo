@@ -1355,3 +1355,25 @@ html[data-theme="dark"] .admin-member-actions button.secondary{background:#34373
   .explore-live-actions{padding-top:7px;margin-top:7px;gap:5px}
   .explore-live-actions>a{width:27px;height:27px}
 }
+
+
+/* Explorer : filtre de genre compact à côté de la recherche */
+.explore-live-filters{flex-wrap:nowrap;position:relative;align-items:stretch}
+.explore-live-filters label{flex:1 1 auto;min-width:0}
+.explore-genre-toggle{height:50px;min-width:112px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:12px var(--sans);cursor:pointer}
+.explore-genre-toggle.active{border-color:var(--accent);color:var(--accent)}
+.explore-genre-toggle svg{transition:transform .2s}
+.explore-genre-toggle svg.rotated{transform:rotate(180deg)}
+.explore-genre-menu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:-10px 0 22px;padding:12px;border:1px solid var(--line);background:var(--surface);border-radius:8px}
+.explore-genre-menu button{display:flex;justify-content:space-between;align-items:center;gap:8px;min-width:0;padding:10px;border:1px solid var(--line);background:transparent;color:var(--ink);font:11px var(--sans);text-align:left;cursor:pointer}
+.explore-genre-menu button.selected{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
+.explore-genre-menu button small{color:var(--muted);font-size:9px}
+@media(max-width:600px){
+ .explore-live-filters{flex-wrap:nowrap;gap:7px}
+ .explore-live-filters label{flex:1 1 auto;min-width:0;width:auto}
+ .explore-genre-toggle{min-width:88px;padding:0 10px;font-size:11px}
+ .explore-genre-menu{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:9px;margin:-8px 0 18px}
+ .explore-genre-menu button{padding:9px 8px;font-size:10px}
+}
+html[data-theme="dark"] .explore-genre-toggle,html[data-theme="dark"] .explore-genre-menu{background:#20221f;color:#eeeae2;border-color:#4a4d45}
+html[data-theme="dark"] .explore-genre-menu button{color:#eeeae2;border-color:#4a4d45}
