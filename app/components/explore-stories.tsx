@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, BookOpen, Search, UserRound } from "lucide-react";
+import { ArrowUpRight, BookOpen, Search, UserRound, ChevronDown } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { StorySaveButton } from "./story-save-button";
 import { useAppPreferences } from "./app-preferences-provider";
@@ -32,6 +32,7 @@ export function ExploreStories({ initialGenre = "" }: { initialGenre?: string })
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [genre, setGenre] = useState(initialGenre);
+  const [genresOpen, setGenresOpen] = useState(false);
   const [members, setMembers] = useState<Member[]>([]);
   const [membersLoading, setMembersLoading] = useState(false);
 
@@ -122,19 +123,14 @@ export function ExploreStories({ initialGenre = "" }: { initialGenre?: string })
     <div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> BOOK-A-BOO</span><h2>{labels.title}</h2></div><span className="shelf-index">{stories.length.toString().padStart(2,"0")} {locale === "en" ? "STORIES" : locale === "es" ? "HISTORIAS" : locale === "pt" ? "HISTÓRIAS" : "HISTOIRES"}</span></div>
     <div className="explore-live-filters">
       <label><Search size={16}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder={labels.search}/></label>
-      <select value={genre} onChange={e => setGenre(e.target.value)} aria-label={labels.all}>
-        <option value="">{labels.all}</option>
-        {["Romance","Fantasy","Drame","Thriller","Psychologie","Fanfiction","Poésie","Science-fiction","Horreur","Historique","Littérature générale"].map(item => <option key={item} value={item}>{item}</option>)}
-      </select>
+      <button type="button" className={`explore-genre-toggle${genre ? " active" : ""}`} aria-expanded={genresOpen} onClick={() => setGenresOpen(open => !open)}>
+        <span>{genre || "Genres"}</span><ChevronDown size={16} className={genresOpen ? "rotated" : ""}/>
+      </button>
     </div>
-    <div className="explore-genres-after explore-genres-functional"><div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> CHOISIR UNE DIRECTION</span><h2>Explorer par <em>genre.</em></h2></div><span className="shelf-index">{genreOptions.length} GENRES</span></div>
-      <div className="explore-genre-grid">{genreOptions.map((item, index) => {
-        const count = stories.filter(story => story.genre?.toLocaleLowerCase() === item.name.toLocaleLowerCase()).length;
-        return <button type="button" key={item.name} onClick={() => setGenre(current => current === item.name ? "" : item.name)} className={`explore-genre explore-genre-button explore-${["rose","violet","ochre","night","sage","blue","rose","night","plum","ochre","sage"][index]}${genre === item.name ? " active" : ""}`}>
-          <span className="explore-genre-number">{String(count).padStart(2,"0")}</span><div><h3>{item.name}</h3><p>{item.note}</p><small>{count} {count > 1 ? "œuvres publiées" : "œuvre publiée"}</small></div><ArrowUpRight size={19}/>
-        </button>;
-      })}</div>
-    </div>
+    {genresOpen && <div className="explore-genre-menu">
+      <button type="button" className={!genre ? "selected" : ""} onClick={() => { setGenre(""); setGenresOpen(false); }}>{labels.all}</button>
+      {genreOptions.map(item => <button type="button" key={item.name} className={genre === item.name ? "selected" : ""} onClick={() => { setGenre(item.name); setGenresOpen(false); }}>{item.name}<small>{stories.filter(story => story.genre?.toLocaleLowerCase() === item.name.toLocaleLowerCase()).length}</small></button>)}
+    </div>}
     {query.trim().length >= 2 && <section className="explore-member-results" aria-live="polite">
       <div className="explore-member-heading"><span className="eyebrow"><span className="eyebrow-line"/> {labels.members}</span><span className="shelf-index">{members.length}</span></div>
       {membersLoading ? <p className="explore-member-empty">{locale === "en" ? "Searching members…" : locale === "es" ? "Buscando miembros…" : locale === "pt" ? "Buscando membros…" : "Recherche des membres…"}</p> : members.length ? <div className="explore-member-grid">{members.map(member => <Link href={`/u/${encodeURIComponent(member.username)}`} className="explore-member-card" key={member.id}>
