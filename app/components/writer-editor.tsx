@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,6 +25,10 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const latestSnapshot = useRef("");
+  const snapshot = JSON.stringify({ chapterId: chapter?.id, title, content, chapterAuthorNote, story, warningsText });
+  latestSnapshot.current = snapshot;
   const [error, setError] = useState("");
   const [publishing, setPublishing] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
@@ -59,6 +63,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     setContent(list[0].content);
     setChapterAuthorNote(list[0].author_note || "");
     setWarningsText((storyData.content_warnings || []).join(", "));
+    setDirty(false);
   }, [router, storyId]);
 
   useEffect(() => {
@@ -70,6 +75,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
 
   async function save(): Promise<boolean> {
     if (!chapter || !story) return false;
+    const savedSnapshot = snapshot;
     setSaving(true); setSaved(false); setError("");
     try {
       const supabase = getSupabaseBrowserClient() as any;
@@ -81,6 +87,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
         .update({ title: story.title.trim(), synopsis: story.synopsis, genre: story.genre, author_note: story.author_note, content_warnings: warningsText.split(",").map(value => value.trim()).filter(Boolean), audience_rating: story.audience_rating, updated_at: new Date().toISOString() }).eq("id", story.id);
       if (storyError) throw storyError;
       setSaved(true);
+      if (latestSnapshot.current === savedSnapshot) setDirty(false);
       setChapters(items => items.map(item => item.id === chapter.id ? { ...item, title: title.trim() || "Chapitre", content, author_note: chapterAuthorNote } : item));
       return true;
     } catch (e) {
@@ -88,6 +95,12 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       return false;
     } finally { setSaving(false); }
   }
+
+  useEffect(() => {
+    if (!dirty || loading || saving || !chapter || !story) return;
+    const timer = window.setTimeout(() => { void save(); }, 1800);
+    return () => window.clearTimeout(timer);
+  }, [dirty, loading, saving, chapter, story, title, content, chapterAuthorNote, warningsText]);
 
   async function uploadCover(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -212,13 +225,13 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     <div className="writer-editor">
       <div className="writer-editor-top"><Link href="/ecrire"><ArrowLeft size={15} /> Mes manuscrits</Link><span><BookOpen size={14} /> {story.status === "published" ? (locale === "en" ? "PUBLISHED" : locale === "es" ? "PUBLICADO" : locale === "pt" ? "PUBLICADO" : "PUBLIÉ") : (locale === "en" ? "PRIVATE DRAFT" : locale === "es" ? "BORRADOR PRIVADO" : locale === "pt" ? "RASCUNHO PRIVADO" : "BROUILLON PRIVÉ")}</span></div>
       <section className="writer-work-metadata">
-        <label className="writer-work-title">Titre de l'œuvre<input value={story.title} onChange={e => setStory({ ...story, title: e.target.value })} maxLength={160} /></label>
+        <label className="writer-work-title">Titre de l'œuvre<input value={story.title} onChange={e => { setStory({ ...story, title: e.target.value }); setDirty(true); setSaved(false); }} maxLength={160} /></label>
         <div className="writer-metadata-grid">
-          <label>Genre littéraire<select value={story.genre || "Littérature générale"} onChange={e => setStory({ ...story, genre: e.target.value })}><option>Romance</option><option>Fantasy</option><option>Drame</option><option>Thriller</option><option>Psychologie</option><option>Fanfiction</option><option>Poésie</option><option>Science-fiction</option><option>Horreur</option><option>Historique</option><option>Littérature générale</option></select></label>
-          <label>Public conseillé<select value={story.audience_rating || "Tout public"} onChange={e => setStory({ ...story, audience_rating: e.target.value })}><option>Tout public</option><option>13 ans et +</option><option>16 ans et +</option><option>18 ans et +</option></select></label>
-          <label className="writer-metadata-wide">Résumé de l'œuvre <span>Jusqu'à 5 000 caractères</span><textarea value={story.synopsis || ""} onChange={e => setStory({ ...story, synopsis: e.target.value })} maxLength={5000} rows={5} placeholder="Présentez votre histoire sans tout dévoiler…" /></label>
-          <label className="writer-metadata-wide">Avertissements au public <span>Séparez les avertissements par des virgules</span><input value={warningsText} onChange={e => setWarningsText(e.target.value)} placeholder="Violence, langage explicite, thèmes sensibles…" /></label>
-          <label className="writer-metadata-wide">Note de l'auteur sur l'œuvre <span>Facultatif</span><textarea value={story.author_note || ""} onChange={e => setStory({ ...story, author_note: e.target.value })} maxLength={3000} rows={3} placeholder="Un mot pour accompagner votre histoire…" /></label>
+          <label>Genre littéraire<select value={story.genre || "Littérature générale"} onChange={e => { setStory({ ...story, genre: e.target.value }); setDirty(true); setSaved(false); }}><option>Romance</option><option>Fantasy</option><option>Drame</option><option>Thriller</option><option>Psychologie</option><option>Fanfiction</option><option>Poésie</option><option>Science-fiction</option><option>Horreur</option><option>Historique</option><option>Littérature générale</option></select></label>
+          <label>Public conseillé<select value={story.audience_rating || "Tout public"} onChange={e => { setStory({ ...story, audience_rating: e.target.value }); setDirty(true); setSaved(false); }}><option>Tout public</option><option>13 ans et +</option><option>16 ans et +</option><option>18 ans et +</option></select></label>
+          <label className="writer-metadata-wide">Résumé de l'œuvre <span>Jusqu'à 5 000 caractères</span><textarea value={story.synopsis || ""} onChange={e => { setStory({ ...story, synopsis: e.target.value }); setDirty(true); setSaved(false); }} maxLength={5000} rows={5} placeholder="Présentez votre histoire sans tout dévoiler…" /></label>
+          <label className="writer-metadata-wide">Avertissements au public <span>Séparez les avertissements par des virgules</span><input value={warningsText} onChange={e => { setWarningsText(e.target.value); setDirty(true); setSaved(false); }} placeholder="Violence, langage explicite, thèmes sensibles…" /></label>
+          <label className="writer-metadata-wide">Note de l'auteur sur l'œuvre <span>Facultatif</span><textarea value={story.author_note || ""} onChange={e => { setStory({ ...story, author_note: e.target.value }); setDirty(true); setSaved(false); }} maxLength={3000} rows={3} placeholder="Un mot pour accompagner votre histoire…" /></label>
         </div>
         <p className="writer-metadata-hint">Les informations publiques seront visibles sur la fiche de votre œuvre après publication.</p>
       </section>
@@ -245,10 +258,10 @@ export function WriterEditor({ storyId }: { storyId: string }) {
           {chapters.map(item => <button key={item.id} className={chapter?.id === item.id ? "writer-chapter active" : "writer-chapter"} onClick={() => selectChapter(item)}> <span>{String(item.chapter_number).padStart(2,"0")}</span>{/^Chapitre \d+$/.test(item.title) ? `${locale === "en" ? "Chapter" : locale === "es" ? "Capítulo" : locale === "pt" ? "Capítulo" : "Chapitre"} ${item.chapter_number}` : item.title}</button>)}
         </aside>
         <section className="writer-writing-area">
-          <input className="writer-chapter-title" value={/^Chapitre \d+$/.test(title) ? `${locale === "en" ? "Chapter" : locale === "es" ? "Capítulo" : locale === "pt" ? "Capítulo" : "Chapitre"} ${chapter?.chapter_number ?? 1}` : title} onChange={e => { setTitle(e.target.value); setSaved(false); }} placeholder={locale === "en" ? "Chapter title" : locale === "es" ? "Título del capítulo" : locale === "pt" ? "Título do capítulo" : "Titre du chapitre"} maxLength={160} />
-          <RichTextEditor key={chapter?.id || "new"} chapterId={chapter?.id || "new"} content={content} onChange={value=>{setContent(value);setSaved(false);}} />
-          <label className="writer-chapter-note">Note de l’auteur pour ce chapitre <span>(facultatif)</span><textarea value={chapterAuthorNote} onChange={e => { setChapterAuthorNote(e.target.value); setSaved(false); }} maxLength={2000} rows={3} placeholder="Un mot avant ou après la lecture de ce chapitre…" /></label>
-          <div className="writer-save-row"><span>{saved ? <><Check size={14} /> {locale === "en" ? "Saved" : locale === "es" ? "Guardado" : locale === "pt" ? "Salvo" : "Enregistré"}</> : (locale === "en" ? "Remember to save your text" : locale === "es" ? "Recuerda guardar tu texto" : locale === "pt" ? "Lembre-se de salvar seu texto" : "Pensez à sauvegarder votre texte")}</span><button className="auth-submit" onClick={save} disabled={saving}>{saving ? <LoaderCircle className="spin" size={15} /> : <Save size={15} />}{saving ? (locale === "en" ? "Saving…" : locale === "es" ? "Guardando…" : locale === "pt" ? "Salvando…" : "Sauvegarde…") : (locale === "en" ? "Save" : locale === "es" ? "Guardar" : locale === "pt" ? "Salvar" : "Enregistrer")}</button></div>
+          <input className="writer-chapter-title" value={/^Chapitre \d+$/.test(title) ? `${locale === "en" ? "Chapter" : locale === "es" ? "Capítulo" : locale === "pt" ? "Capítulo" : "Chapitre"} ${chapter?.chapter_number ?? 1}` : title} onChange={e => { setTitle(e.target.value); setDirty(true); setSaved(false); }} placeholder={locale === "en" ? "Chapter title" : locale === "es" ? "Título del capítulo" : locale === "pt" ? "Título do capítulo" : "Titre du chapitre"} maxLength={160} />
+          <RichTextEditor key={chapter?.id || "new"} chapterId={chapter?.id || "new"} content={content} onChange={value=>{setContent(value);setDirty(true);setSaved(false);}} />
+          <label className="writer-chapter-note">Note de l’auteur pour ce chapitre <span>(facultatif)</span><textarea value={chapterAuthorNote} onChange={e => { setChapterAuthorNote(e.target.value); setDirty(true); setSaved(false); }} maxLength={2000} rows={3} placeholder="Un mot avant ou après la lecture de ce chapitre…" /></label>
+          <div className="writer-save-row"><span>{saving ? (locale === "en" ? "Saving automatically…" : locale === "es" ? "Guardando automáticamente…" : locale === "pt" ? "Salvando automaticamente…" : "Sauvegarde automatique…") : saved ? <><Check size={14} /> {locale === "en" ? "Saved" : locale === "es" ? "Guardado" : locale === "pt" ? "Salvo" : "Enregistré"}</> : dirty ? (locale === "en" ? "Unsaved changes" : locale === "es" ? "Cambios sin guardar" : locale === "pt" ? "Alterações não salvas" : "Modifications en attente") : (locale === "en" ? "Your text is saved" : locale === "es" ? "Tu texto está guardado" : locale === "pt" ? "Seu texto está salvo" : "Votre texte est enregistré")}</span><button className="auth-submit" onClick={save} disabled={saving}>{saving ? <LoaderCircle className="spin" size={15} /> : <Save size={15} />}{saving ? (locale === "en" ? "Saving…" : locale === "es" ? "Guardando…" : locale === "pt" ? "Salvando…" : "Sauvegarde…") : (locale === "en" ? "Save" : locale === "es" ? "Guardar" : locale === "pt" ? "Salvar" : "Enregistrer")}</button></div>
           {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
         </section>
       </div>
