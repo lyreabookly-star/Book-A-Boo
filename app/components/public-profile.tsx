@@ -138,7 +138,7 @@ export function PublicProfile({ username }: { username: string }) {
     <section className="public-profile-heading">
       {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : <span className="public-profile-avatar"><UserRound size={28}/></span>}
       <div className="public-profile-identity"><span className="catalogue-overline">{words.author}</span><h2>{profile.display_name || profile.username}</h2><p>@{profile.username}</p>{profile.bio && <div className="public-profile-bio">{profile.bio}</div>}
-        <div className="public-profile-stats"><span><strong>{followerCount}</strong> {words.followers}</span><span><strong>{followingCount}</strong> {words.following}</span><span><strong>{works.length}</strong> {isEn ? "works" : isEs ? "obras" : isPt ? "obras" : "œuvres"}</span><span><strong>{readCount}</strong> {isEn ? "reads" : isEs ? "lecturas" : isPt ? "leituras" : "lectures"}</span><span><strong>{voteCount}</strong> {isEn ? "votes received" : isEs ? "votos" : isPt ? "votos" : "votes reçus"}</span><span><strong>{ratingCount}</strong> {isEn ? "ratings" : isEs ? "valoraciones" : isPt ? "avaliações" : "notes reçues"}</span></div>
+        <div className="public-profile-stats"><a href="#public-profile-followers" className="public-profile-stat-link" aria-label={isEn ? "View followers" : isEs ? "Ver seguidores" : isPt ? "Ver seguidores" : "Voir les abonnés"}><strong>{followerCount}</strong> {words.followers}</a><a href="#public-profile-following" className="public-profile-stat-link" aria-label={isEn ? "View following" : isEs ? "Ver seguidos" : isPt ? "Ver seguindo" : "Voir les abonnements"}><strong>{followingCount}</strong> {words.following}</a><span><strong>{works.length}</strong> {isEn ? "works" : isEs ? "obras" : isPt ? "obras" : "œuvres"}</span><span><strong>{readCount}</strong> {isEn ? "reads" : isEs ? "lecturas" : isPt ? "leituras" : "lectures"}</span><span><strong>{voteCount}</strong> {isEn ? "votes received" : isEs ? "votos" : isPt ? "votos" : "votes reçus"}</span><span><strong>{ratingCount}</strong> {isEn ? "ratings" : isEs ? "valoraciones" : isPt ? "avaliações" : "notes reçues"}</span></div>
         <AuthorFollowButton authorId={profile.id} onFollowChange={(delta: number) => setFollowerCount((count) => Math.max(0, count + delta))}/><ContentReportButton targetType="profile" targetId={profile.id}/>
       </div>
     </section>
@@ -153,7 +153,7 @@ export function PublicProfile({ username }: { username: string }) {
       </Link>)}</div> : <p className="explore-live-empty">{words.emptyWorks}</p>}
     </section>
 
-    <section className="public-profile-followers">
+    <section className="public-profile-followers" id="public-profile-followers" tabIndex={-1}>
       <div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> {words.followers.toUpperCase()}</span><h2>{isEn ? "Readers following this author." : isEs ? "Lectores que siguen a este autor." : isPt ? "Leitores que seguem este autor." : "Les lecteurs qui suivent cet auteur."}</h2></div><span className="shelf-index">{followerCount}</span></div>
       {followers.length ? <div className="public-profile-follower-list">{followers.map((follower) => <Link href={`/u/${encodeURIComponent(follower.username)}`} className="public-profile-follower" key={follower.id}>
         {follower.avatar_url ? <img src={follower.avatar_url} alt="" loading="lazy"/> : <span><UserRound size={16}/></span>}
@@ -162,7 +162,7 @@ export function PublicProfile({ username }: { username: string }) {
       {followers.length < followerCount && <p className="public-profile-privacy-note">{isEn ? "Some followers have chosen to keep their profiles private." : isEs ? "Algunos seguidores han elegido mantener sus perfiles privados." : isPt ? "Alguns seguidores escolheram manter seus perfis privados." : "Certains abonnés ont choisi de garder leur profil privé."}</p>}
     </section>
 
-    <section className="public-profile-following">
+    <section className="public-profile-following" id="public-profile-following" tabIndex={-1}>
       <div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> {words.following.toUpperCase()}</span><h2>{isEn ? "Authors followed by this reader." : isEs ? "Autores que sigue este lector." : isPt ? "Autores que este leitor segue." : "Les auteurs suivis par ce lecteur."}</h2></div><span className="shelf-index">{followingCount}</span></div>
       {following.length ? <div className="public-profile-follower-list">{following.map((member) => <Link href={"/u/" + encodeURIComponent(member.username)} className="public-profile-follower" key={member.id}>
         {member.avatar_url ? <img src={member.avatar_url} alt="" loading="lazy"/> : <span><UserRound size={16}/></span>}
