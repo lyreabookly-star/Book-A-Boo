@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     title: "Book-A-Boo",
   },
   icons: {
-    icon: "/icons/icon-192.png",
+    icon: "/icons/icon-dark.svg",
     apple: "/icons/apple-touch-icon.png",
   },
 };
