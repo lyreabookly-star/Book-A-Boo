@@ -12,7 +12,7 @@ export function OwnProfile() {
 
   useEffect(() => {
     let active = true;
-    const supabase = getSupabaseBrowserClient();
+    const supabase = getSupabaseBrowserClient() as any;
     async function load() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
