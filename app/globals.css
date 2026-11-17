@@ -1679,3 +1679,13 @@ body{font-size:var(--bab-text-base);line-height:1.6}
 .public-profile-stats>.public-profile-stat-link{padding:3px 4px;border-bottom:1px solid transparent}
 .public-profile-stats>.public-profile-stat-link:hover small,.public-profile-stats>.public-profile-stat-link:focus-visible small{color:var(--accent)}
 @media(max-width:620px){.public-profile-stats{max-width:100%;gap:4px}.public-profile-stats>span strong,.public-profile-stats>.public-profile-stat-link strong{font-size:18px}}
+
+
+/* Profile follower/following lists open only on demand. */
+.public-profile-list-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(8,10,14,.62);backdrop-filter:blur(5px)}
+.public-profile-list-dialog{width:min(100%,520px);max-height:min(78vh,720px);overflow:auto;padding:22px;border:1px solid var(--line,rgba(128,128,128,.25));border-radius:22px;background:var(--surface,#fff);color:var(--text,#222);box-shadow:0 24px 80px rgba(0,0,0,.28)}
+.public-profile-list-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.public-profile-list-header h2{margin:0;font-size:1.2rem}
+.public-profile-list-header button{width:36px;height:36px;border:0;border-radius:50%;background:var(--surface-muted,#eee);color:inherit;font-size:25px;line-height:1;cursor:pointer}
+.public-profile-stat-link{border:0;background:transparent;color:inherit;font:inherit;cursor:pointer}
+.public-profile-stat-link:focus-visible,.public-profile-list-header button:focus-visible{outline:2px solid var(--accent,#8a6b45);outline-offset:4px}
