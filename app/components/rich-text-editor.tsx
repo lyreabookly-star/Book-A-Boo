@@ -11,8 +11,12 @@ export function RichTextEditor({ content, chapterId, onChange }: Props) {
   const [size, setSize] = useState("16");
 
   useEffect(() => {
-    setFont(localStorage.getItem("bab-editor-font") || "Georgia");
-    setSize(localStorage.getItem("bab-editor-size") || "16");
+    try {
+      setFont(localStorage.getItem("bab-editor-font") || "Georgia");
+      setSize(localStorage.getItem("bab-editor-size") || "16");
+    } catch {
+      // Keep readable defaults when browser storage is unavailable.
+    }
   }, []);
 
   useEffect(() => {
@@ -28,13 +32,35 @@ export function RichTextEditor({ content, chapterId, onChange }: Props) {
     document.execCommand(name, false, value);
     sync();
   }
+  function remember(key: string, value: string) {
+    try { localStorage.setItem(key, value); } catch {
+      // Formatting still works for this session if storage is unavailable.
+    }
+  }
   function setFontFamily(value: string) {
-    setFont(value); localStorage.setItem("bab-editor-font", value); command("fontName", value);
+    setFont(value);
+    remember("bab-editor-font", value);
+    command("fontName", value);
   }
   function setFontSize(value: string) {
-    setSize(value); localStorage.setItem("bab-editor-size", value);
-    const n = Number(value);
-    command("fontSize", n <= 14 ? "2" : n <= 16 ? "3" : n <= 18 ? "4" : n <= 24 ? "5" : "5");
+    setSize(value);
+    remember("bab-editor-size", value);
+    editor.current?.focus();
+    document.execCommand("fontSize", false, "7");
+    const selection = window.getSelection();
+    const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+    if (editor.current && range) {
+      editor.current.querySelectorAll('font[size="7"]').forEach(node => {
+        try {
+          if (!range.intersectsNode(node)) return;
+        } catch { return; }
+        const span = document.createElement("span");
+        span.style.fontSize = value + "px";
+        while (node.firstChild) span.appendChild(node.firstChild);
+        node.replaceWith(span);
+      });
+    }
+    sync();
   }
   function stepSize(direction: number) {
     const values = [12,14,16,18,20,22,24];
