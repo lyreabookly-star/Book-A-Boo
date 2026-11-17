@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Activity, Compass, Feather, House, UserRound, LogIn, ShieldCheck } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
+import { InstallAppButton } from "./install-app-button";
 
 const items = [
   { href: "/", label: "Accueil", icon: House },
@@ -84,6 +85,7 @@ export function SiteHeader({ active = "/", hideGuestActions = false }: { active?
         {visibleItems.map(item => <Link key={item.href} className={active === item.href ? "active" : ""} href={item.href}>{item.label}</Link>)}
       </nav>
       <div className="header-actions">
+        <InstallAppButton />
         {authReady && profile ? (
           <Link className="header-profile-link" href="/profil" aria-label={profile.displayName ? `Ouvrir le profil de ${profile.displayName}` : "Ouvrir mon profil"} title="Mon profil">
             {profile.avatarUrl ? <img className="header-profile-avatar" src={profile.avatarUrl} alt="" /> : <span className="header-profile-fallback"><UserRound size={20}/></span>}
