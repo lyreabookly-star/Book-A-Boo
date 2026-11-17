@@ -93,8 +93,19 @@ export function StoryDetail({ storyId }: { storyId: string }) {
           setStory(data);
           setAuthor(authorResult.data);
           setAuthorFollowerCount(followerResult.count ?? 0);
-          setChapters(chapterResult.data ?? []);
-          setActiveChapter((chapterResult.data ?? [])[0] ?? null);
+          const loadedChapters = chapterResult.data ?? [];
+          setChapters(loadedChapters);
+          let resumeChapter: Chapter | null = null;
+          try {
+            const progress = window.localStorage.getItem("bab-reading-progress:" + data.id);
+            if (progress) {
+              const parsed = JSON.parse(progress);
+              resumeChapter = loadedChapters.find((item: Chapter) => item.id === parsed.chapterId) ?? null;
+            }
+          } catch {
+            // Ignore unavailable or malformed local reading progress.
+          }
+          setActiveChapter(resumeChapter ?? loadedChapters[0] ?? null);
         }
       } catch (e) {
         if (active) setError(e instanceof Error ? e.message : "Cette histoire n'est pas accessible.");
@@ -103,6 +114,19 @@ export function StoryDetail({ storyId }: { storyId: string }) {
     void load();
     return () => { active = false; };
   }, [storyId]);
+
+  useEffect(() => {
+    if (!story || !activeChapter) return;
+    try {
+      window.localStorage.setItem("bab-reading-progress:" + story.id, JSON.stringify({
+        chapterId: activeChapter.id,
+        chapterNumber: activeChapter.chapter_number,
+        savedAt: new Date().toISOString()
+      }));
+    } catch {
+      // Reading continues normally when local storage is unavailable.
+    }
+  }, [story, activeChapter]);
 
   async function copyStoryLink() {
     if (!story) return;
