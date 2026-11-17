@@ -1661,3 +1661,10 @@ body{font-size:var(--bab-text-base);line-height:1.6}
   .app-page .interior-content select,
   .app-page .interior-content textarea{font-size:13px}
 }
+
+
+/* Clickable follower and following counters */
+.public-profile-stats .public-profile-stat-link{display:inline-flex;align-items:baseline;gap:5px;line-height:1.5;font-size:11px;color:var(--muted);text-decoration:none;border-bottom:1px solid transparent;transition:color .18s ease,border-color .18s ease}
+.public-profile-stats .public-profile-stat-link strong{font-size:17px;color:var(--ink);font-weight:650;font-variant-numeric:tabular-nums}
+.public-profile-stats .public-profile-stat-link:hover,.public-profile-stats .public-profile-stat-link:focus-visible{color:var(--accent);border-bottom-color:var(--accent);outline:none}
+.public-profile-followers[id],.public-profile-following[id]{scroll-margin-top:96px}
