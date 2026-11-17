@@ -1693,3 +1693,22 @@ body{font-size:var(--bab-text-base);line-height:1.6}
 .own-profile-tools{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 22px}
 .own-profile-tools a{display:inline-flex;align-items:center;padding:9px 13px;border:1px solid var(--line,rgba(128,128,128,.25));border-radius:999px;color:var(--text,inherit);text-decoration:none;font-size:.88rem}
 .profile-direct-content{padding-top:clamp(22px,4vw,48px)}
+
+/* Logo BAB : contraste explicite selon le thème et la palette active. */
+html[data-theme="dark"]:not([data-palette="classic"]):not([data-palette="frost"]) .site-header-app .brand-logo,
+html[data-palette="crimson"] .site-header-app .brand-logo,
+html[data-palette="azure"] .site-header-app .brand-logo,
+html[data-palette="noctis"] .site-header-app .brand-logo {
+  filter: brightness(0) invert(1) !important;
+  -webkit-filter: brightness(0) invert(1) !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+}
+html:not([data-theme="dark"]) .site-header-app .brand-logo,
+html[data-palette="classic"] .site-header-app .brand-logo,
+html[data-palette="frost"] .site-header-app .brand-logo {
+  filter: brightness(0) !important;
+  -webkit-filter: brightness(0) !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+}
