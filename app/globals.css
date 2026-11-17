@@ -1590,3 +1590,16 @@ html[data-theme="dark"]:not([data-palette]) :is(
   color:inherit;
   opacity:.9;
 }
+
+
+/* Book covers on public profiles: show the complete uploaded cover without cropping. */
+.public-profile-work-cover img{object-fit:contain!important;background:var(--surface,var(--paper))}
+
+/* Library sort control: keep native select readable in dark mode and every palette. */
+.library-summary-line label select{
+  background-color:var(--surface,var(--paper))!important;
+  color:var(--ink)!important;
+  border-color:var(--line)!important;
+  color-scheme:light;
+}
+html[data-theme="dark"] .library-summary-line label select{color-scheme:dark}
