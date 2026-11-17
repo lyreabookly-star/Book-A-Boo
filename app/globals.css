@@ -1668,3 +1668,14 @@ body{font-size:var(--bab-text-base);line-height:1.6}
 .public-profile-stats .public-profile-stat-link strong{font-size:17px;color:var(--ink);font-weight:650;font-variant-numeric:tabular-nums}
 .public-profile-stats .public-profile-stat-link:hover,.public-profile-stats .public-profile-stat-link:focus-visible{color:var(--accent);border-bottom-color:var(--accent);outline:none}
 .public-profile-followers[id],.public-profile-following[id]{scroll-margin-top:96px}
+
+
+/* Profile header stats: compact three-column social profile layout */
+.public-profile-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0 12px;max-width:520px}
+.public-profile-stats>span,.public-profile-stats>.public-profile-stat-link{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;text-align:center;line-height:1.35}
+.public-profile-stats>span{font-size:11px;color:var(--muted)}
+.public-profile-stats>span strong,.public-profile-stats>.public-profile-stat-link strong{font-size:19px;line-height:1.2;color:var(--ink);font-weight:700}
+.public-profile-stats>span small,.public-profile-stats>.public-profile-stat-link small{font-size:11px;color:var(--muted);font-weight:500}
+.public-profile-stats>.public-profile-stat-link{padding:3px 4px;border-bottom:1px solid transparent}
+.public-profile-stats>.public-profile-stat-link:hover small,.public-profile-stats>.public-profile-stat-link:focus-visible small{color:var(--accent)}
+@media(max-width:620px){.public-profile-stats{max-width:100%;gap:4px}.public-profile-stats>span strong,.public-profile-stats>.public-profile-stat-link strong{font-size:18px}}
