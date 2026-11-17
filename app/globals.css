@@ -1689,3 +1689,7 @@ body{font-size:var(--bab-text-base);line-height:1.6}
 .public-profile-list-header button{width:36px;height:36px;border:0;border-radius:50%;background:var(--surface-muted,#eee);color:inherit;font-size:25px;line-height:1;cursor:pointer}
 .public-profile-stat-link{border:0;background:transparent;color:inherit;font:inherit;cursor:pointer}
 .public-profile-stat-link:focus-visible,.public-profile-list-header button:focus-visible{outline:2px solid var(--accent,#8a6b45);outline-offset:4px}
+
+.own-profile-tools{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 22px}
+.own-profile-tools a{display:inline-flex;align-items:center;padding:9px 13px;border:1px solid var(--line,rgba(128,128,128,.25));border-radius:999px;color:var(--text,inherit);text-decoration:none;font-size:.88rem}
+.profile-direct-content{padding-top:clamp(22px,4vw,48px)}
