@@ -14,12 +14,12 @@ type PublishedStory = { id: string; slug: string; title: string; synopsis: strin
 type Follower = { id: string; username: string; display_name: string | null; avatar_url: string | null };
 type Following = Follower;
 
-export function PublicProfile({ username }: { username: string }) {
+export function PublicProfile({ username, allowPrivate = false }: { username: string; allowPrivate?: boolean }) {
   const { locale } = useAppPreferences();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [books, setBooks] = useState<LibraryStory[]>([]);
   const [works, setWorks] = useState<PublishedStory[]>([]);
-  const [followers, setFollowers] = useState<Follower[]>([]);
+  const [followers, setFollowers] = useState<Follower[]>([]);\n  const [openList, setOpenList] = useState<"followers" | "following" | null>(null);
   const [followerCount, setFollowerCount] = useState(0);
   const [following, setFollowing] = useState<Following[]>([]);
   const [followingCount, setFollowingCount] = useState(0);
@@ -55,7 +55,7 @@ export function PublicProfile({ username }: { username: string }) {
           .select("id,username,display_name,bio,avatar_url,is_public,show_library_on_profile")
           .eq("username", username).maybeSingle();
         if (profileError) throw profileError;
-        if (!data || !data.is_public) throw new Error("PROFILE_NOT_AVAILABLE");
+        if (!data || (!data.is_public && !allowPrivate)) throw new Error("PROFILE_NOT_AVAILABLE");
 
         const [workResult, followerResult, followingResult] = await Promise.all([
           supabase.from("stories")
@@ -129,7 +129,7 @@ export function PublicProfile({ username }: { username: string }) {
     }
     void load();
     return () => { active = false; };
-  }, [username]);
+  }, [username, allowPrivate]);
 
   if (loading) return <div className="library-live-state"><LoaderCircle className="spin" size={20}/>{isEn ? "Loading profile…" : isEs ? "Cargando perfil…" : isPt ? "Carregando perfil…" : "Chargement du profil…"}</div>;
   if (!profile) return <div className="personal-library-empty"><UserRound size={25}/><h2>{words.unavailable}</h2><p>{words.private}</p><Link href="/explorer" className="primary-button">{words.explore}</Link></div>;
@@ -138,7 +138,7 @@ export function PublicProfile({ username }: { username: string }) {
     <section className="public-profile-heading">
       {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : <span className="public-profile-avatar"><UserRound size={28}/></span>}
       <div className="public-profile-identity"><span className="catalogue-overline">{words.author}</span><h2>{profile.display_name || profile.username}</h2><p>@{profile.username}</p>
-        <div className="public-profile-stats"><span><strong>{works.length}</strong><small>{isEn ? "Publications" : isEs ? "Publicaciones" : isPt ? "Publicações" : "Publications"}</small></span><a href="#public-profile-followers" className="public-profile-stat-link" aria-label={isEn ? "View followers" : isEs ? "Ver seguidores" : isPt ? "Ver seguidores" : "Voir les abonnés"}><strong>{followerCount}</strong><small>{words.followers}</small></a><a href="#public-profile-following" className="public-profile-stat-link" aria-label={isEn ? "View following" : isEs ? "Ver seguidos" : isPt ? "Ver seguindo" : "Voir les abonnements"}><strong>{followingCount}</strong><small>{words.following}</small></a></div>
+        <div className="public-profile-stats"><span><strong>{works.length}</strong><small>{isEn ? "Publications" : isEs ? "Publicaciones" : isPt ? "Publicações" : "Publications"}</small></span><button type="button" onClick={() => setOpenList("followers")} className="public-profile-stat-link" aria-label={isEn ? "View followers" : isEs ? "Ver seguidores" : isPt ? "Ver seguidores" : "Voir les abonnés"}><strong>{followerCount}</strong><small>{words.followers}</small></button><button type="button" onClick={() => setOpenList("following")} className="public-profile-stat-link" aria-label={isEn ? "View following" : isEs ? "Ver seguidos" : isPt ? "Ver seguindo" : "Voir les abonnements"}><strong>{followingCount}</strong><small>{words.following}</small></button></div>
         {profile.bio && <div className="public-profile-bio">{profile.bio}</div>}
         <AuthorFollowButton authorId={profile.id} onFollowChange={(delta: number) => setFollowerCount((count) => Math.max(0, count + delta))}/><ContentReportButton targetType="profile" targetId={profile.id}/>
       </div>
@@ -154,24 +154,7 @@ export function PublicProfile({ username }: { username: string }) {
       </Link>)}</div> : <p className="explore-live-empty">{words.emptyWorks}</p>}
     </section>
 
-    <section className="public-profile-followers" id="public-profile-followers" tabIndex={-1}>
-      <div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> {words.followers.toUpperCase()}</span><h2>{isEn ? "Readers following this author." : isEs ? "Lectores que siguen a este autor." : isPt ? "Leitores que seguem este autor." : "Les lecteurs qui suivent cet auteur."}</h2></div><span className="shelf-index">{followerCount}</span></div>
-      {followers.length ? <div className="public-profile-follower-list">{followers.map((follower) => <Link href={`/u/${encodeURIComponent(follower.username)}`} className="public-profile-follower" key={follower.id}>
-        {follower.avatar_url ? <img src={follower.avatar_url} alt="" loading="lazy"/> : <span><UserRound size={16}/></span>}
-        <strong>{follower.display_name || follower.username}</strong><small>@{follower.username}</small>
-      </Link>)}</div> : <p className="explore-live-empty">{isEn ? "No public follower to show yet." : isEs ? "Aún no hay seguidores públicos." : isPt ? "Ainda não há seguidores públicos para mostrar." : "Aucun abonné public à afficher pour le moment."}</p>}
-      {followers.length < followerCount && <p className="public-profile-privacy-note">{isEn ? "Some followers have chosen to keep their profiles private." : isEs ? "Algunos seguidores han elegido mantener sus perfiles privados." : isPt ? "Alguns seguidores escolheram manter seus perfis privados." : "Certains abonnés ont choisi de garder leur profil privé."}</p>}
-    </section>
-
-    <section className="public-profile-following" id="public-profile-following" tabIndex={-1}>
-      <div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> {words.following.toUpperCase()}</span><h2>{isEn ? "Authors followed by this reader." : isEs ? "Autores que sigue este lector." : isPt ? "Autores que este leitor segue." : "Les auteurs suivis par ce lecteur."}</h2></div><span className="shelf-index">{followingCount}</span></div>
-      {following.length ? <div className="public-profile-follower-list">{following.map((member) => <Link href={"/u/" + encodeURIComponent(member.username)} className="public-profile-follower" key={member.id}>
-        {member.avatar_url ? <img src={member.avatar_url} alt="" loading="lazy"/> : <span><UserRound size={16}/></span>}
-        <strong>{member.display_name || member.username}</strong><small>@{member.username}</small>
-      </Link>)}</div> : <p className="explore-live-empty">{isEn ? "This member is not following anyone publicly yet." : isEs ? "Este miembro aún no sigue a nadie públicamente." : isPt ? "Este membro ainda não segue ninguém publicamente." : "Ce membre ne suit encore personne publiquement."}</p>}
-      {following.length < followingCount && <p className="public-profile-privacy-note">{isEn ? "Some followed members have private profiles." : isEs ? "Algunos perfiles seguidos son privados." : isPt ? "Alguns perfis seguidos são privados." : "Certains profils suivis sont privés."}</p>}
-    </section>
-
+    {openList && <div className="public-profile-list-overlay" role="dialog" aria-modal="true" aria-label={openList === "followers" ? words.followers : words.following} onClick={() => setOpenList(null)}><section className="public-profile-list-dialog" onClick={(event) => event.stopPropagation()}><div className="public-profile-list-header"><h2>{openList === "followers" ? words.followers : words.following}</h2><button type="button" onClick={() => setOpenList(null)} aria-label={isEn ? "Close" : "Fermer"}>×</button></div>{(openList === "followers" ? followers : following).length ? <div className="public-profile-follower-list">{(openList === "followers" ? followers : following).map((member) => <Link href={`/u/${encodeURIComponent(member.username)}`} className="public-profile-follower" key={member.id} onClick={() => setOpenList(null)}>{member.avatar_url ? <img src={member.avatar_url} alt="" loading="lazy"/> : <span><UserRound size={16}/></span>}<strong>{member.display_name || member.username}</strong><small>@{member.username}</small></Link>)}</div> : <p className="explore-live-empty">{openList === "followers" ? (isEn ? "No public follower to show yet." : "Aucun abonné public à afficher pour le moment.") : (isEn ? "Not following anyone publicly yet." : "Aucun abonnement public à afficher pour le moment.")}</p>}{((openList === "followers" ? followers.length < followerCount : following.length < followingCount)) && <p className="public-profile-privacy-note">{isEn ? "Some profiles are private." : "Certains profils sont privés."}</p>}</section></div>}
     {profile.show_library_on_profile && <section className="public-profile-library"><div className="explore-section-heading"><div><span className="eyebrow"><span className="eyebrow-line"/> {words.library}</span><h2>{words.libraryTitle}</h2></div></div>
       {books.length ? <div className="public-profile-books">{books.map(item => item.story && <Link href={`/histoire/${item.story.id}`} className="public-profile-book" key={item.id}><BookOpen size={20}/><span><strong>{item.story.title}</strong><small>{item.story.genre || "Book-A-Boo"} · {item.story.language.toUpperCase()}</small></span><Bookmark size={15}/></Link>)}</div> : <p className="explore-live-empty">{words.emptyLibrary}</p>}
     </section>}
