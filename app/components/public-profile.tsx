@@ -19,7 +19,8 @@ export function PublicProfile({ username, allowPrivate = false }: { username: st
   const [profile, setProfile] = useState<Profile | null>(null);
   const [books, setBooks] = useState<LibraryStory[]>([]);
   const [works, setWorks] = useState<PublishedStory[]>([]);
-  const [followers, setFollowers] = useState<Follower[]>([]);\n  const [openList, setOpenList] = useState<"followers" | "following" | null>(null);
+  const [followers, setFollowers] = useState<Follower[]>([]);
+  const [openList, setOpenList] = useState<"followers" | "following" | null>(null);
   const [followerCount, setFollowerCount] = useState(0);
   const [following, setFollowing] = useState<Following[]>([]);
   const [followingCount, setFollowingCount] = useState(0);
