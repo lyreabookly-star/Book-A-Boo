@@ -15,6 +15,8 @@ export function InstallAppButton() {
   const [ios, setIos] = useState(false);
 
   useEffect(() => {
+    const installWindow = window as Window & { __BAB_DEFERRED_INSTALL_PROMPT?: InstallPromptEvent | null };
+    if (installWindow.__BAB_DEFERRED_INSTALL_PROMPT) setInstallEvent(installWindow.__BAB_DEFERRED_INSTALL_PROMPT);
     const standalone = window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as Navigator & { standalone?: boolean }).standalone === true;
     setInstalled(standalone);
@@ -22,17 +24,25 @@ export function InstallAppButton() {
     setIos(/iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
     const onPrompt = (event: Event) => {
       event.preventDefault();
-      setInstallEvent(event as InstallPromptEvent);
+      const promptEvent = event as InstallPromptEvent;
+      installWindow.__BAB_DEFERRED_INSTALL_PROMPT = promptEvent;
+      setInstallEvent(promptEvent);
+    };
+    const onPromptReady = () => {
+      if (installWindow.__BAB_DEFERRED_INSTALL_PROMPT) setInstallEvent(installWindow.__BAB_DEFERRED_INSTALL_PROMPT);
     };
     const onInstalled = () => {
       setInstalled(true);
       setInstallEvent(null);
+      installWindow.__BAB_DEFERRED_INSTALL_PROMPT = null;
       setHelpOpen(false);
     };
     window.addEventListener("beforeinstallprompt", onPrompt);
+    window.addEventListener("babinstallpromptready", onPromptReady);
     window.addEventListener("appinstalled", onInstalled);
     return () => {
       window.removeEventListener("beforeinstallprompt", onPrompt);
+      window.removeEventListener("babinstallpromptready", onPromptReady);
       window.removeEventListener("appinstalled", onInstalled);
     };
   }, []);
@@ -40,8 +50,9 @@ export function InstallAppButton() {
   async function install() {
     if (installEvent) {
       await installEvent.prompt();
-      const choice = await installEvent.userChoice;
-      if (choice.outcome === "accepted") setInstallEvent(null);
+      await installEvent.userChoice;
+      setInstallEvent(null);
+      (window as Window & { __BAB_DEFERRED_INSTALL_PROMPT?: InstallPromptEvent | null }).__BAB_DEFERRED_INSTALL_PROMPT = null;
       return;
     }
     setHelpOpen(true);
