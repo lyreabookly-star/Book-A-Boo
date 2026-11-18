@@ -1,0 +1,97 @@
+name: Build Book-A-Boo Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "android/twa-manifest.json"
+      - ".github/workflows/build-android.yml"
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Bubblewrap
+        run: npm install --global @bubblewrap/cli
+
+      - name: Create temporary signing key
+        working-directory: android
+        run: |
+          STORE_PASSWORD="$(openssl rand -hex 24)"
+          echo "BAB_KEY_PASSWORD=$STORE_PASSWORD" >> "$GITHUB_ENV"
+          keytool -genkeypair -v \
+            -keystore android.keystore \
+            -alias android \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "$STORE_PASSWORD" \
+            -keypass "$STORE_PASSWORD" \
+            -dname "CN=Book-A-Boo, OU=Mobile, O=Book-A-Boo, L=Abidjan, ST=Abidjan, C=CI"
+
+      - name: Generate Android project
+        working-directory: android
+        run: bubblewrap update --skipVersionUpgrade
+
+      - name: Build signed APK
+        working-directory: android
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.BAB_KEY_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ env.BAB_KEY_PASSWORD }}
+        run: bubblewrap build --skipPwaValidation
+
+      - name: Generate Digital Asset Links
+        working-directory: android
+        env:
+          STORE_PASSWORD: ${{ env.BAB_KEY_PASSWORD }}
+        run: |
+          FINGERPRINT=$(keytool -list -v -keystore android.keystore -alias android -storepass "$STORE_PASSWORD" | awk -F': ' '/SHA256:/{print $2; exit}')
+          test -n "$FINGERPRINT"
+          mkdir -p ../public/.well-known
+          cat > ../public/.well-known/assetlinks.json <<EOF
+          [
+            {
+              "relation": ["delegate_permission/common.handle_all_urls"],
+              "target": {
+                "namespace": "android_app",
+                "package_name": "com.bookaboo.app",
+                "sha256_cert_fingerprints": ["$FINGERPRINT"]
+              }
+            }
+          ]
+          EOF
+          echo "Android signing fingerprint: $FINGERPRINT"
+
+      - name: Publish Digital Asset Links
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/.well-known/assetlinks.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Configure Android app verification for Book-A-Boo"
+            git push
+          fi
+
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Book-A-Boo-Android-APK
+          path: android/app-release-signed.apk
+          if-no-files-found: error
+          retention-days: 14
