@@ -29,21 +29,24 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Restore permanent Android signing key
+        working-directory: android
+        env:
+          KEYSTORE_BASE64: ${{ secrets.BAB_ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.BAB_ANDROID_KEYSTORE_PASSWORD }}
+          EXPECTED_SHA256: ${{ secrets.BAB_ANDROID_CERT_SHA256 }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_BASE64" || (echo "Missing BAB_ANDROID_KEYSTORE_BASE64 secret" && exit 1)
+          test -n "$KEYSTORE_PASSWORD" || (echo "Missing BAB_ANDROID_KEYSTORE_PASSWORD secret" && exit 1)
+          test -n "$EXPECTED_SHA256" || (echo "Missing BAB_ANDROID_CERT_SHA256 secret" && exit 1)
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > android.keystore
+          ACTUAL_SHA256=$(keytool -list -v -keystore android.keystore -alias android -storepass "$KEYSTORE_PASSWORD" | awk -F': ' '/SHA256:/{print $2; exit}')
+          test "$ACTUAL_SHA256" = "$EXPECTED_SHA256" || (echo "Signing certificate fingerprint mismatch" && exit 1)
+          echo "Permanent signing key restored and verified."
+
       - name: Install Bubblewrap
         run: npm install --global @bubblewrap/cli
-
-      - name: Create temporary signing key
-        working-directory: android
-        run: |
-          STORE_PASSWORD="$(openssl rand -hex 24)"
-          echo "BAB_KEY_PASSWORD=$STORE_PASSWORD" >> "$GITHUB_ENV"
-          keytool -genkeypair -v \
-            -keystore android.keystore \
-            -alias android \
-            -keyalg RSA -keysize 2048 -validity 10000 \
-            -storepass "$STORE_PASSWORD" \
-            -keypass "$STORE_PASSWORD" \
-            -dname "CN=Book-A-Boo, OU=Mobile, O=Book-A-Boo, L=Abidjan, ST=Abidjan, C=CI"
 
       - name: Generate Android project
         working-directory: android
@@ -52,31 +55,28 @@ jobs:
       - name: Build signed APK
         working-directory: android
         env:
-          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.BAB_KEY_PASSWORD }}
-          BUBBLEWRAP_KEY_PASSWORD: ${{ env.BAB_KEY_PASSWORD }}
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.BAB_ANDROID_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.BAB_ANDROID_KEYSTORE_PASSWORD }}
         run: bubblewrap build --skipPwaValidation
 
       - name: Generate Digital Asset Links
-        working-directory: android
         env:
-          STORE_PASSWORD: ${{ env.BAB_KEY_PASSWORD }}
+          EXPECTED_SHA256: ${{ secrets.BAB_ANDROID_CERT_SHA256 }}
         run: |
-          FINGERPRINT=$(keytool -list -v -keystore android.keystore -alias android -storepass "$STORE_PASSWORD" | awk -F': ' '/SHA256:/{print $2; exit}')
-          test -n "$FINGERPRINT"
-          mkdir -p ../public/.well-known
-          cat > ../public/.well-known/assetlinks.json <<EOF
+          set -euo pipefail
+          mkdir -p public/.well-known
+          cat > public/.well-known/assetlinks.json <<EOF
           [
             {
               "relation": ["delegate_permission/common.handle_all_urls"],
               "target": {
                 "namespace": "android_app",
                 "package_name": "com.bookaboo.app",
-                "sha256_cert_fingerprints": ["$FINGERPRINT"]
+                "sha256_cert_fingerprints": ["$EXPECTED_SHA256"]
               }
             }
           ]
           EOF
-          echo "Android signing fingerprint: $FINGERPRINT"
 
       - name: Publish Digital Asset Links
         run: |
@@ -84,7 +84,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/.well-known/assetlinks.json
           if ! git diff --cached --quiet; then
-            git commit -m "Configure Android app verification for Book-A-Boo"
+            git commit -m "Publish permanent Android app verification"
             git push
           fi
 
