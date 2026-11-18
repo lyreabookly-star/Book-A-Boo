@@ -1,0 +1,39 @@
+{
+  "packageId": "com.bookaboo.app",
+  "host": "book-a-boo-lyreabookly-2697.vercel.app",
+  "name": "Book-A-Boo",
+  "launcherName": "BAB",
+  "display": "standalone",
+  "displayOverride": [
+    "standalone"
+  ],
+  "themeColor": "#f7f6f2",
+  "themeColorDark": "#171614",
+  "navigationColor": "#f7f6f2",
+  "navigationColorDark": "#171614",
+  "navigationDividerColor": "#e8e4dc",
+  "navigationDividerColorDark": "#292621",
+  "backgroundColor": "#f7f6f2",
+  "enableNotifications": false,
+  "startUrl": "/",
+  "iconUrl": "https://book-a-boo-lyreabookly-2697.vercel.app/icons/icon-512.png",
+  "maskableIconUrl": "https://book-a-boo-lyreabookly-2697.vercel.app/icons/icon-512-maskable.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "android"
+  },
+  "appVersionCode": 1,
+  "appVersion": "1.0.0",
+  "shortcuts": [],
+  "webManifestUrl": "https://book-a-boo-lyreabookly-2697.vercel.app/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "minSdkVersion": 24,
+  "orientation": "default",
+  "fingerprints": [],
+  "additionalTrustedOrigins": []
+}
