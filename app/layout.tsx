@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import Script from "next/script";
 import { AppPreferencesProvider } from "./components/app-preferences-provider";
 import { ServiceWorkerRegister } from "./components/service-worker-register";
 
@@ -30,7 +29,24 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr">
-      <head><Script src="/capture-install-prompt.js" strategy="beforeInteractive" /></head>
+      <head>
+        <script
+          id="bab-pwa-install-capture"
+          dangerouslySetInnerHTML={{
+            __html: `(function () {
+  window.__BAB_DEFERRED_INSTALL_PROMPT = window.__BAB_DEFERRED_INSTALL_PROMPT || null;
+  window.addEventListener("beforeinstallprompt", function (event) {
+    event.preventDefault();
+    window.__BAB_DEFERRED_INSTALL_PROMPT = event;
+    window.dispatchEvent(new Event("babinstallpromptready"));
+  });
+  window.addEventListener("appinstalled", function () {
+    window.__BAB_DEFERRED_INSTALL_PROMPT = null;
+  });
+})();`,
+          }}
+        />
+      </head>
       <body><ServiceWorkerRegister /><AppPreferencesProvider>{children}</AppPreferencesProvider></body>
     </html>
   );
