@@ -27,6 +27,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState(false);
   const latestSnapshot = useRef("");
+  const saveInFlight = useRef(false);
   const snapshot = JSON.stringify({ chapterId: chapter?.id, title, content, chapterAuthorNote, story, warningsText });
   latestSnapshot.current = snapshot;
   const [error, setError] = useState("");
@@ -74,7 +75,8 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   }, [load]);
 
   async function save(): Promise<boolean> {
-    if (!chapter || !story) return false;
+    if (!chapter || !story || saveInFlight.current) return false;
+    saveInFlight.current = true;
     const savedSnapshot = snapshot;
     setSaving(true); setSaved(false); setError("");
     try {
@@ -93,8 +95,21 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     } catch (e) {
       setError(e instanceof Error ? e.message : "La sauvegarde a échoué.");
       return false;
-    } finally { setSaving(false); }
+    } finally {
+      saveInFlight.current = false;
+      setSaving(false);
+    }
   }
+
+  useEffect(() => {
+    if (!dirty) return;
+    const warnBeforeLeaving = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warnBeforeLeaving);
+    return () => window.removeEventListener("beforeunload", warnBeforeLeaving);
+  }, [dirty]);
 
   useEffect(() => {
     if (!dirty || loading || saving || !chapter || !story) return;
