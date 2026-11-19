@@ -91,7 +91,9 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       setSaved(true);
       if (latestSnapshot.current === savedSnapshot) setDirty(false);
       setChapters(items => items.map(item => item.id === chapter.id ? { ...item, title: title.trim() || "Chapitre", content, author_note: chapterAuthorNote } : item));
-      return true;
+      // If the author kept typing while this request was in flight, keep the editor dirty.
+      // The autosave effect will run again after saving becomes false.
+      return latestSnapshot.current === savedSnapshot;
     } catch (e) {
       setError(e instanceof Error ? e.message : "La sauvegarde a échoué.");
       return false;
