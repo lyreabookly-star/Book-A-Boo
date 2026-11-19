@@ -104,6 +104,6 @@ export function SiteHeader({ active = "/", hideGuestActions = false }: { active?
   </>;
 }
 
-export function InteriorPage({ active, eyebrow, title, description, children }: { active: string; eyebrow: string; title: React.ReactNode; description: string; children?: React.ReactNode }) {
-  return <main className="app-page"><SiteHeader active={active}/><section className="interior-hero"><div className="eyebrow"><span className="eyebrow-line"/>{eyebrow}</div><h1>{title}</h1><p>{description}</p></section><section className="interior-content">{children}</section><footer className="app-footer"><Link href="/">Book-A-Boo</Link><span>Chaque histoire ouvre un monde.</span></footer></main>;
+export function InteriorPage({ active, eyebrow, title, description, children, compactHero = false }: { active: string; eyebrow: string; title: React.ReactNode; description: string; children?: React.ReactNode; compactHero?: boolean }) {
+  return <main className="app-page"><SiteHeader active={active}/><section className={`interior-hero${compactHero ? " interior-hero-compact" : ""}`}><div className="eyebrow"><span className="eyebrow-line"/>{eyebrow}</div><h1>{title}</h1><p>{description}</p></section><section className="interior-content">{children}</section><footer className="app-footer"><Link href="/">Book-A-Boo</Link><span>Chaque histoire ouvre un monde.</span></footer></main>;
 }
