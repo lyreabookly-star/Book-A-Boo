@@ -38,10 +38,10 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   const [recoveryNotice, setRecoveryNotice] = useState(false);
   const draftKey = (chapterId: string) => `bab-local-draft:${authorId}:${storyId}:${chapterId}`;
 
-  function restoreLocalDraft(target: Chapter, fallbackStory: Story | null): boolean {
-    if (!authorId) return false;
+  function restoreLocalDraft(target: Chapter, fallbackStory: Story | null, ownerId = authorId): boolean {
+    if (!ownerId) return false;
     try {
-      const rawDraft = window.localStorage.getItem(draftKey(target.id));
+      const rawDraft = window.localStorage.getItem(`bab-local-draft:${ownerId}:${storyId}:${target.id}`);
       if (!rawDraft) return false;
       const draft = JSON.parse(rawDraft) as {
         title?: string; content?: string; authorNote?: string; savedAt?: number;
@@ -95,7 +95,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     setWarningsText((storyData.content_warnings || []).join(", "));
     setRecoveryNotice(false);
     setDirty(false);
-    const recovered = restoreLocalDraft(list[0], storyData);
+    const recovered = restoreLocalDraft(list[0], storyData, user.id);
     setDirty(recovered);
   }, [router, storyId]);
 
