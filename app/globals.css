@@ -1712,3 +1712,10 @@ html[data-palette="frost"] .site-header-app .brand-logo {
   opacity: 1 !important;
   mix-blend-mode: normal !important;
 }
+
+
+/* Explorer: réduire l'introduction pour rendre la recherche immédiatement accessible. */
+.interior-hero-compact{padding-top:38px;padding-bottom:18px}
+.interior-hero-compact h1{font-size:clamp(36px,4.5vw,56px);margin:13px 0 9px}
+.interior-hero-compact>p{font-size:13px;line-height:1.6}
+@media(max-width:620px){.interior-hero-compact{padding-top:27px;padding-bottom:12px}.interior-hero-compact h1{font-size:36px;margin:10px 0 7px}.interior-hero-compact>p{font-size:12px;line-height:1.5}}
