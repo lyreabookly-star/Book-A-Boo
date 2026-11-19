@@ -195,6 +195,14 @@ export function WriterEditor({ storyId }: { storyId: string }) {
         await supabase.storage.from("book-covers").remove([path]);
         throw updateError;
       }
+      if (story.cover_url) {
+        const marker = "/book-covers/";
+        const previousPath = story.cover_url.includes(marker) ? story.cover_url.split(marker)[1]?.split("?")[0] : "";
+        if (previousPath) {
+          // Replacing a cover should not leave the previous image orphaned in storage.
+          await supabase.storage.from("book-covers").remove([decodeURIComponent(previousPath)]);
+        }
+      }
       setStory(current => current ? { ...current, cover_url: urlData.publicUrl } : current);
     } catch (e) {
       setError(e instanceof Error ? e.message : (locale === "en" ? "Cover upload failed." : locale === "es" ? "No se pudo subir la portada." : locale === "pt" ? "Falha ao enviar a capa." : "L'envoi de la couverture a échoué."));
