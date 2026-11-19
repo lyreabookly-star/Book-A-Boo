@@ -10,6 +10,25 @@ type Person = { username: string; display_name: string | null; avatar_url: strin
 type Story = { title: string; slug: string };
 
 export function NotificationsPanel() {
+  const { locale } = useAppPreferences();
+  const copy = {
+    login: { fr:"Connectez-vous pour consulter vos notifications.", en:"Sign in to view your notifications.", es:"Inicia sesión para ver tus notificaciones.", pt:"Entre para ver suas notificações." },
+    loadError: { fr:"Impossible de charger vos notifications.", en:"Unable to load your notifications.", es:"No se pudieron cargar tus notificaciones.", pt:"Não foi possível carregar suas notificações." },
+    empty: { fr:"Vous n’avez pas encore de notification. Les nouvelles arriveront ici.", en:"You don't have any notifications yet. New ones will appear here.", es:"Todavía no tienes notificaciones. Las nuevas aparecerán aquí.", pt:"Você ainda não tem notificações. As novas aparecerão aqui." },
+    follower: { fr:"a commencé à vous suivre.", en:"started following you.", es:"ha comenzado a seguirte.", pt:"começou a seguir você." },
+    story: { fr:"a publié", en:"published", es:"ha publicado", pt:"publicou" },
+    comment: { fr:"a commenté votre œuvre", en:"commented on your work", es:"ha comentado tu obra", pt:"comentou sua obra" },
+    reaction: { fr:"a réagi à votre œuvre", en:"reacted to your work", es:"ha reaccionado a tu obra", pt:"reagiu à sua obra" },
+    newStory: { fr:"une nouvelle histoire", en:"a new story", es:"una nueva historia", pt:"uma nova história" },
+    yourStory: { fr:"votre histoire", en:"your story", es:"tu historia", pt:"sua história" },
+    readStory: { fr:"Lire cette histoire ↗", en:"Read this story ↗", es:"Leer esta historia ↗", pt:"Ler esta história ↗" },
+    read: { fr:"Marquer comme lu", en:"Mark as read", es:"Marcar como leída", pt:"Marcar como lida" },
+    profile: { fr:"Voir le profil ↗", en:"View profile ↗", es:"Ver perfil ↗", pt:"Ver perfil ↗" },
+    manage: { fr:"Gérer mes préférences de notifications →", en:"Manage notification preferences →", es:"Gestionar mis preferencias de notificaciones →", pt:"Gerenciar minhas preferências de notificações →" },
+    member: { fr:"Un membre", en:"A member", es:"Un miembro", pt:"Um membro" }
+  } as const;
+  const t = (key: keyof typeof copy) => copy[key][locale];
+  const dateLocale = locale === "en" ? "en-GB" : locale === "es" ? "es-ES" : locale === "pt" ? "pt-PT" : "fr-FR";
   const [items, setItems] = useState<Notice[]>([]);
   const [people, setPeople] = useState<Record<string, Person>>({});
   const [stories, setStories] = useState<Record<string, Story>>({});
