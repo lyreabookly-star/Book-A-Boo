@@ -67,7 +67,7 @@ export function WriterStudio() {
     setError("");
     try {
       const supabase = getSupabaseBrowserClient() as any;
-      const baseSlug = title.trim().normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "oeuvre";
+      const baseSlug = title.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "oeuvre";
       const slug = `${baseSlug}-${crypto.randomUUID().slice(0, 8)}`;
       const { data, error: insertError } = await supabase
         .from("stories")
