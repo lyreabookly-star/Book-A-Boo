@@ -15,6 +15,7 @@ type Chapter = { id: string; title: string; content: string; author_note: string
 export function WriterEditor({ storyId }: { storyId: string }) {
   const router = useRouter();
   const { locale } = useAppPreferences();
+  const tx = (fr: string, en: string, es: string, pt: string) => locale === "en" ? en : locale === "es" ? es : locale === "pt" ? pt : fr;
   const [story, setStory] = useState<Story | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [chapter, setChapter] = useState<Chapter | null>(null);
@@ -101,7 +102,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
 
   useEffect(() => {
     let alive = true;
-    void load().catch(e => { if (alive) setError(e instanceof Error ? e.message : "Impossible d'ouvrir ce manuscrit."); })
+    void load().catch(e => { if (alive) setError(e instanceof Error ? e.message : tx("Impossible d'ouvrir ce manuscrit.", "Could not open this manuscript.", "No se pudo abrir este manuscrito.", "Não foi possível abrir este manuscrito.")); })
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
   }, [load]);
@@ -131,7 +132,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       // The autosave effect will run again after saving becomes false.
       return latestSnapshot.current === savedSnapshot;
     } catch (e) {
-      setError(e instanceof Error ? e.message : "La sauvegarde a échoué.");
+      setError(e instanceof Error ? e.message : tx("La sauvegarde a échoué.", "Saving failed.", "Error al guardar.", "Falha ao salvar."));
       return false;
     } finally {
       saveInFlight.current = false;
@@ -183,7 +184,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     try {
       const supabase = getSupabaseBrowserClient() as any;
       const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) throw authError || new Error("Connexion requise.");
+      if (authError || !user) throw authError || new Error(tx("Connexion requise.", "Sign-in required.", "Debes iniciar sesión.", "É necessário iniciar sessão."));
       const extension = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
       const path = `${user.id}/${story.id}/cover-${Date.now()}.${extension}`;
       const { error: uploadError } = await supabase.storage.from("book-covers").upload(path, file, { contentType: file.type, upsert: false });
@@ -238,7 +239,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       setChapters(items => [...items, data]);
       setChapter(data); setTitle(data.title); setContent(""); setChapterAuthorNote("");
       setSaved(false);
-    } catch (e) { setError(e instanceof Error ? e.message : "Impossible d'ajouter ce chapitre."); }
+    } catch (e) { setError(e instanceof Error ? e.message : tx("Impossible d'ajouter ce chapitre.", "Could not add this chapter.", "No se pudo añadir este capítulo.", "Não foi possível adicionar este capítulo.")); }
   }
 
   async function selectChapter(item: Chapter) {
@@ -286,23 +287,23 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     } finally { setPublishing(false); }
   }
 
-  if (loading) return <div className="writer-state"><LoaderCircle className="spin" size={22} /> Ouverture de votre manuscrit…</div>;
-  if (!story) return <div className="writer-empty"><strong>Ce manuscrit n'est pas accessible.</strong><p>Il est peut-être privé ou n'existe plus.</p><Link href="/ecrire">Retour à mes manuscrits</Link></div>;
+  if (loading) return <div className="writer-state"><LoaderCircle className="spin" size={22} /> {tx("Ouverture de votre manuscrit…", "Opening your manuscript…", "Abriendo tu manuscrito…", "Abrindo seu manuscrito…")}</div>;
+  if (!story) return <div className="writer-empty"><strong>{tx("Ce manuscrit n'est pas accessible.", "This manuscript is unavailable.", "Este manuscrito no está disponible.", "Este manuscrito não está disponível.")}</strong><p>{tx("Il est peut-être privé ou n'existe plus.", "It may be private or no longer exist.", "Puede ser privado o ya no existir.", "Pode ser privado ou não existir mais.")}</p><Link href="/ecrire">{tx("Retour à mes manuscrits", "Back to my manuscripts", "Volver a mis manuscritos", "Voltar aos meus manuscritos")}</Link></div>;
 
   return (
     <div className="writer-editor">
-      <div className="writer-editor-top"><Link href="/ecrire"><ArrowLeft size={15} /> Mes manuscrits</Link><span><BookOpen size={14} /> {story.status === "published" ? (locale === "en" ? "PUBLISHED" : locale === "es" ? "PUBLICADO" : locale === "pt" ? "PUBLICADO" : "PUBLIÉ") : (locale === "en" ? "PRIVATE DRAFT" : locale === "es" ? "BORRADOR PRIVADO" : locale === "pt" ? "RASCUNHO PRIVADO" : "BROUILLON PRIVÉ")}</span></div>
+      <div className="writer-editor-top"><Link href="/ecrire"><ArrowLeft size={15} /> {tx("Mes manuscrits", "My manuscripts", "Mis manuscritos", "Meus manuscritos")}</Link><span><BookOpen size={14} /> {story.status === "published" ? (locale === "en" ? "PUBLISHED" : locale === "es" ? "PUBLICADO" : locale === "pt" ? "PUBLICADO" : "PUBLIÉ") : (locale === "en" ? "PRIVATE DRAFT" : locale === "es" ? "BORRADOR PRIVADO" : locale === "pt" ? "RASCUNHO PRIVADO" : "BROUILLON PRIVÉ")}</span></div>
       {recoveryNotice && <p className="auth-feedback" role="status">{locale === "en" ? "A local backup newer than the online copy was recovered. Save it to keep it." : locale === "es" ? "Se recuperó una copia local más reciente que la versión en línea. Guárdala para conservarla." : locale === "pt" ? "Uma cópia local mais recente que a versão online foi recuperada. Salve-a para mantê-la." : "Une sauvegarde locale plus récente que la version en ligne a été récupérée. Enregistrez-la pour la conserver."}</p>}
       <section className="writer-work-metadata">
-        <label className="writer-work-title">Titre de l'œuvre<input value={story.title} onChange={e => { setStory({ ...story, title: e.target.value }); setDirty(true); setSaved(false); }} maxLength={160} /></label>
+        <label className="writer-work-title">{tx("Titre de l'œuvre", "Work title", "Título de la obra", "Título da obra")}<input value={story.title} onChange={e => { setStory({ ...story, title: e.target.value }); setDirty(true); setSaved(false); }} maxLength={160} /></label>
         <div className="writer-metadata-grid">
-          <label>Genre littéraire<select value={story.genre || "Littérature générale"} onChange={e => { setStory({ ...story, genre: e.target.value }); setDirty(true); setSaved(false); }}><option>Romance</option><option>Fantasy</option><option>Drame</option><option>Thriller</option><option>Psychologie</option><option>Fanfiction</option><option>Poésie</option><option>Science-fiction</option><option>Horreur</option><option>Historique</option><option>Littérature générale</option></select></label>
-          <label>Public conseillé<select value={story.audience_rating || "Tout public"} onChange={e => { setStory({ ...story, audience_rating: e.target.value }); setDirty(true); setSaved(false); }}><option>Tout public</option><option>13 ans et +</option><option>16 ans et +</option><option>18 ans et +</option></select></label>
-          <label className="writer-metadata-wide">Résumé de l'œuvre <span>Jusqu'à 5 000 caractères</span><textarea value={story.synopsis || ""} onChange={e => { setStory({ ...story, synopsis: e.target.value }); setDirty(true); setSaved(false); }} maxLength={5000} rows={5} placeholder="Présentez votre histoire sans tout dévoiler…" /></label>
-          <label className="writer-metadata-wide">Avertissements au public <span>Séparez les avertissements par des virgules</span><input value={warningsText} onChange={e => { setWarningsText(e.target.value); setDirty(true); setSaved(false); }} placeholder="Violence, langage explicite, thèmes sensibles…" /></label>
-          <label className="writer-metadata-wide">Note de l'auteur sur l'œuvre <span>Facultatif</span><textarea value={story.author_note || ""} onChange={e => { setStory({ ...story, author_note: e.target.value }); setDirty(true); setSaved(false); }} maxLength={3000} rows={3} placeholder="Un mot pour accompagner votre histoire…" /></label>
+          <label>{tx("Genre littéraire", "Genre", "Género literario", "Gênero literário")}<select value={story.genre || "Littérature générale"} onChange={e => { setStory({ ...story, genre: e.target.value }); setDirty(true); setSaved(false); }}><option>Romance</option><option>Fantasy</option><option>Drame</option><option>Thriller</option><option>Psychologie</option><option>Fanfiction</option><option>Poésie</option><option>Science-fiction</option><option>Horreur</option><option>Historique</option><option>Littérature générale</option></select></label>
+          <label>{tx("Public conseillé", "Recommended audience", "Público recomendado", "Público recomendado")}<select value={story.audience_rating || "Tout public"} onChange={e => { setStory({ ...story, audience_rating: e.target.value }); setDirty(true); setSaved(false); }}><option>{tx("Tout public", "All audiences", "Todos los públicos", "Todos os públicos")}</option><option>13 {tx("ans et +", "and up", "años o más", "anos ou mais")}</option><option>16 {tx("ans et +", "años o más", "años o más", "anos ou mais")}</option><option>18 {tx("ans et +", "and up", "años o más", "anos ou mais")}</option></select></label>
+          <label className="writer-metadata-wide">{tx("Résumé de l'œuvre", "Work summary", "Resumen de la obra", "Resumo da obra")} <span>{tx("Jusqu'à 5 000 caractères", "Up to 5,000 characters", "Hasta 5.000 caracteres", "Até 5.000 caracteres")}</span><textarea value={story.synopsis || ""} onChange={e => { setStory({ ...story, synopsis: e.target.value }); setDirty(true); setSaved(false); }} maxLength={5000} rows={5} placeholder={tx("Présentez votre histoire sans tout dévoiler…", "Introduce your story without giving everything away…", "Presenta tu historia sin revelarlo todo…", "Apresente sua história sem revelar tudo…")} /></label>
+          <label className="writer-metadata-wide">{tx("Avertissements au public", "Content warnings", "Advertencias de contenido", "Avisos de conteúdo")} <span>{tx("Séparez les avertissements par des virgules", "Separate warnings with commas", "Separa las advertencias con comas", "Separe os avisos com vírgulas")}</span><input value={warningsText} onChange={e => { setWarningsText(e.target.value); setDirty(true); setSaved(false); }} placeholder={tx("Violence, langage explicite, thèmes sensibles…", "Violence, explicit language, sensitive themes…", "Violencia, lenguaje explícito, temas sensibles…", "Violência, linguagem explícita, temas sensíveis…")} /></label>
+          <label className="writer-metadata-wide">{tx("Note de l'auteur sur l'œuvre", "Author's note about the work", "Nota del autor sobre la obra", "Nota do autor sobre a obra")} <span>{tx("Facultatif", "Optional", "Opcional", "Opcional")}</span><textarea value={story.author_note || ""} onChange={e => { setStory({ ...story, author_note: e.target.value }); setDirty(true); setSaved(false); }} maxLength={3000} rows={3} placeholder={tx("Un mot pour accompagner votre histoire…", "A few words to accompany your story…", "Unas palabras para acompañar tu historia…", "Algumas palavras para acompanhar sua história…")} /></label>
         </div>
-        <p className="writer-metadata-hint">Les informations publiques seront visibles sur la fiche de votre œuvre après publication.</p>
+        <p className="writer-metadata-hint">{tx("Les informations publiques seront visibles sur la fiche de votre œuvre après publication.", "Public information will appear on your work page after publication.", "La información pública aparecerá en la página de tu obra después de publicarla.", "As informações públicas aparecerão na página da sua obra após a publicação.")}</p>
       </section>
       <section className="writer-cover-settings">
         <div className="writer-cover-preview">
@@ -323,13 +324,13 @@ export function WriterEditor({ storyId }: { storyId: string }) {
         <button type="button" className="writer-publish-button" onClick={togglePublication} disabled={publishing || saving}>{publishing ? (locale === "en" ? "Please wait…" : locale === "es" ? "Un momento…" : locale === "pt" ? "Aguarde…" : "Patientez…") : story.status === "published" ? (locale === "en" ? "Unpublish" : locale === "es" ? "Retirar" : locale === "pt" ? "Retirar" : "Dépublier") : (locale === "en" ? "Publish my story" : locale === "es" ? "Publicar mi historia" : locale === "pt" ? "Publicar minha história" : "Publier mon histoire")}</button>
       </div>
       <div className="writer-editor-grid">
-        <aside className="writer-chapter-list"><div className="writer-chapter-heading"><span className="catalogue-overline">SOMMAIRE</span><button onClick={addChapter} aria-label="Ajouter un chapitre"><Plus size={16} /></button></div>
+        <aside className="writer-chapter-list"><div className="writer-chapter-heading"><span className="catalogue-overline">{tx("SOMMAIRE", "CONTENTS", "ÍNDICE", "SUMÁRIO")}</span><button onClick={addChapter} aria-label={tx("Ajouter un chapitre", "Add a chapter", "Añadir un capítulo", "Adicionar capítulo")}><Plus size={16} /></button></div>
           {chapters.map(item => <button key={item.id} className={chapter?.id === item.id ? "writer-chapter active" : "writer-chapter"} onClick={() => selectChapter(item)}> <span>{String(item.chapter_number).padStart(2,"0")}</span>{/^Chapitre \d+$/.test(item.title) ? `${locale === "en" ? "Chapter" : locale === "es" ? "Capítulo" : locale === "pt" ? "Capítulo" : "Chapitre"} ${item.chapter_number}` : item.title}</button>)}
         </aside>
         <section className="writer-writing-area">
           <input className="writer-chapter-title" value={/^Chapitre \d+$/.test(title) ? `${locale === "en" ? "Chapter" : locale === "es" ? "Capítulo" : locale === "pt" ? "Capítulo" : "Chapitre"} ${chapter?.chapter_number ?? 1}` : title} onChange={e => { setTitle(e.target.value); setDirty(true); setSaved(false); }} placeholder={locale === "en" ? "Chapter title" : locale === "es" ? "Título del capítulo" : locale === "pt" ? "Título do capítulo" : "Titre du chapitre"} maxLength={160} />
           <RichTextEditor key={chapter?.id || "new"} chapterId={chapter?.id || "new"} locale={locale} content={content} onChange={value=>{setContent(value);setDirty(true);setSaved(false);}} />
-          <label className="writer-chapter-note">Note de l’auteur pour ce chapitre <span>(facultatif)</span><textarea value={chapterAuthorNote} onChange={e => { setChapterAuthorNote(e.target.value); setDirty(true); setSaved(false); }} maxLength={2000} rows={3} placeholder="Un mot avant ou après la lecture de ce chapitre…" /></label>
+          <label className="writer-chapter-note">{tx("Note de l’auteur pour ce chapitre", "Author’s note for this chapter", "Nota del autor para este capítulo", "Nota do autor para este capítulo")} <span>({tx("facultatif", "optional", "opcional", "opcional")})</span><textarea value={chapterAuthorNote} onChange={e => { setChapterAuthorNote(e.target.value); setDirty(true); setSaved(false); }} maxLength={2000} rows={3} placeholder={tx("Un mot avant ou après la lecture de ce chapitre…", "A note before or after reading this chapter…", "Unas palabras antes o después de leer este capítulo…", "Uma mensagem antes ou depois da leitura deste capítulo…")} /></label>
           <div className="writer-save-row"><span>{saving ? (locale === "en" ? "Saving automatically…" : locale === "es" ? "Guardando automáticamente…" : locale === "pt" ? "Salvando automaticamente…" : "Sauvegarde automatique…") : saved ? <><Check size={14} /> {locale === "en" ? "Saved" : locale === "es" ? "Guardado" : locale === "pt" ? "Salvo" : "Enregistré"}</> : dirty ? (locale === "en" ? "Unsaved changes" : locale === "es" ? "Cambios sin guardar" : locale === "pt" ? "Alterações não salvas" : "Modifications en attente") : (locale === "en" ? "Your text is saved" : locale === "es" ? "Tu texto está guardado" : locale === "pt" ? "Seu texto está salvo" : "Votre texte est enregistré")}</span><button className="auth-submit" onClick={save} disabled={saving}>{saving ? <LoaderCircle className="spin" size={15} /> : <Save size={15} />}{saving ? (locale === "en" ? "Saving…" : locale === "es" ? "Guardando…" : locale === "pt" ? "Salvando…" : "Sauvegarde…") : (locale === "en" ? "Save" : locale === "es" ? "Guardar" : locale === "pt" ? "Salvar" : "Enregistrer")}</button></div>
           {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
         </section>
