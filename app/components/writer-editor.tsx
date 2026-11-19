@@ -34,6 +34,9 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   const [publishing, setPublishing] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [authorId, setAuthorId] = useState("");
+  const [recoveryNotice, setRecoveryNotice] = useState(false);
+  const draftKey = (chapterId: string) => `bab-local-draft:${authorId}:${storyId}:${chapterId}`;
 
   const load = useCallback(async () => {
     const supabase = getSupabaseBrowserClient() as any;
@@ -43,6 +46,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       router.replace(`/connexion?next=${encodeURIComponent(`/ecrire/${storyId}`)}`);
       return;
     }
+    setAuthorId(user.id);
     const { data: storyData, error: storyError } = await supabase
       .from("stories").select("id,slug,title,synopsis,genre,author_note,content_warnings,audience_rating,status,visibility,published_at,cover_url").eq("id", storyId).eq("author_id", user.id).single();
     if (storyError) throw storyError;
@@ -63,6 +67,24 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     setTitle(list[0].title);
     setContent(list[0].content);
     setChapterAuthorNote(list[0].author_note || "");
+    try {
+      const rawDraft = window.localStorage.getItem(`bab-local-draft:${user.id}:${storyId}:${list[0].id}`);
+      if (rawDraft) {
+        const draft = JSON.parse(rawDraft) as { title?: string; content?: string; authorNote?: string; savedAt?: number };
+        const serverTime = Date.parse(list[0].updated_at || "") || 0;
+        if (typeof draft.savedAt === "number" && draft.savedAt > serverTime &&
+            typeof draft.title === "string" && typeof draft.content === "string" &&
+            typeof draft.authorNote === "string") {
+          setTitle(draft.title);
+          setContent(draft.content);
+          setChapterAuthorNote(draft.authorNote);
+          setDirty(true);
+          setRecoveryNotice(true);
+        }
+      }
+    } catch {
+      // Ignore an unreadable local draft; the server copy remains untouched.
+    }
     setWarningsText((storyData.content_warnings || []).join(", "));
     setDirty(false);
   }, [router, storyId]);
@@ -89,7 +111,11 @@ export function WriterEditor({ storyId }: { storyId: string }) {
         .update({ title: story.title.trim(), synopsis: story.synopsis, genre: story.genre, author_note: story.author_note, content_warnings: warningsText.split(",").map(value => value.trim()).filter(Boolean), audience_rating: story.audience_rating, updated_at: new Date().toISOString() }).eq("id", story.id);
       if (storyError) throw storyError;
       setSaved(true);
-      if (latestSnapshot.current === savedSnapshot) setDirty(false);
+      if (latestSnapshot.current === savedSnapshot) {
+        setDirty(false);
+        try { window.localStorage.removeItem(draftKey(chapter.id)); } catch { /* Local storage may be unavailable. */ }
+        setRecoveryNotice(false);
+      }
       setChapters(items => items.map(item => item.id === chapter.id ? { ...item, title: title.trim() || "Chapitre", content, author_note: chapterAuthorNote } : item));
       // If the author kept typing while this request was in flight, keep the editor dirty.
       // The autosave effect will run again after saving becomes false.
@@ -102,6 +128,17 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       setSaving(false);
     }
   }
+
+  useEffect(() => {
+    if (!dirty || loading || !chapter || !authorId) return;
+    try {
+      window.localStorage.setItem(draftKey(chapter.id), JSON.stringify({
+        title, content, authorNote: chapterAuthorNote, savedAt: Date.now(),
+      }));
+    } catch {
+      // Storage can be full or disabled; cloud autosave remains available.
+    }
+  }, [dirty, loading, chapter, authorId, title, content, chapterAuthorNote]);
 
   useEffect(() => {
     if (!dirty) return;
@@ -241,6 +278,7 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   return (
     <div className="writer-editor">
       <div className="writer-editor-top"><Link href="/ecrire"><ArrowLeft size={15} /> Mes manuscrits</Link><span><BookOpen size={14} /> {story.status === "published" ? (locale === "en" ? "PUBLISHED" : locale === "es" ? "PUBLICADO" : locale === "pt" ? "PUBLICADO" : "PUBLIÉ") : (locale === "en" ? "PRIVATE DRAFT" : locale === "es" ? "BORRADOR PRIVADO" : locale === "pt" ? "RASCUNHO PRIVADO" : "BROUILLON PRIVÉ")}</span></div>
+      {recoveryNotice && <p className="auth-feedback" role="status">{locale === "en" ? "A local backup newer than the online copy was recovered. Save it to keep it." : locale === "es" ? "Se recuperó una copia local más reciente que la versión en línea. Guárdala para conservarla." : locale === "pt" ? "Uma cópia local mais recente que a versão online foi recuperada. Salve-a para mantê-la." : "Une sauvegarde locale plus récente que la version en ligne a été récupérée. Enregistrez-la pour la conserver."}</p>}
       <section className="writer-work-metadata">
         <label className="writer-work-title">Titre de l'œuvre<input value={story.title} onChange={e => { setStory({ ...story, title: e.target.value }); setDirty(true); setSaved(false); }} maxLength={160} /></label>
         <div className="writer-metadata-grid">
