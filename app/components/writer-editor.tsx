@@ -38,6 +38,31 @@ export function WriterEditor({ storyId }: { storyId: string }) {
   const [recoveryNotice, setRecoveryNotice] = useState(false);
   const draftKey = (chapterId: string) => `bab-local-draft:${authorId}:${storyId}:${chapterId}`;
 
+  function restoreLocalDraft(target: Chapter, fallbackStory: Story | null): boolean {
+    if (!authorId) return false;
+    try {
+      const rawDraft = window.localStorage.getItem(draftKey(target.id));
+      if (!rawDraft) return false;
+      const draft = JSON.parse(rawDraft) as {
+        title?: string; content?: string; authorNote?: string; savedAt?: number;
+        story?: Story; warningsText?: string;
+      };
+      const serverTime = Date.parse(target.updated_at || "") || 0;
+      if (typeof draft.savedAt !== "number" || draft.savedAt <= serverTime ||
+          typeof draft.title !== "string" || typeof draft.content !== "string" ||
+          typeof draft.authorNote !== "string") return false;
+      setTitle(draft.title);
+      setContent(draft.content);
+      setChapterAuthorNote(draft.authorNote);
+      if (draft.story && fallbackStory && draft.story.id === fallbackStory.id) setStory(draft.story);
+      if (typeof draft.warningsText === "string") setWarningsText(draft.warningsText);
+      setRecoveryNotice(true);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   const load = useCallback(async () => {
     const supabase = getSupabaseBrowserClient() as any;
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -67,26 +92,11 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     setTitle(list[0].title);
     setContent(list[0].content);
     setChapterAuthorNote(list[0].author_note || "");
-    try {
-      const rawDraft = window.localStorage.getItem(`bab-local-draft:${user.id}:${storyId}:${list[0].id}`);
-      if (rawDraft) {
-        const draft = JSON.parse(rawDraft) as { title?: string; content?: string; authorNote?: string; savedAt?: number };
-        const serverTime = Date.parse(list[0].updated_at || "") || 0;
-        if (typeof draft.savedAt === "number" && draft.savedAt > serverTime &&
-            typeof draft.title === "string" && typeof draft.content === "string" &&
-            typeof draft.authorNote === "string") {
-          setTitle(draft.title);
-          setContent(draft.content);
-          setChapterAuthorNote(draft.authorNote);
-          setDirty(true);
-          setRecoveryNotice(true);
-        }
-      }
-    } catch {
-      // Ignore an unreadable local draft; the server copy remains untouched.
-    }
     setWarningsText((storyData.content_warnings || []).join(", "));
+    setRecoveryNotice(false);
     setDirty(false);
+    const recovered = restoreLocalDraft(list[0], storyData);
+    setDirty(recovered);
   }, [router, storyId]);
 
   useEffect(() => {
@@ -133,12 +143,12 @@ export function WriterEditor({ storyId }: { storyId: string }) {
     if (!dirty || loading || !chapter || !authorId) return;
     try {
       window.localStorage.setItem(draftKey(chapter.id), JSON.stringify({
-        title, content, authorNote: chapterAuthorNote, savedAt: Date.now(),
+        title, content, authorNote: chapterAuthorNote, story, warningsText, savedAt: Date.now(),
       }));
     } catch {
       // Storage can be full or disabled; cloud autosave remains available.
     }
-  }, [dirty, loading, chapter, authorId, title, content, chapterAuthorNote]);
+  }, [dirty, loading, chapter, authorId, title, content, chapterAuthorNote, story, warningsText]);
 
   useEffect(() => {
     if (!dirty) return;
@@ -236,7 +246,11 @@ export function WriterEditor({ storyId }: { storyId: string }) {
       const savedCurrent = await save();
       if (!savedCurrent) return;
     }
-    setChapter(item); setTitle(item.title); setContent(item.content); setChapterAuthorNote(item.author_note || ""); setSaved(false);
+    setChapter(item);
+    setTitle(item.title); setContent(item.content); setChapterAuthorNote(item.author_note || "");
+    setRecoveryNotice(false);
+    setDirty(restoreLocalDraft(item, story));
+    setSaved(false);
   }
 
   async function copyPublishedLink() {
