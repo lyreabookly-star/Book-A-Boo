@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 
-type Notice = { id: string; actor_id: string | null; type: "new_follower" | "new_story"; story_id: string | null; created_at: string; read_at: string | null };
+type Notice = { id: string; actor_id: string | null; type: "new_follower" | "new_story" | "new_comment" | "new_reaction"; story_id: string | null; created_at: string; read_at: string | null };
 type Person = { username: string; display_name: string | null; avatar_url: string | null };
 type Story = { title: string; slug: string };
 
@@ -49,8 +49,8 @@ export function NotificationsPanel() {
     <div className="settings-section-heading"><span>VOTRE COMMUNAUTÉ</span><h2>Notifications</h2><p>Les nouvelles liées à vos abonnements et à vos publications.</p></div>
     {items.length === 0 ? <p>Vous n’avez pas encore de notification. Les nouvelles arriveront ici.</p> : <div className="notification-list">
       {items.map(n => { const person = n.actor_id ? people[n.actor_id] : null; const label = person?.display_name || (person?.username ? "@"+person.username : "Un membre"); return <article className={n.read_at ? "notification-item" : "notification-item is-unread"} key={n.id}>
-        <p>{n.type === "new_follower" ? <><strong>{label}</strong> a commencé à vous suivre.</> : <><strong>{label}</strong> a publié « {n.story_id ? stories[n.story_id]?.title || "une nouvelle histoire" : "une nouvelle histoire"} ».</>}</p>
-        {n.type === "new_story" && n.story_id && stories[n.story_id]?.slug && <Link href={`/histoire/${encodeURIComponent(stories[n.story_id].slug)}`}>Lire cette histoire ↗</Link>}
+        <p>{n.type === "new_follower" ? <><strong>{label}</strong> a commencé à vous suivre.</> : n.type === "new_story" ? <><strong>{label}</strong> a publié « {n.story_id ? stories[n.story_id]?.title || "une nouvelle histoire" : "une nouvelle histoire"} ».</> : n.type === "new_comment" ? <><strong>{label}</strong> a commenté votre œuvre « {n.story_id ? stories[n.story_id]?.title || "votre histoire" : "votre histoire"} ».</> : <><strong>{label}</strong> a réagi à votre œuvre « {n.story_id ? stories[n.story_id]?.title || "votre histoire" : "votre histoire"} ».</>}</p>
+        {n.type !== "new_follower" && n.story_id && stories[n.story_id]?.slug && <Link href={`/histoire/${encodeURIComponent(stories[n.story_id].slug)}`}>Lire cette histoire ↗</Link>}
         <small>{new Date(n.created_at).toLocaleString("fr-FR")}</small>
         {!n.read_at && <button className="auth-secondary" type="button" onClick={() => void markRead(n.id)}>Marquer comme lu</button>}
         {person?.username && <Link href={`/u/${encodeURIComponent(person.username)}`}>Voir le profil ↗</Link>}
