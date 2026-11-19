@@ -27,6 +27,7 @@ export function WriterStudio() {
     pt: { loading:"Carregando seu espaço de escrita…", personal:"SEU ESPAÇO PESSOAL", loginTitle:"Entre para começar a escrever.", loginText:"Suas histórias e seus rascunhos serão salvos na sua conta e permanecerão privados até você decidir publicá-los.", login:"Entrar", signup:"Criar uma conta", dashboard:"Seu espaço", author:"de autor.", saved:"Seus textos são salvos na sua conta. Os rascunhos permanecem privados.", manuscripts:"MEUS MANUSCRITOS", project:"projeto", projects:"projetos", newWork:"Nova obra", newManuscript:"NOVO MANUSCRITO", title:"Título da obra", summary:"Resumo da obra", optional:"(opcional · até 5.000 caracteres)", genre:"Gênero literário", create:"Criar meu manuscrito", creating:"Criando…", cancel:"Cancelar", noSummary:"Ainda sem resumo", draft:"RASCUNHO PRIVADO", published:"PUBLICADO", waiting:"Sua primeira história está esperando.", empty:"Crie um manuscrito para começar a escrever. Ele será salvo de forma privada na sua conta.", first:"Criar minha primeira obra", private:"Seus rascunhos são privados.", privateDetail:"Somente sua conta pode visualizá-los e editá-los.", loadError:"Não foi possível carregar seus projetos.", createError:"Não foi possível criar sua obra.", genres:["Romance","Fantasia","Drama","Thriller","Psicologia","Fanfiction","Poesia","Ficção científica","Terror","Histórico","Literatura geral"] }
   } as const;
   const t = copy[locale === "en" || locale === "es" || locale === "pt" ? locale : "fr"];
+  const genreValues = ["Romance","Fantasy","Drame","Thriller","Psychologie","Fanfiction","Poésie","Science-fiction","Horreur","Historique","Littérature générale"];
 
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState("");
@@ -127,7 +128,7 @@ export function WriterStudio() {
           <span className="catalogue-overline">{t.newManuscript}</span>
           <label>{t.title}<input value={title} onChange={e => setTitle(e.target.value)} maxLength={160} placeholder={locale === "en" ? "Your story title" : locale === "es" ? "El título de tu historia" : locale === "pt" ? "O título da sua história" : "Le titre de votre histoire"} required /></label>
           <label>{t.summary} <span>{t.optional}</span><textarea value={synopsis} onChange={e => setSynopsis(e.target.value)} maxLength={5000} rows={5} placeholder={locale === "en" ? "A few words about your world…" : locale === "es" ? "Unas palabras sobre tu universo…" : locale === "pt" ? "Algumas palavras sobre seu universo…" : "Quelques mots sur votre univers…"} /></label>
-          <label>{t.genre}<select value={genre} onChange={e => setGenre(e.target.value)}>{t.genres.map(item => <option key={item}>{item}</option>)}</select></label>
+          <label>{t.genre}<select value={genre} onChange={e => setGenre(e.target.value)}>{t.genres.map((item, index) => <option key={genreValues[index]} value={genreValues[index]}>{item}</option>)}</select></label>
           {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
           <div className="writer-form-actions"><button className="auth-submit" type="submit" disabled={creating}>{creating ? t.creating : t.create}</button><button className="auth-secondary" type="button" onClick={() => setShowForm(false)}>{t.cancel}</button></div>
         </form>
@@ -140,7 +141,7 @@ export function WriterStudio() {
           {stories.map(story => (
             <Link href={`/ecrire/${story.id}`} className="writer-project-row" key={story.id}>
               <span className="writer-project-icon"><BookOpen size={19} /></span>
-              <span className="writer-project-copy"><strong>{story.title}</strong><small>{story.synopsis || "{t.noSummary}"}</small></span>
+              <span className="writer-project-copy"><strong>{story.title}</strong><small>{story.synopsis || t.noSummary}</small></span>
               <span className="writer-project-status">{story.status === "draft" ? t.draft : t.published}</span>
             </Link>
           ))}
