@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { useAppPreferences } from "./app-preferences-provider";
 
-type Settings = { theme: "light" | "dark"; preferred_language: "fr" | "en" | "es" | "pt"; email_notifications: boolean; product_updates: boolean; notify_new_followers: boolean; notify_followed_author_stories: boolean };
-const defaults: Settings = { theme: "light", preferred_language: "fr", email_notifications: true, product_updates: false, notify_new_followers: true, notify_followed_author_stories: true };
+type Settings = { theme: "light" | "dark"; preferred_language: "fr" | "en" | "es" | "pt"; email_notifications: boolean; product_updates: boolean; notify_new_followers: boolean; notify_followed_author_stories: boolean; notify_story_comments: boolean; notify_story_reactions: boolean };
+const defaults: Settings = { theme: "light", preferred_language: "fr", email_notifications: true, product_updates: false, notify_new_followers: true, notify_followed_author_stories: true, notify_story_comments: true, notify_story_reactions: true };
 
 export function SettingsPanel() {
   const router = useRouter();
@@ -96,7 +96,7 @@ export function SettingsPanel() {
       const [profile, privateProfile, prefs] = await Promise.all([
         supabase.from("profiles").select("username,display_name,bio,avatar_url,is_public,show_library_on_profile,preferred_language").eq("id", user.id).maybeSingle(),
         supabase.from("profile_private").select("first_name,last_name").eq("user_id", user.id).maybeSingle(),
-        supabase.from("user_settings").select("theme,preferred_language,email_notifications,product_updates,notify_new_followers,notify_followed_author_stories").eq("user_id", user.id).maybeSingle()
+        supabase.from("user_settings").select("theme,preferred_language,email_notifications,product_updates,notify_new_followers,notify_followed_author_stories,notify_story_comments,notify_story_reactions").eq("user_id", user.id).maybeSingle()
       ]);
       if (!active) return;
       if (profile.error || privateProfile.error || prefs.error) setError("Certains réglages n'ont pas pu être chargés.");
@@ -267,6 +267,8 @@ export function SettingsPanel() {
       <label className="settings-toggle"><span><strong>Nouveautés Book-A-Boo</strong><small>Recevoir les actualités et annonces de la plateforme.</small></span><input type="checkbox" checked={settings.product_updates} onChange={e=>update("product_updates",e.target.checked)}/></label>
       <label className="settings-toggle"><span><strong>Nouveaux abonnés</strong><small>Être averti lorsqu’un membre commence à vous suivre.</small></span><input type="checkbox" checked={settings.notify_new_followers} onChange={e=>update("notify_new_followers",e.target.checked)}/></label>
       <label className="settings-toggle"><span><strong>Nouvelles publications</strong><small>Être averti lorsqu’un auteur que vous suivez publie une histoire publique.</small></span><input type="checkbox" checked={settings.notify_followed_author_stories} onChange={e=>update("notify_followed_author_stories",e.target.checked)}/></label>
+      <label className="settings-toggle"><span><strong>Nouveaux commentaires</strong><small>Être averti lorsqu’un lecteur commente l’une de vos œuvres.</small></span><input type="checkbox" checked={settings.notify_story_comments} onChange={e=>update("notify_story_comments",e.target.checked)}/></label>
+      <label className="settings-toggle"><span><strong>Nouvelles réactions</strong><small>Être averti lorsqu’un lecteur réagit à l’une de vos œuvres.</small></span><input type="checkbox" checked={settings.notify_story_reactions} onChange={e=>update("notify_story_reactions",e.target.checked)}/></label>
       <button className="settings-save" onClick={savePreferences} disabled={saving}>Enregistrer les notifications</button>
     </section>
     <section className="settings-section settings-security">
