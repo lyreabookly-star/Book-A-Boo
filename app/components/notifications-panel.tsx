@@ -57,7 +57,7 @@ export function NotificationsPanel() {
     }
     void load();
     return () => { active = false; };
-  }, []);
+  }, [locale]);
   async function markRead(id: string) {
     const supabase = getSupabaseBrowserClient() as any;
     const { error: e } = await supabase.from("notifications").update({ read_at: new Date().toISOString() }).eq("id", id);
