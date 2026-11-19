@@ -199,8 +199,8 @@ export function WriterEditor({ storyId }: { storyId: string }) {
         const marker = "/book-covers/";
         const previousPath = story.cover_url.includes(marker) ? story.cover_url.split(marker)[1]?.split("?")[0] : "";
         if (previousPath) {
-          // Replacing a cover should not leave the previous image orphaned in storage.
-          await supabase.storage.from("book-covers").remove([decodeURIComponent(previousPath)]);
+          // Best-effort cleanup: a storage cleanup failure must not undo a successful cover update.
+          try { await supabase.storage.from("book-covers").remove([decodeURIComponent(previousPath)]); } catch { /* Keep the newly saved cover active. */ }
         }
       }
       setStory(current => current ? { ...current, cover_url: urlData.publicUrl } : current);
