@@ -70,9 +70,14 @@ export function StoryDetail({ storyId }: { storyId: string }) {
     async function load() {
       try {
         const supabase = getSupabaseBrowserClient() as any;
-        const { data, error: storyError } = await supabase.from("stories")
-          .select("id,slug,title,synopsis,genre,language,author_id,published_at,cover_url,author_note,content_warnings,audience_rating")
-          .or(`id.eq.${storyId},slug.eq.${storyId}`).eq("status", "published").eq("visibility", "public").single();
+        const storyQuery = supabase.from("stories")
+          .select("id,slug,title,synopsis,genre,language,author_id,published_at,cover_url,author_note,content_warnings,audience_rating");
+        // The database id is a UUID while the public route also accepts a text slug.
+        // Never compare a slug to the UUID column: Postgres rejects that with HTTP 400.
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(storyId);
+        const lookup = isUuid ? storyQuery.eq("id", storyId) : storyQuery.eq("slug", storyId);
+        const { data, error: storyError } = await lookup
+          .eq("status", "published").eq("visibility", "public").single();
         if (storyError) throw storyError;
         const { data: authData } = await supabase.auth.getUser();
         if (authData?.user?.id) {
