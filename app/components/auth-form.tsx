@@ -5,7 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getSupabaseBrowserClient } from "../../lib/supabase/client";
+import { getAuthRedirectUrl, getSupabaseBrowserClient } from "../../lib/supabase/client";
 
 type AuthFormProps = { mode: "signup" | "login" };
 
@@ -45,7 +45,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           email: email.trim(),
           password,
           options: {
-            emailRedirectTo: window.location.origin + "/connexion",
+            emailRedirectTo: getAuthRedirectUrl("/connexion"),
             data: {
               username: cleanUsername,
               display_name: displayName.trim() || cleanUsername,
