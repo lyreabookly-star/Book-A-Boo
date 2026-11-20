@@ -3,7 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getSupabaseBrowserClient } from "../../lib/supabase/client";
+import { getAuthRedirectUrl, getSupabaseBrowserClient } from "../../lib/supabase/client";
 
 export function PasswordRecoveryForm({ mode }: { mode: "request" | "reset" }) {
   const router = useRouter();
@@ -37,7 +37,7 @@ export function PasswordRecoveryForm({ mode }: { mode: "request" | "reset" }) {
       const supabase = getSupabaseBrowserClient();
       if (mode === "request") {
         const { error: requestError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-          redirectTo: window.location.origin + "/reinitialiser-mot-de-passe",
+          redirectTo: getAuthRedirectUrl("/reinitialiser-mot-de-passe"),
         });
         if (requestError) throw requestError;
         setMessage("Si un compte correspond à cette adresse, un e-mail de récupération vient d’être envoyé. Pensez à vérifier vos courriers indésirables.");
