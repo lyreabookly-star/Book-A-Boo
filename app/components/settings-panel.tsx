@@ -286,6 +286,7 @@ export function SettingsPanel() {
         <div><strong>{readingStats.words.toLocaleString(locale)}</strong><small>Mots estimés lus</small></div>
         <div><strong>{readingStats.stories}</strong><small>Œuvres commencées</small></div>
         <div><strong>{readingStats.chapters}</strong><small>Chapitres suivis</small></div>
+        <div><strong>{readingStats.seconds > 0 ? Math.round(readingStats.words / (readingStats.seconds / 60)) : "—"}</strong><small>Vitesse moyenne (mots/min)</small></div>
       </div>
       <p className="settings-footnote">La vitesse moyenne en mots par minute sera affichée dès que suffisamment de données auront été recueillies. Le temps est compté uniquement lorsque la page est visible et que vous avez interagi récemment.</p>
     </section>
