@@ -34,6 +34,8 @@ export function SettingsPanel() {
   const [avatarPositionX, setAvatarPositionX] = useState(50);
   const [avatarPositionY, setAvatarPositionY] = useState(50);
   const [avatarSaving, setAvatarSaving] = useState(false);
+  const [readingTrackingEnabled, setReadingTrackingEnabled] = useState(true);
+  const [readingStats, setReadingStats] = useState({ words: 0, seconds: 0, stories: 0, chapters: 0 });
 
   useEffect(() => {
     if (!avatarPreviewUrl) return;
@@ -93,13 +95,15 @@ export function SettingsPanel() {
       const supabase = getSupabaseBrowserClient() as any;
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.replace("/connexion?next=%2Fparametres"); return; }
-      const [profile, privateProfile, prefs] = await Promise.all([
+      const [profile, privateProfile, prefs, readingPrefs, readingProgress] = await Promise.all([
         supabase.from("profiles").select("username,display_name,bio,avatar_url,is_public,show_library_on_profile,preferred_language").eq("id", user.id).maybeSingle(),
         supabase.from("profile_private").select("first_name,last_name").eq("user_id", user.id).maybeSingle(),
-        supabase.from("user_settings").select("theme,preferred_language,email_notifications,product_updates,notify_new_followers,notify_followed_author_stories,notify_story_comments,notify_story_reactions").eq("user_id", user.id).maybeSingle()
+        supabase.from("user_settings").select("theme,preferred_language,email_notifications,product_updates,notify_new_followers,notify_followed_author_stories,notify_story_comments,notify_story_reactions").eq("user_id", user.id).maybeSingle(),
+        supabase.from("user_reading_preferences").select("tracking_enabled").eq("user_id", user.id).maybeSingle(),
+        supabase.from("user_reading_progress").select("story_id,chapter_id,words_read,active_seconds").eq("user_id", user.id)
       ]);
       if (!active) return;
-      if (profile.error || privateProfile.error || prefs.error) setError("Certains réglages n'ont pas pu être chargés.");
+      if (profile.error || privateProfile.error || prefs.error || readingPrefs.error || readingProgress.error) setError("Certains réglages ou statistiques n'ont pas pu être chargés.");
       setUserId(user.id); setEmail(user.email ?? ""); setNewEmail(user.email ?? "");
       setUsername(profile.data?.username ?? "");
       setDisplayName(profile.data?.display_name ?? "");
@@ -109,6 +113,14 @@ export function SettingsPanel() {
       setShowLibrary(profile.data?.show_library_on_profile ?? true);
       setFirstName(privateProfile.data?.first_name ?? "");
       setLastName(privateProfile.data?.last_name ?? "");
+      setReadingTrackingEnabled(readingPrefs.data?.tracking_enabled ?? true);
+      const progressRows = readingProgress.data ?? [];
+      setReadingStats({
+        words: progressRows.reduce((total: number, row: any) => total + (row.words_read ?? 0), 0),
+        seconds: progressRows.reduce((total: number, row: any) => total + (row.active_seconds ?? 0), 0),
+        stories: new Set(progressRows.map((row: any) => row.story_id)).size,
+        chapters: progressRows.length
+      });
       const loadedSettings = { ...defaults, ...(prefs.data ?? {}), preferred_language: prefs.data?.preferred_language ?? profile.data?.preferred_language ?? "fr" } as Settings;
       setSettings(loadedSettings);
       setLocale(loadedSettings.preferred_language);
@@ -162,6 +174,16 @@ export function SettingsPanel() {
       if (p.error) throw p.error; if (pp.error) throw pp.error;
       setMessage("Votre profil et vos préférences sont enregistrés.");
     } catch (e) { setError(e instanceof Error ? e.message : "Enregistrement impossible."); }
+    finally { setSaving(false); }
+  }
+
+  async function saveReadingTracking() {
+    setSaving(true); setError(""); setMessage("");
+    try {
+      const { error: preferenceError } = await (getSupabaseBrowserClient() as any).from("user_reading_preferences").upsert({ user_id: userId, tracking_enabled: readingTrackingEnabled, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
+      if (preferenceError) throw preferenceError;
+      setMessage("Votre préférence de suivi de lecture est enregistrée.");
+    } catch (e) { setError(e instanceof Error ? e.message : "Impossible d'enregistrer ce réglage."); }
     finally { setSaving(false); }
   }
 
@@ -255,14 +277,27 @@ export function SettingsPanel() {
       <div className="settings-choice-row"><div><strong>Langue préférée</strong><small>Votre choix est enregistré dans votre compte</small></div><select value={settings.preferred_language} onChange={e=>update("preferred_language",e.target.value as Settings["preferred_language"])}><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option><option value="pt">Português</option></select></div>
       <button className="settings-save" onClick={savePreferences} disabled={saving}>{saving ? "Enregistrement…" : "Enregistrer mes préférences"}</button>
     </section>
+    <section className="settings-section reading-rhythm-settings">
+      <div className="settings-section-heading"><span>04 / LECTURE</span><h2>{locale === "en" ? "My reading rhythm" : locale === "es" ? "Mi ritmo de lectura" : locale === "pt" ? "Meu ritmo de leitura" : "Mon rythme de lecture"}</h2><p>{locale === "en" ? "Track your reading time and progress privately." : locale === "es" ? "Sigue tu tiempo y progreso de lectura de forma privada." : locale === "pt" ? "Acompanhe seu tempo e progresso de leitura de forma privada." : "Suivez votre temps et votre progression de lecture en toute confidentialité."}</p></div>
+      <label className="settings-toggle"><span><strong>{locale === "en" ? "Reading tracking" : locale === "es" ? "Seguimiento de lectura" : locale === "pt" ? "Acompanhamento de leitura" : "Suivi de lecture"}</strong><small>{locale === "en" ? "Save chapter position, active time and estimated words read. Your data stays private." : locale === "es" ? "Guarda la posición del capítulo, el tiempo activo y las palabras estimadas. Tus datos son privados." : locale === "pt" ? "Salva a posição do capítulo, o tempo ativo e as palavras estimadas. Seus dados são privados." : "Enregistre la position dans le chapitre, le temps actif et les mots estimés. Vos données restent privées."}</small></span><input type="checkbox" checked={readingTrackingEnabled} onChange={e=>setReadingTrackingEnabled(e.target.checked)}/></label>
+      <button type="button" className="settings-save" onClick={saveReadingTracking} disabled={saving}>{locale === "en" ? "Save reading settings" : locale === "es" ? "Guardar ajustes de lectura" : locale === "pt" ? "Salvar ajustes de leitura" : "Enregistrer le suivi de lecture"}</button>
+      <div className="reading-rhythm-stat-grid">
+        <div><strong>{Math.floor(readingStats.seconds / 3600)} h {Math.floor((readingStats.seconds % 3600) / 60)} min</strong><small>Temps de lecture actif</small></div>
+        <div><strong>{readingStats.words.toLocaleString(locale)}</strong><small>Mots estimés lus</small></div>
+        <div><strong>{readingStats.stories}</strong><small>Œuvres commencées</small></div>
+        <div><strong>{readingStats.chapters}</strong><small>Chapitres suivis</small></div>
+        <div><strong>{readingStats.seconds > 0 ? Math.round(readingStats.words / (readingStats.seconds / 60)) : "—"}</strong><small>Vitesse moyenne (mots/min)</small></div>
+      </div>
+      <p className="settings-footnote">La vitesse moyenne en mots par minute sera affichée dès que suffisamment de données auront été recueillies. Le temps est compté uniquement lorsque la page est visible et que vous avez interagi récemment.</p>
+    </section>
     <section className="settings-section">
-      <div className="settings-section-heading"><span>04 / CONFIDENTIALITÉ</span><h2>Ce que les autres voient</h2><p>Gardez le contrôle sur les informations visibles par les autres lecteurs.</p></div>
+      <div className="settings-section-heading"><span>05 / CONFIDENTIALITÉ</span><h2>Ce que les autres voient</h2><p>Gardez le contrôle sur les informations visibles par les autres lecteurs.</p></div>
       <label className="settings-toggle"><span><strong>Profil public</strong><small>Autoriser les autres lecteurs à consulter votre profil.</small></span><input type="checkbox" checked={isPublic} onChange={e=>setIsPublic(e.target.checked)}/></label>
       <label className="settings-toggle"><span><strong>Afficher ma bibliothèque sur mon profil</strong><small>Permettre aux visiteurs de voir les livres de votre bibliothèque.</small></span><input type="checkbox" checked={showLibrary} onChange={e=>setShowLibrary(e.target.checked)}/></label>
       <button type="button" className="settings-save" onClick={saveProfile} disabled={saving}>Enregistrer la confidentialité</button>
     </section>
     <section className="settings-section">
-      <div className="settings-section-heading"><span>05 / MESSAGES</span><h2>Notifications</h2><p>Choisissez les alertes que vous souhaitez recevoir sur Book-A-Boo.</p></div>
+      <div className="settings-section-heading"><span>06 / MESSAGES</span><h2>Notifications</h2><p>Choisissez les alertes que vous souhaitez recevoir sur Book-A-Boo.</p></div>
       <label className="settings-toggle"><span><strong>{locale === "en" ? "Email notifications (not available yet)" : locale === "es" ? "Notificaciones por correo (aún no disponibles)" : locale === "pt" ? "Notificações por e-mail (ainda indisponíveis)" : "Notifications par e-mail (pas encore disponibles)"}</strong><small>{locale === "en" ? "Email delivery is not connected yet. This option will be enabled when sending is implemented." : locale === "es" ? "El envío de correos aún no está conectado. Esta opción se activará cuando esté implementado." : locale === "pt" ? "O envio de e-mails ainda não está conectado. Esta opção será ativada quando estiver implementado." : "L’envoi d’e-mails n’est pas encore connecté. Cette option sera activée lorsque l’envoi sera disponible."}</small></span><input type="checkbox" checked={false} disabled aria-label={locale === "en" ? "Email notifications unavailable" : locale === "es" ? "Notificaciones por correo no disponibles" : locale === "pt" ? "Notificações por e-mail indisponíveis" : "Notifications par e-mail indisponibles"}/></label>
       <label className="settings-toggle"><span><strong>Nouveautés Book-A-Boo</strong><small>Recevoir les actualités et annonces de la plateforme.</small></span><input type="checkbox" checked={settings.product_updates} onChange={e=>update("product_updates",e.target.checked)}/></label>
       <label className="settings-toggle"><span><strong>Nouveaux abonnés</strong><small>Être averti lorsqu’un membre commence à vous suivre.</small></span><input type="checkbox" checked={settings.notify_new_followers} onChange={e=>update("notify_new_followers",e.target.checked)}/></label>
@@ -272,7 +307,7 @@ export function SettingsPanel() {
       <button className="settings-save" onClick={savePreferences} disabled={saving}>Enregistrer les notifications</button>
     </section>
     <section className="settings-section settings-security">
-      <div className="settings-section-heading"><span>06 / SÉCURITÉ</span><h2>Vos sessions</h2><p>Vous pouvez fermer votre compte sur tous les appareils connectés. Vous devrez vous reconnecter ensuite.</p></div>
+      <div className="settings-section-heading"><span>07 / SÉCURITÉ</span><h2>Vos sessions</h2><p>Vous pouvez fermer votre compte sur tous les appareils connectés. Vous devrez vous reconnecter ensuite.</p></div>
       <button className="settings-danger" onClick={signOutEverywhere} disabled={saving}>Me déconnecter de tous les appareils</button>
       <p className="settings-footnote">La suppression définitive du compte nécessite une procédure sécurisée distincte ; elle n'est pas proposée ici pour éviter toute suppression accidentelle.</p>
     </section>
