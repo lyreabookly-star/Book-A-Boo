@@ -10,7 +10,6 @@ import { useAppPreferences } from "./app-preferences-provider";
 const items = [
   { href: "/", label: "Accueil", icon: House },
   { href: "/explorer", label: "Explorer", icon: Compass },
-  { href: "/actualites", label: "Actualités", icon: Activity },
   { href: "/ecrire", label: "Écrire", icon: Feather },
   { href: "/profil", label: "Profil", icon: UserRound },
 ];
