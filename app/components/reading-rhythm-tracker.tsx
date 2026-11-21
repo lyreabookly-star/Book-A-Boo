@@ -13,6 +13,7 @@ function countWords(value: string) {
 export function ReadingRhythmTracker({ storyId, chapter, children }: Props) {
   const articleRef = useRef<HTMLDivElement>(null);
   const [enabled, setEnabled] = useState(false);
+  const enabledRef = useRef(false);
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState(0);
   const [activeSeconds, setActiveSeconds] = useState(0);
@@ -24,7 +25,7 @@ export function ReadingRhythmTracker({ storyId, chapter, children }: Props) {
     let baseSeconds = 0;
     let accumulatedSeconds = 0;
     let baseWords = 0;
-    let lastActivity = Date.now();
+    let lastActivity = 0;
     let lastTick = Date.now();
     let lastSavedAt = 0;
     let currentRatio = 0;
@@ -40,6 +41,7 @@ export function ReadingRhythmTracker({ storyId, chapter, children }: Props) {
       userId = auth.user.id;
       const isEnabled = preference?.tracking_enabled ?? true;
       setEnabled(isEnabled);
+      enabledRef.current = isEnabled;
       if (!isEnabled) { setReady(true); return; }
 
       const { data: saved } = await supabase.from("user_reading_progress")
@@ -75,7 +77,7 @@ export function ReadingRhythmTracker({ storyId, chapter, children }: Props) {
     }
 
     async function save() {
-      if (!userId || !enabled || document.visibilityState !== "visible") return;
+      if (!userId || !enabledRef.current || document.visibilityState !== "visible") return;
       const now = Date.now();
       const seconds = Math.floor(accumulatedSeconds);
       const words = Math.max(baseWords, Math.round(wordCount * currentRatio));
@@ -111,11 +113,11 @@ export function ReadingRhythmTracker({ storyId, chapter, children }: Props) {
       const now = Date.now();
       const elapsed = Math.min(15, Math.max(0, (now - lastTick) / 1000));
       lastTick = now;
-      if (document.visibilityState === "visible" && now - lastActivity < 60000 && userId && enabled) {
+      if (document.visibilityState === "visible" && now - lastActivity < 60000 && userId && enabledRef.current) {
         accumulatedSeconds += elapsed;
         setActiveSeconds(baseSeconds + Math.floor(accumulatedSeconds));
       }
-      if (userId && enabled && now - lastSavedAt >= 15000) void save();
+      if (userId && enabledRef.current && now - lastSavedAt >= 15000) void save();
     }, 5000);
     const onPageHide = () => { void save(); };
     window.addEventListener("pagehide", onPageHide);
@@ -131,7 +133,7 @@ export function ReadingRhythmTracker({ storyId, chapter, children }: Props) {
       window.removeEventListener("pagehide", onPageHide);
       void save();
     };
-  }, [storyId, chapter.id, chapter.chapter_number, chapter.content, wordCount, enabled]);
+  }, [storyId, chapter.id, chapter.chapter_number, chapter.content, wordCount]);
 
   const minutes = Math.floor(activeSeconds / 60);
   const seconds = activeSeconds % 60;
