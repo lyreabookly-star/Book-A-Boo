@@ -1719,3 +1719,17 @@ html[data-palette="frost"] .site-header-app .brand-logo {
 .interior-hero-compact h1{font-size:clamp(36px,4.5vw,56px);margin:13px 0 9px}
 .interior-hero-compact>p{font-size:13px;line-height:1.6}
 @media(max-width:620px){.interior-hero-compact{padding-top:27px;padding-bottom:12px}.interior-hero-compact h1{font-size:36px;margin:10px 0 7px}.interior-hero-compact>p{font-size:12px;line-height:1.5}}
+
+
+/* Mon rythme de lecture : indicateurs sobres, lisibles dans toutes les palettes. */
+.reading-rhythm-inline{margin:18px 0 12px;padding:13px 15px;border:1px solid var(--line);border-radius:10px;background:var(--surface,var(--paper));color:var(--ink)}
+.reading-rhythm-inline-top{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:12px;color:var(--muted)}
+.reading-rhythm-inline-top strong{font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+.reading-rhythm-track{height:6px;margin:9px 0 7px;overflow:hidden;border-radius:99px;background:var(--line)}
+.reading-rhythm-track span{display:block;height:100%;border-radius:inherit;background:var(--accent);transition:width .2s ease}
+.reading-rhythm-inline small{font-size:11px;color:var(--muted)}
+.reading-rhythm-stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0}
+.reading-rhythm-stat-grid>div{display:flex;flex-direction:column;gap:5px;min-width:0;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--surface,var(--paper))}
+.reading-rhythm-stat-grid strong{font-size:19px;line-height:1.25;color:var(--ink);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.reading-rhythm-stat-grid small{font-size:11px;color:var(--muted)}
+@media(min-width:700px){.reading-rhythm-stat-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
