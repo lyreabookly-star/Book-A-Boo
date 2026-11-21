@@ -1004,8 +1004,8 @@ html[data-palette][data-theme] .mobile-nav a.active {
 /* En mode sombre, conserver les logos lisibles même lorsqu'une palette est active. */
 html[data-theme="dark"][data-palette] .brand-logo,
 html[data-theme="dark"] .brand-logo {
-  filter:brightness(0) invert(1)!important;
-  -webkit-filter:brightness(0) invert(1)!important;
+  filter:none!important;
+  -webkit-filter:none!important;
   mix-blend-mode:normal!important;
   opacity:1!important;
 }
