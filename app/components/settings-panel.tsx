@@ -95,7 +95,7 @@ export function SettingsPanel() {
       const supabase = getSupabaseBrowserClient() as any;
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.replace("/connexion?next=%2Fparametres"); return; }
-      const [profile, privateProfile, prefs] = await Promise.all([
+      const [profile, privateProfile, prefs, readingPrefs, readingProgress] = await Promise.all([
         supabase.from("profiles").select("username,display_name,bio,avatar_url,is_public,show_library_on_profile,preferred_language").eq("id", user.id).maybeSingle(),
         supabase.from("profile_private").select("first_name,last_name").eq("user_id", user.id).maybeSingle(),
         supabase.from("user_settings").select("theme,preferred_language,email_notifications,product_updates,notify_new_followers,notify_followed_author_stories,notify_story_comments,notify_story_reactions").eq("user_id", user.id).maybeSingle(),
