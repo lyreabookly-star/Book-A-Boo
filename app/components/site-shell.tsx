@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Activity, Compass, Feather, House, UserRound, LogIn, ShieldCheck } from "lucide-react";
+import { Compass, Feather, House, UserRound, LogIn, ShieldCheck } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { InstallAppButton } from "./install-app-button";
 import { useAppPreferences } from "./app-preferences-provider";
