@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Activity, Compass, Feather, House, UserRound, LogIn, ShieldCheck } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../lib/supabase/client";
 import { InstallAppButton } from "./install-app-button";
+import { useAppPreferences } from "./app-preferences-provider";
 
 const items = [
   { href: "/", label: "Accueil", icon: House },
@@ -17,6 +18,7 @@ const items = [
 type HeaderProfile = { id: string; avatarUrl: string | null; displayName: string | null };
 
 export function SiteHeader({ active = "/", hideGuestActions = false }: { active?: string; hideGuestActions?: boolean }) {
+  const { theme } = useAppPreferences();
   const [profile, setProfile] = useState<HeaderProfile | null>(null);
   const [canManageEditorial, setCanManageEditorial] = useState(false);
   const [canManageAdministration, setCanManageAdministration] = useState(false);
@@ -80,7 +82,7 @@ export function SiteHeader({ active = "/", hideGuestActions = false }: { active?
 
   return <>
     <header className="site-header site-header-app">
-      <Link className="brand" href="/" aria-label="Book-A-Boo accueil"><img className="brand-logo" src="/book-a-boo-logo.svg" alt="Book-A-Boo" /></Link>
+      <Link className="brand" href="/" aria-label="Book-A-Boo accueil"><img className="brand-logo" src={theme === "dark" ? "/book-a-boo-logo-white.svg" : "/book-a-boo-logo.svg"} alt="Book-A-Boo" /></Link>
       <nav className="main-nav" aria-label="Navigation principale">
         {visibleItems.map(item => <Link key={item.href} className={active === item.href ? "active" : ""} href={item.href}>{item.label}</Link>)}
       </nav>
