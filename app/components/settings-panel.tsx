@@ -103,7 +103,7 @@ export function SettingsPanel() {
         supabase.from("user_reading_progress").select("story_id,chapter_id,words_read,active_seconds").eq("user_id", user.id)
       ]);
       if (!active) return;
-      if (profile.error || privateProfile.error || prefs.error) setError("Certains réglages n'ont pas pu être chargés.");
+      if (profile.error || privateProfile.error || prefs.error || readingPrefs.error || readingProgress.error) setError("Certains réglages ou statistiques n'ont pas pu être chargés.");
       setUserId(user.id); setEmail(user.email ?? ""); setNewEmail(user.email ?? "");
       setUsername(profile.data?.username ?? "");
       setDisplayName(profile.data?.display_name ?? "");
