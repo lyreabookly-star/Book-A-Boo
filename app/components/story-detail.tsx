@@ -102,14 +102,28 @@ export function StoryDetail({ storyId }: { storyId: string }) {
           const loadedChapters = chapterResult.data ?? [];
           setChapters(loadedChapters);
           let resumeChapter: Chapter | null = null;
-          try {
-            const progress = window.localStorage.getItem("bab-reading-progress:" + data.id);
-            if (progress) {
-              const parsed = JSON.parse(progress);
-              resumeChapter = loadedChapters.find((item: Chapter) => item.id === parsed.chapterId) ?? null;
+          if (authData?.user?.id) {
+            const { data: savedProgress } = await supabase.from("user_reading_progress")
+              .select("chapter_id")
+              .eq("user_id", authData.user.id)
+              .eq("story_id", data.id)
+              .order("updated_at", { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            if (savedProgress?.chapter_id) {
+              resumeChapter = loadedChapters.find((item: Chapter) => item.id === savedProgress.chapter_id) ?? null;
             }
-          } catch {
-            // Ignore unavailable or malformed local reading progress.
+          }
+          if (!resumeChapter) {
+            try {
+              const progress = window.localStorage.getItem("bab-reading-progress:" + data.id);
+              if (progress) {
+                const parsed = JSON.parse(progress);
+                resumeChapter = loadedChapters.find((item: Chapter) => item.id === parsed.chapterId) ?? null;
+              }
+            } catch {
+              // Ignore unavailable or malformed local reading progress.
+            }
           }
           setActiveChapter(resumeChapter ?? loadedChapters[0] ?? null);
         }
