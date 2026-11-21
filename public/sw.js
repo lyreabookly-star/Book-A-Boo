@@ -1,4 +1,4 @@
-const CACHE_NAME = "book-a-boo-static-v3";
+const CACHE_NAME = "book-a-boo-static-v4";
 const OFFLINE_URL = "/offline.html";
 
 self.addEventListener("install", (event) => {
@@ -44,7 +44,8 @@ self.addEventListener("fetch", (event) => {
   // behind an old cached image.
   const isBrandAsset =
     url.pathname.startsWith("/icons/") ||
-    url.pathname === "/book-a-boo-logo.svg";
+    url.pathname === "/book-a-boo-logo.svg" ||
+    url.pathname === "/book-a-boo-logo-white.svg";
 
   if (isBrandAsset) {
     event.respondWith(
