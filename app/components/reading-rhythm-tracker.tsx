@@ -7,7 +7,7 @@ type Chapter = { id: string; chapter_number: number; content: string };
 type Props = { storyId: string; chapter: Chapter; children: ReactNode };
 
 function countWords(value: string) {
-  return value.replace(/<[^>]*>/g, " ").trim().split(/\\s+/).filter(Boolean).length;
+  return value.replace(/<[^>]*>/g, " ").trim().split(/\s+/).filter(Boolean).length;
 }
 
 export function ReadingRhythmTracker({ storyId, chapter, children }: Props) {
@@ -60,9 +60,10 @@ export function ReadingRhythmTracker({ storyId, chapter, children }: Props) {
           const node = articleRef.current;
           if (!node) return;
           const top = node.getBoundingClientRect().top + window.scrollY;
-          window.scrollTo({ top: top + Math.max(0, node.offsetHeight - window.innerHeight) * currentRatio, behavior: "instant" });
+          window.scrollTo({ top: top + Math.max(0, node.offsetHeight - window.innerHeight) * currentRatio, behavior: "auto" });
         });
       }
+      lastActivity = Date.now();
       setReady(true);
     }
 
@@ -137,6 +138,8 @@ export function ReadingRhythmTracker({ storyId, chapter, children }: Props) {
 
   const minutes = Math.floor(activeSeconds / 60);
   const seconds = activeSeconds % 60;
+  const estimatedSpeed = activeSeconds > 0 ? Math.round((wordCount * progress / 100) / (activeSeconds / 60)) : 0;
+  const remainingMinutes = estimatedSpeed > 0 ? Math.ceil((wordCount * (1 - progress / 100)) / estimatedSpeed) : null;
 
   return (
     <div className="reading-rhythm-wrap">
@@ -144,7 +147,7 @@ export function ReadingRhythmTracker({ storyId, chapter, children }: Props) {
         <div className="reading-rhythm-inline" aria-live="polite">
           <div className="reading-rhythm-inline-top"><span>Progression du chapitre</span><strong>{progress}%</strong></div>
           <div className="reading-rhythm-track"><span style={{ width: progress + "%" }} /></div>
-          <small>Temps de lecture actif : {minutes} min {seconds.toString().padStart(2, "0")} s</small>
+          <small>Temps actif : {minutes} min {seconds.toString().padStart(2, "0")} s · Vitesse estimée : {estimatedSpeed || "—"} mots/min · Temps restant : {remainingMinutes === null ? "calcul en cours" : remainingMinutes + " min"}</small>
         </div>
       )}
       <div ref={articleRef}>{children}</div>
