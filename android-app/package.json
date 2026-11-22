@@ -1,0 +1,19 @@
+{
+  "name": "book-a-boo-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Android application shell for Book-A-Boo",
+  "scripts": {
+    "android:sync": "cap sync android",
+    "android:open": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "7.4.3",
+    "@capacitor/core": "7.4.3",
+    "@capacitor/splash-screen": "7.0.3"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "4.0.0",
+    "@capacitor/cli": "7.4.3"
+  }
+}
