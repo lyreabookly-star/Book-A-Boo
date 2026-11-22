@@ -1,4 +1,4 @@
-const CACHE_NAME = "book-a-boo-static-v4";
+const CACHE_NAME = "book-a-boo-static-v5";
 const OFFLINE_URL = "/offline.html";
 
 self.addEventListener("install", (event) => {

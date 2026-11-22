@@ -1752,3 +1752,13 @@ html[data-theme="light"] .site-header .brand-logo {
   opacity:1!important;
   background:transparent!important;
 }
+
+/* Le logo possède déjà une version claire et une version sombre.
+   Ne jamais recolorer le SVG par CSS : cela écrase ses couleurs natives. */
+.site-header-app .brand-logo,
+.site-header .brand-logo {
+  filter: none !important;
+  -webkit-filter: none !important;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+}
