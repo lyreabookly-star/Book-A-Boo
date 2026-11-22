@@ -16,8 +16,8 @@
   "backgroundColor": "#f7f6f2",
   "enableNotifications": false,
   "startUrl": "/",
-  "iconUrl": "https://book-a-boo-mu.vercel.app/icons/icon-512.png",
-  "maskableIconUrl": "https://book-a-boo-mu.vercel.app/icons/icon-512-maskable.png",
+  "iconUrl": "https://raw.githubusercontent.com/lyreabookly-star/Book-A-Boo/main/public/icons/icon-512.png",
+  "maskableIconUrl": "https://raw.githubusercontent.com/lyreabookly-star/Book-A-Boo/main/public/icons/icon-512-maskable.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "./android.keystore",
