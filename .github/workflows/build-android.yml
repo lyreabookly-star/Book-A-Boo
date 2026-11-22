@@ -37,6 +37,13 @@ jobs:
           accept-android-sdk-licenses: true
           packages: platform-tools platforms;android-36 build-tools;36.0.0
 
+      - name: Add legacy SDK tools path expected by Bubblewrap
+        run: |
+          if [ ! -e "$ANDROID_HOME/tools" ]; then
+            ln -s "$ANDROID_HOME/cmdline-tools/latest" "$ANDROID_HOME/tools"
+          fi
+          test -x "$ANDROID_HOME/tools/bin/sdkmanager"
+
       - name: Prepare Android signing key
         working-directory: android
         env:
