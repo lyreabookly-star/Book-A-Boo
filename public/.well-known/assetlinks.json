@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.bookaboo.app",
+      "sha256_cert_fingerprints": ["05:C7:3F:7C:E9:D5:B0:5E:64:86:6F:F0:37:C1:34:4C:4B:3E:90:D1:C1:75:42:05:2C:3A:80:6B:29:1F:B7:2B"]
+    }
+  }
+]
