@@ -35,3 +35,16 @@ Nature du contrôle : lecture seule. Aucune donnée, politique, table ou migrati
 ## Prochaine étape sûre
 
 Créer une référence de schéma à partir de l'état réel de la base et réconcilier l'historique Git avec les 23 versions déjà appliquées, sans modifier la base de production. Toute correction SQL devra être une nouvelle migration, limitée, relue et testée avant application.
+
+
+## Avis Supabase complémentaires
+
+### Sécurité
+- L'avis de sécurité actuel signale uniquement `auth_leaked_password_protection` : la protection contre les mots de passe compromis est désactivée.
+- Il s'agit d'un réglage Auth à traiter dans les paramètres du projet. Ne pas modifier le forfait ni activer une option payante sans validation du propriétaire.
+
+### Performance
+- Supabase signale 22 index non utilisés et 11 cas de politiques permissives multiples.
+- Les index non utilisés ne doivent pas être supprimés sur cette seule base : le projet est encore jeune et ces index peuvent devenir utiles avec la croissance.
+- Les politiques multiples correspondent notamment à des accès volontairement alternatifs (propriétaire, public, administrateur). Leur fusion peut changer la logique d'accès ; aucune fusion automatique n'a été appliquée.
+- Aucun changement de schéma n'a été effectué à la suite de ces avis.
