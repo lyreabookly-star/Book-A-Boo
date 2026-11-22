@@ -1,11 +1,19 @@
-const CACHE_NAME = "book-a-boo-static-v5";
+const CACHE_NAME = "book-a-boo-static-v6";
 const OFFLINE_URL = "/offline.html";
+const BRAND_ASSETS = [
+  OFFLINE_URL,
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/icon-512-maskable.png",
+  "/icons/apple-touch-icon.png",
+];
 
 self.addEventListener("install", (event) => {
-  // Do not let one missing optional asset break service-worker installation.
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.add(OFFLINE_URL).catch(() => undefined))
+      .then((cache) => Promise.all(
+        BRAND_ASSETS.map((asset) => cache.add(asset).catch(() => undefined))
+      ))
       .then(() => self.skipWaiting())
   );
 });
@@ -40,8 +48,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Always refresh the app icons and logo so a new release cannot be hidden
-  // behind an old cached image.
+  // Refresh brand assets first, with a cached copy available offline.
   const isBrandAsset =
     url.pathname.startsWith("/icons/") ||
     url.pathname === "/book-a-boo-logo.svg" ||

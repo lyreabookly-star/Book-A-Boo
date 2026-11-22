@@ -13,15 +13,21 @@ export function InstallAppButton() {
   const [installed, setInstalled] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [ios, setIos] = useState(false);
+  const [android, setAndroid] = useState(false);
 
   useEffect(() => {
     const installWindow = window as Window & { __BAB_DEFERRED_INSTALL_PROMPT?: InstallPromptEvent | null };
     if (installWindow.__BAB_DEFERRED_INSTALL_PROMPT) setInstallEvent(installWindow.__BAB_DEFERRED_INSTALL_PROMPT);
+
     const standalone = window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia("(display-mode: fullscreen)").matches ||
       (navigator as Navigator & { standalone?: boolean }).standalone === true;
     setInstalled(standalone);
+
     const ua = navigator.userAgent;
     setIos(/iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+    setAndroid(/Android/i.test(ua));
+
     const onPrompt = (event: Event) => {
       event.preventDefault();
       const promptEvent = event as InstallPromptEvent;
@@ -37,6 +43,7 @@ export function InstallAppButton() {
       installWindow.__BAB_DEFERRED_INSTALL_PROMPT = null;
       setHelpOpen(false);
     };
+
     window.addEventListener("beforeinstallprompt", onPrompt);
     window.addEventListener("babinstallpromptready", onPromptReady);
     window.addEventListener("appinstalled", onInstalled);
@@ -48,14 +55,22 @@ export function InstallAppButton() {
   }, []);
 
   async function install() {
-    if (installEvent) {
-      await installEvent.prompt();
-      await installEvent.userChoice;
-      setInstallEvent(null);
-      (window as Window & { __BAB_DEFERRED_INSTALL_PROMPT?: InstallPromptEvent | null }).__BAB_DEFERRED_INSTALL_PROMPT = null;
+    if (!installEvent) {
+      setHelpOpen(true);
       return;
     }
-    setHelpOpen(true);
+
+    try {
+      await installEvent.prompt();
+      const choice = await installEvent.userChoice;
+      if (choice.outcome === "accepted") {
+        setInstalled(true);
+        setHelpOpen(false);
+      }
+    } finally {
+      setInstallEvent(null);
+      (window as Window & { __BAB_DEFERRED_INSTALL_PROMPT?: InstallPromptEvent | null }).__BAB_DEFERRED_INSTALL_PROMPT = null;
+    }
   }
 
   if (installed) return null;
@@ -74,10 +89,12 @@ export function InstallAppButton() {
             <h2 id="bab-install-title">Installer Book-A-Boo</h2>
             {ios ? (
               <p>Dans Safari, appuie sur <strong>Partager</strong>, puis sur <strong>Sur l’écran d’accueil</strong> et confirme avec <strong>Ajouter</strong>.</p>
+            ) : android ? (
+              <p>Dans Chrome, ouvre le menu <strong>⋮</strong> et choisis <strong>Installer l’application</strong> (ou <strong>Installer Book-A-Boo</strong>). Évite <strong>Créer un raccourci</strong> ou <strong>Ajouter à l’écran d’accueil</strong> si Chrome propose aussi l’installation : ces options peuvent créer un simple raccourci Chrome.</p>
             ) : (
-              <p>Si l’installation directe n’est pas proposée par ton navigateur, ouvre son menu et choisis <strong>Installer l’application</strong> ou <strong>Ajouter à l’écran d’accueil</strong>, si cette option est disponible.</p>
+              <p>Ouvre le menu de ton navigateur et choisis <strong>Installer Book-A-Boo</strong> ou <strong>Installer l’application</strong>, si cette option est disponible.</p>
             )}
-            <p className="bab-install-note">Tu peux aussi utiliser Book-A-Boo directement dans ton navigateur, sans rien installer.</p>
+            <p className="bab-install-note">Après l’installation, l’icône Book-A-Boo doit ouvrir l’application directement, sans passer par un onglet Chrome.</p>
             <button className="bab-install-dismiss" type="button" onClick={() => setHelpOpen(false)}>J’ai compris</button>
           </section>
         </div>
