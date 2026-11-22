@@ -19,8 +19,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: android-app/package.json
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -40,6 +38,12 @@ jobs:
             https://book-a-boo-mu.vercel.app/icons/icon-512.png \
             --output assets/logo.png
           file assets/logo.png
+
+      - name: Prepare local web fallback directory
+        working-directory: android-app
+        run: |
+          mkdir -p www
+          printf '<!doctype html><html lang="fr"><meta charset="utf-8"><title>Book-A-Boo</title><body>Connexion à Book-A-Boo…</body></html>' > www/index.html
 
       - name: Generate Android project
         working-directory: android-app
