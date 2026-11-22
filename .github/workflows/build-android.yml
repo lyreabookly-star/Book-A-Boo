@@ -79,6 +79,26 @@ jobs:
           printf '{"jdkPath":"%s","androidSdkPath":"%s"}\n' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.bubblewrap/config.json"
           cat "$HOME/.bubblewrap/config.json"
 
+      - name: Regenerate valid Android PNG icons from BAB SVG artwork
+        run: |
+          npm install --no-save --no-audit --no-fund @resvg/resvg-js@2.6.2
+          node <<'NODE'
+          const fs = require('node:fs');
+          const { Resvg } = require('@resvg/resvg-js');
+          const svg = fs.readFileSync('public/icons/icon-512.svg', 'utf8');
+          const png = new Resvg(svg, { fitTo: { mode: 'width', value: 512 } }).render().asPng();
+          fs.writeFileSync('public/icons/icon-512.png', png);
+          fs.writeFileSync('public/icons/icon-512-maskable.png', png);
+          console.log('Generated valid 512x512 BAB PNG icons.');
+          NODE
+          git add public/icons/icon-512.png public/icons/icon-512-maskable.png
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Regenerate valid Book-A-Boo Android icons"
+            git push
+          fi
+
       - name: Generate Android project
         working-directory: android
         run: bubblewrap update --skipVersionUpgrade
