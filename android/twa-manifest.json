@@ -1,6 +1,6 @@
 {
   "packageId": "com.bookaboo.app",
-  "host": "book-a-boo-lyreabookly-2697.vercel.app",
+  "host": "book-a-boo-mu.vercel.app",
   "name": "Book-A-Boo",
   "launcherName": "BAB",
   "display": "standalone",
@@ -16,8 +16,8 @@
   "backgroundColor": "#f7f6f2",
   "enableNotifications": false,
   "startUrl": "/",
-  "iconUrl": "https://book-a-boo-lyreabookly-2697.vercel.app/icons/icon-512.png",
-  "maskableIconUrl": "https://book-a-boo-lyreabookly-2697.vercel.app/icons/icon-512-maskable.png",
+  "iconUrl": "https://book-a-boo-mu.vercel.app/icons/icon-512.png",
+  "maskableIconUrl": "https://book-a-boo-mu.vercel.app/icons/icon-512-maskable.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "./android.keystore",
@@ -26,7 +26,7 @@
   "appVersionCode": 1,
   "appVersion": "1.0.0",
   "shortcuts": [],
-  "webManifestUrl": "https://book-a-boo-lyreabookly-2697.vercel.app/manifest.webmanifest",
+  "webManifestUrl": "https://book-a-boo-mu.vercel.app/manifest.webmanifest",
   "fallbackType": "customtabs",
   "features": {},
   "enableSiteSettingsShortcut": true,
