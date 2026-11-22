@@ -32,7 +32,7 @@ jobs:
           accept-android-sdk-licenses: true
           packages: platform-tools platforms;android-36 build-tools;36.0.0
 
-      - name: Restore permanent Android signing key
+      - name: Prepare Android signing key
         working-directory: android
         env:
           KEYSTORE_BASE64: ${{ secrets.BAB_ANDROID_KEYSTORE_BASE64 }}
@@ -40,13 +40,30 @@ jobs:
           EXPECTED_SHA256: ${{ secrets.BAB_ANDROID_CERT_SHA256 }}
         run: |
           set -euo pipefail
-          test -n "$KEYSTORE_BASE64" || (echo "Missing BAB_ANDROID_KEYSTORE_BASE64 secret" && exit 1)
-          test -n "$KEYSTORE_PASSWORD" || (echo "Missing BAB_ANDROID_KEYSTORE_PASSWORD secret" && exit 1)
-          test -n "$EXPECTED_SHA256" || (echo "Missing BAB_ANDROID_CERT_SHA256 secret" && exit 1)
-          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > android.keystore
-          ACTUAL_SHA256=$(keytool -list -v -keystore android.keystore -alias android -storepass "$KEYSTORE_PASSWORD" | awk -F': ' '/SHA256:/{print $2; exit}')
-          test "$ACTUAL_SHA256" = "$EXPECTED_SHA256" || (echo "Signing certificate fingerprint mismatch" && exit 1)
-          echo "Permanent signing key restored and verified."
+          if [ -n "$KEYSTORE_BASE64" ] && [ -n "$KEYSTORE_PASSWORD" ] && [ -n "$EXPECTED_SHA256" ]; then
+            printf '%s' "$KEYSTORE_BASE64" | base64 --decode > android.keystore
+            ACTUAL_SHA256=$(keytool -list -v -keystore android.keystore -alias android -storepass "$KEYSTORE_PASSWORD" | awk -F': ' '/SHA256:/{print $2; exit}' | tr -d '\r')
+            test "$ACTUAL_SHA256" = "$EXPECTED_SHA256" || (echo "Signing certificate fingerprint mismatch" && exit 1)
+            BAB_KEYSTORE_PASSWORD="$KEYSTORE_PASSWORD"
+            BAB_CERT_SHA256="$EXPECTED_SHA256"
+            BAB_SIGNING_MODE="persistent"
+            echo "Persistent signing key restored and verified."
+          else
+            echo "::warning::No permanent signing secrets configured. Generating a temporary beta key; future APK updates will require uninstalling the previous beta first."
+            BAB_KEYSTORE_PASSWORD=$(openssl rand -hex 24)
+            keytool -genkeypair -noprompt -v \
+              -keystore android.keystore \
+              -alias android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "$BAB_KEYSTORE_PASSWORD" \
+              -keypass "$BAB_KEYSTORE_PASSWORD" \
+              -dname "CN=Book-A-Boo, OU=Android, O=Book-A-Boo, L=Abidjan, ST=Abidjan, C=CI"
+            BAB_CERT_SHA256=$(keytool -list -v -keystore android.keystore -alias android -storepass "$BAB_KEYSTORE_PASSWORD" | awk -F': ' '/SHA256:/{print $2; exit}' | tr -d '\r')
+            BAB_SIGNING_MODE="temporary-beta"
+          fi
+          echo "BAB_KEYSTORE_PASSWORD=$BAB_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "BAB_CERT_SHA256=$BAB_CERT_SHA256" >> "$GITHUB_ENV"
+          echo "BAB_SIGNING_MODE=$BAB_SIGNING_MODE" >> "$GITHUB_ENV"
 
       - name: Install Bubblewrap
         run: npm install --global @bubblewrap/cli
@@ -58,13 +75,13 @@ jobs:
       - name: Build signed APK
         working-directory: android
         env:
-          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.BAB_ANDROID_KEYSTORE_PASSWORD }}
-          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.BAB_ANDROID_KEYSTORE_PASSWORD }}
-        run: bubblewrap build --skipPwaValidation
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.BAB_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ env.BAB_KEYSTORE_PASSWORD }}
+        run: bubblewrap build --skipPwaValidation --signingKeyPath=./android.keystore --signingKeyAlias=android
 
       - name: Generate Digital Asset Links
         env:
-          EXPECTED_SHA256: ${{ secrets.BAB_ANDROID_CERT_SHA256 }}
+          EXPECTED_SHA256: ${{ env.BAB_CERT_SHA256 }}
         run: |
           set -euo pipefail
           mkdir -p public/.well-known
@@ -87,14 +104,25 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/.well-known/assetlinks.json
           if ! git diff --cached --quiet; then
-            git commit -m "Publish permanent Android app verification"
+            git commit -m "Publish Android app verification fingerprint"
             git push
+          fi
+
+      - name: Prepare APK artifact
+        run: |
+          mkdir -p android-release
+          cp android/app-release-signed.apk android-release/Book-A-Boo.apk
+          cp public/.well-known/assetlinks.json android-release/assetlinks.json
+          printf '%s\n' "$BAB_CERT_SHA256" > android-release/certificate-sha256.txt
+          printf '%s\n' "$BAB_SIGNING_MODE" > android-release/signing-mode.txt
+          if [ "$BAB_SIGNING_MODE" = "temporary-beta" ]; then
+            printf '%s\n' "Beta build only. A later beta build may have a different signature; uninstall this beta before installing its replacement." > android-release/INSTALL-NOTES.txt
           fi
 
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
           name: Book-A-Boo-Android-APK
-          path: android/app-release-signed.apk
+          path: android-release/
           if-no-files-found: error
           retention-days: 14
